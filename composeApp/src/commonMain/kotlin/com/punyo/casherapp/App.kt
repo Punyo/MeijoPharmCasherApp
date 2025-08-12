@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
@@ -61,7 +59,6 @@ import meijopharmcasherapp.composeapp.generated.resources.nav_home
 import meijopharmcasherapp.composeapp.generated.resources.nav_profile
 import meijopharmcasherapp.composeapp.generated.resources.nav_settings
 import meijopharmcasherapp.composeapp.generated.resources.nav_transactions
-import meijopharmcasherapp.composeapp.generated.resources.profile
 import org.jetbrains.compose.resources.stringResource
 
 data class DrawerItem(
@@ -100,7 +97,7 @@ fun DrawerContent(
 fun ResponsiveNavigationDrawer(
     drawerItems: List<DrawerItem>,
     selectedItem: String,
-    onItemClick: (String) -> Unit = {},
+    onItemClick: (String) -> Unit,
     content: @Composable (showMenuButton: Boolean, onMenuClick: () -> Unit) -> Unit,
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -177,6 +174,10 @@ fun App() {
         ResponsiveNavigationDrawer(
             drawerItems = drawerItems,
             selectedItem = selectedItem,
+            onItemClick = { item ->
+                @Suppress("AssignedValueIsNeverRead")
+                selectedItem = item
+            },
         ) { showMenuButton, onMenuClick ->
             MainContent(
                 selectedItem = selectedItem,
@@ -197,13 +198,6 @@ fun DrawerHeader() {
                 .padding(16.dp),
         horizontalAlignment = Alignment.Start,
     ) {
-        Icon(
-            imageVector = Icons.Filled.AccountCircle,
-            contentDescription = stringResource(Res.string.profile),
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.onPrimary,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(Res.string.app_name),
             style = MaterialTheme.typography.headlineSmall,
