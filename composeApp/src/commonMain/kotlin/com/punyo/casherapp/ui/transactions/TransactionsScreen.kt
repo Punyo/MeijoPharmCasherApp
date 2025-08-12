@@ -8,30 +8,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.nav_transactions
+import meijopharmcasherapp.composeapp.generated.resources.transactions_description
+import meijopharmcasherapp.composeapp.generated.resources.transactions_title
 import org.jetbrains.compose.resources.stringResource
-import casherapplication.composeapp.generated.resources.Res
-import casherapplication.composeapp.generated.resources.*
 
 @Composable
 fun TransactionsScreen() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = Icons.Filled.AccountBalance,
             contentDescription = stringResource(Res.string.nav_transactions),
             modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = stringResource(Res.string.transactions_title),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
         )
         Text(
             text = stringResource(Res.string.transactions_description),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

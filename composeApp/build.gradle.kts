@@ -5,12 +5,14 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.ktlint)
 }
 
 kotlin {
     jvm("desktop")
-    
+
     sourceSets {
+        @Suppress("unused")
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
@@ -22,14 +24,18 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation("org.jetbrains.compose.material3.adaptive:adaptive:1.1.2")
+                implementation(libs.compose.material3.adaptive)
             }
         }
+
+        @Suppress("unused")
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
             }
         }
+
+        @Suppress("unused")
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -38,7 +44,6 @@ kotlin {
         }
     }
 }
-
 
 compose.desktop {
     application {
