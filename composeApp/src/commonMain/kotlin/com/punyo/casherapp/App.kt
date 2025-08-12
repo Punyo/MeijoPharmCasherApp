@@ -16,13 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import casherapplication.composeapp.generated.resources.Res
-import casherapplication.composeapp.generated.resources.*
 import com.punyo.casherapp.ui.home.HomeScreen
 import com.punyo.casherapp.ui.transactions.TransactionsScreen
 import com.punyo.casherapp.ui.settings.SettingsScreen
 import com.punyo.casherapp.ui.profile.ProfileScreen
 import com.punyo.casherapp.ui.about.AboutScreen
+import meijopharmcasherapp.composeapp.generated.resources.*
 
 data class DrawerItem(
     val icon: ImageVector,
