@@ -97,12 +97,12 @@ fun ProductScreen() {
         }
     }
     if (showAddProductDialog) {
-//        AddProductDialog(
-//            onDismiss = { showAddProductDialog = false },
-//            onSaveClick = { name, qr, price, stock ->
-//                // TODO: 商品保存処理
-//            },
-//        )
+        AddProductDialog(
+            onDismiss = { showAddProductDialog = false },
+            onSaveClick = { name, qr, price, stock ->
+                // TODO: 商品保存処理
+            },
+        )
     }
 }
 
