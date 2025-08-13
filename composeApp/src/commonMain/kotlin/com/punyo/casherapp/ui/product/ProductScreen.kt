@@ -33,16 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.punyo.casherapp.data.product.model.ProductDataModel
 import org.koin.compose.koinInject
-
-data class Product(
-    val id: String,
-    val name: String,
-    val barcode: String,
-    val price: Int,
-//    val category: String,
-    val stock: Int,
-)
 
 @Composable
 fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
@@ -100,10 +92,10 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
 
 @Composable
 private fun ProductList(
-    products: List<Product>,
+    products: List<ProductDataModel>,
     searchText: String,
-    onProductClick: (Product) -> Unit,
-    onProductMenuClick: (Product) -> Unit,
+    onProductClick: (ProductDataModel) -> Unit,
+    onProductMenuClick: (ProductDataModel) -> Unit,
     onClearSearch: () -> Unit,
 ) {
     if (products.isEmpty()) {
@@ -130,7 +122,7 @@ private fun ProductList(
 
 @Composable
 private fun ProductItem(
-    product: Product,
+    product: ProductDataModel,
     onClick: () -> Unit,
     onMenuClick: () -> Unit,
 ) {

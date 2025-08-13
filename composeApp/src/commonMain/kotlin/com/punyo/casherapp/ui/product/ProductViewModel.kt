@@ -1,6 +1,7 @@
 package com.punyo.casherapp.ui.product
 
 import androidx.lifecycle.ViewModel
+import com.punyo.casherapp.data.product.model.ProductDataModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -9,11 +10,11 @@ import kotlin.uuid.Uuid
 
 data class ProductUiState(
     val searchText: String = "",
-    val products: List<Product> = emptyList(),
+    val products: List<ProductDataModel> = emptyList(),
     val showAddProductDialog: Boolean = false,
     val isLoading: Boolean = false,
 ) {
-    val filteredProducts: List<Product> =
+    val filteredProducts: List<ProductDataModel> =
         if (searchText.isBlank()) {
             products
         } else {
@@ -52,7 +53,7 @@ class ProductViewModel : ViewModel() {
         stock: Int,
     ) {
         val newProduct =
-            Product(
+            ProductDataModel(
                 id = Uuid.random().toString(),
                 name = name,
                 barcode = barcode,
@@ -66,11 +67,11 @@ class ProductViewModel : ViewModel() {
         hideAddProductDialog()
     }
 
-    fun onProductClick(product: Product) {
+    fun onProductClick(product: ProductDataModel) {
         // TODO: 商品詳細画面への遷移
     }
 
-    fun onProductMenuClick(product: Product) {
+    fun onProductMenuClick(product: ProductDataModel) {
         // TODO: 商品メニュー表示
     }
 
