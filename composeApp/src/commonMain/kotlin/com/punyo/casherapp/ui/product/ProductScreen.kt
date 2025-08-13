@@ -25,36 +25,28 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.koin.compose.koinInject
 
-// 仮のデータ型
 data class Product(
     val id: String,
     val name: String,
     val barcode: String,
     val price: Int,
-    val category: String,
+//    val category: String,
     val stock: Int,
 )
 
 @Composable
-fun ProductScreen() {
-    var searchText by remember { mutableStateOf("") }
-    var showAddProductDialog by rememberSaveable { mutableStateOf(false) }
-
-    // 仮の商品データ（空リスト）
-    val products = remember { emptyList<Product>() }
+fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -68,23 +60,24 @@ fun ProductScreen() {
         ) {
             // ヘッダー部分
             ProductHeader(
-                searchText = searchText,
-                onSearchTextChange = { searchText = it },
-                onBarcodeClick = { /* TODO: バーコードスキャン */ },
-                onMenuClick = { /* TODO: メニュー表示 */ },
+                searchText = uiState.searchText,
+                onSearchTextChange = viewModel::updateSearchText,
+                onBarcodeClick = viewModel::onBarcodeClick,
+                onMenuClick = viewModel::onMenuClick,
             )
 
             // 商品一覧エリア
             ProductList(
-                products = products,
-                searchText = searchText,
-                onProductClick = { /* TODO: 商品詳細画面への遷移 */ },
-                onProductMenuClick = { /* TODO: 商品メニュー表示 */ },
+                products = uiState.filteredProducts,
+                searchText = uiState.searchText,
+                onProductClick = viewModel::onProductClick,
+                onProductMenuClick = viewModel::onProductMenuClick,
+                onClearSearch = viewModel::clearSearch,
             )
         }
 
         FloatingActionButton(
-            onClick = { showAddProductDialog = true },
+            onClick = viewModel::showAddProductDialog,
             modifier =
                 Modifier
                     .align(Alignment.BottomEnd)
@@ -96,12 +89,11 @@ fun ProductScreen() {
             )
         }
     }
-    if (showAddProductDialog) {
+
+    if (uiState.showAddProductDialog) {
         AddProductDialog(
-            onDismiss = { showAddProductDialog = false },
-            onSaveClick = { name, qr, price, stock ->
-                // TODO: 商品保存処理
-            },
+            onDismiss = viewModel::hideAddProductDialog,
+            onSaveClick = viewModel::addProduct,
         )
     }
 }
@@ -112,12 +104,13 @@ private fun ProductList(
     searchText: String,
     onProductClick: (Product) -> Unit,
     onProductMenuClick: (Product) -> Unit,
+    onClearSearch: () -> Unit,
 ) {
     if (products.isEmpty()) {
         // 空状態表示
         EmptyState(
             searchText = searchText,
-            onClearSearch = { /* TODO: 検索クリア */ },
+            onClearSearch = onClearSearch,
         )
     } else {
         LazyColumn(
@@ -169,10 +162,10 @@ private fun ProductItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                SuggestionChip(
-                    onClick = { },
-                    label = { Text(product.category) },
-                )
+//                SuggestionChip(
+//                    onClick = { },
+//                    label = { Text(product.category) },
+//                )
             }
 
             // 価格・在庫情報部分
