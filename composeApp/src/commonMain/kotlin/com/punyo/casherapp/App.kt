@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.punyo.casherapp.ui.about.AboutScreen
 import com.punyo.casherapp.ui.home.HomeScreen
-import com.punyo.casherapp.ui.profile.ProfileScreen
+import com.punyo.casherapp.ui.product.ProductScreen
 import com.punyo.casherapp.ui.settings.SettingsScreen
 import com.punyo.casherapp.ui.transactions.TransactionsScreen
 import kotlinx.coroutines.launch
@@ -56,9 +56,10 @@ import meijopharmcasherapp.composeapp.generated.resources.app_subtitle
 import meijopharmcasherapp.composeapp.generated.resources.menu
 import meijopharmcasherapp.composeapp.generated.resources.nav_about
 import meijopharmcasherapp.composeapp.generated.resources.nav_home
-import meijopharmcasherapp.composeapp.generated.resources.nav_profile
+import meijopharmcasherapp.composeapp.generated.resources.nav_product
 import meijopharmcasherapp.composeapp.generated.resources.nav_settings
 import meijopharmcasherapp.composeapp.generated.resources.nav_transactions
+import meijopharmcasherapp.composeapp.generated.resources.product_title
 import org.jetbrains.compose.resources.stringResource
 
 data class DrawerItem(
@@ -167,7 +168,7 @@ fun App() {
                 DrawerItem(Icons.Filled.Home, stringResource(Res.string.nav_home), "home"),
                 DrawerItem(Icons.Filled.AccountBalance, stringResource(Res.string.nav_transactions), "transactions"),
                 DrawerItem(Icons.Filled.Settings, stringResource(Res.string.nav_settings), "settings"),
-                DrawerItem(Icons.Filled.Person, stringResource(Res.string.nav_profile), "profile"),
+                DrawerItem(Icons.Filled.Person, stringResource(Res.string.product_title), "product"),
                 DrawerItem(Icons.Filled.Info, stringResource(Res.string.nav_about), "about"),
             )
 
@@ -243,7 +244,7 @@ fun MainContent(
                 stringResource(Res.string.nav_home) -> HomeScreen()
                 stringResource(Res.string.nav_transactions) -> TransactionsScreen()
                 stringResource(Res.string.nav_settings) -> SettingsScreen()
-                stringResource(Res.string.nav_profile) -> ProfileScreen()
+                stringResource(Res.string.nav_product) -> ProductScreen()
                 stringResource(Res.string.nav_about) -> AboutScreen()
                 else -> HomeScreen()
             }
