@@ -10,7 +10,7 @@ fun main() =
         startKoin {
             modules(appModule)
         }
-        
+
         Window(
             onCloseRequest = ::exitApplication,
             title = "CasherApplication",
