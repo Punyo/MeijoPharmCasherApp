@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -28,6 +29,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core.viewmodel)
+                implementation(libs.sqldelight.coroutines.extensions)
             }
         }
 
@@ -43,7 +45,16 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutinesSwing)
+                implementation(libs.sqldelight.driver.sqlite)
             }
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("com.punyo.casherapp.application.db")
         }
     }
 }
