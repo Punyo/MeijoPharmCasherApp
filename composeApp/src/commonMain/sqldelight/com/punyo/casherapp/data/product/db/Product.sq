@@ -1,0 +1,33 @@
+CREATE TABLE IF NOT EXISTS product (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    barcode TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    stock INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM product;
+
+selectById:
+SELECT * FROM product WHERE id = ?;
+
+searchProducts:
+SELECT * FROM product 
+WHERE name LIKE '%' || ? || '%' 
+   OR barcode LIKE '%' || ? || '%';
+
+insertProduct:
+INSERT INTO product (id, name, barcode, price, stock)
+VALUES (?, ?, ?, ?, ?);
+
+updateProduct:
+UPDATE product 
+SET name = ?, barcode = ?, price = ?, stock = ?
+WHERE id = ?;
+
+deleteProduct:
+DELETE FROM product WHERE id = ?;
+
+deleteAll:
+DELETE FROM product;
