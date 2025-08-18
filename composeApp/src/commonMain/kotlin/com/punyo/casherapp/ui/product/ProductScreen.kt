@@ -3,23 +3,18 @@ package com.punyo.casherapp.ui.product
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,16 +24,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.ui.component.DataTable
+import com.punyo.casherapp.ui.component.TableColumn
 import org.koin.compose.koinInject
+import kotlin.collections.listOf
 
 @Composable
 fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
     val uiState by viewModel.uiState.collectAsState()
+    val products = uiState.filteredProducts
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -58,14 +57,53 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                 onMenuClick = viewModel::onMenuClick,
             )
 
-            // 商品一覧エリア
-            ProductList(
-                products = uiState.filteredProducts,
-                searchText = uiState.searchText,
-                onProductClick = viewModel::onProductClick,
-                onProductMenuClick = viewModel::onProductMenuClick,
-                onClearSearch = viewModel::clearSearch,
-            )
+            if (products.isEmpty()) {
+                // 空状態表示
+                EmptyState(
+                    searchText = uiState.searchText,
+                    onClearSearch = viewModel::clearSearch,
+                )
+            } else {
+                val productColumns =
+                    remember {
+                        listOf<TableColumn<ProductDataModel>>(
+                            TableColumn(
+                                header = "商品名",
+                                accessor = { it.name },
+                                width = 3f,
+                            ),
+                            TableColumn(
+                                header = "バーコード",
+                                accessor = { it.barcode },
+                                width = 1f,
+                            ),
+                            TableColumn(
+                                header = "価格",
+                                accessor = { it.price },
+                                width = 1f,
+                            ),
+                            TableColumn(
+                                header = "在庫",
+                                accessor = { it.stock },
+                                width = 1f,
+                            ),
+                        )
+                    }
+
+                DataTable(
+                    data = products,
+                    columns = productColumns,
+                    modifier = Modifier.fillMaxWidth(),
+                    actions =
+                        mapOf(
+                            "編集" to { index ->
+                            },
+                            "削除" to { index ->
+                                viewModel.deleteProduct(products[index].id)
+                            },
+                        ),
+                )
+            }
         }
 
         FloatingActionButton(
@@ -87,105 +125,6 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
             onDismiss = viewModel::hideAddProductDialog,
             onSaveClick = viewModel::addProduct,
         )
-    }
-}
-
-@Composable
-private fun ProductList(
-    products: List<ProductDataModel>,
-    searchText: String,
-    onProductClick: (ProductDataModel) -> Unit,
-    onProductMenuClick: (ProductDataModel) -> Unit,
-    onClearSearch: () -> Unit,
-) {
-    if (products.isEmpty()) {
-        // 空状態表示
-        EmptyState(
-            searchText = searchText,
-            onClearSearch = onClearSearch,
-        )
-    } else {
-        LazyColumn(
-            contentPadding = PaddingValues(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-        ) {
-            items(products) { product ->
-                ProductItem(
-                    product = product,
-                    onClick = { onProductClick(product) },
-                    onMenuClick = { onProductMenuClick(product) },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProductItem(
-    product: ProductDataModel,
-    onClick: () -> Unit,
-    onMenuClick: () -> Unit,
-) {
-    Card(
-        onClick = onClick,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(72.dp),
-    ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // 商品情報部分
-            Column(
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(
-                    text = product.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = "バーコード: ${product.barcode}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-//                SuggestionChip(
-//                    onClick = { },
-//                    label = { Text(product.category) },
-//                )
-            }
-
-            // 価格・在庫情報部分
-            Column(
-                horizontalAlignment = Alignment.End,
-            ) {
-                Text(
-                    text = "¥${product.price}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = "在庫:${product.stock}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // メニューボタン
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "メニュー",
-                )
-            }
-        }
     }
 }
 

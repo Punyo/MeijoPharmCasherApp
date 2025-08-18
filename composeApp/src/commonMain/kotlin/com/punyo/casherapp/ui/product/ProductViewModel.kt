@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 data class ProductUiState(
     val searchText: String = "",
@@ -58,6 +57,18 @@ class ProductViewModel(
 
     fun hideAddProductDialog() {
         state.value = state.value.copy(showAddProductDialog = false)
+    }
+
+    fun deleteProduct(id: Long) {
+        viewModelScope.launch {
+            repository.deleteProduct(id)
+        }
+        state.value.copy(
+            products =
+                state.value.products.filter {
+                    it.id != id
+                },
+        )
     }
 
     fun addProduct(
