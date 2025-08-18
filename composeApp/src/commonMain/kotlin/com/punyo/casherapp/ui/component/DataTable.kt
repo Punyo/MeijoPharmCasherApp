@@ -109,7 +109,7 @@ fun <T> DataTable(
             Row(
                 modifier =
                     Modifier
-                        .height(32.dp)
+                        .height(56.dp)
                         .padding(horizontal = 16.dp)
                         .background(MaterialTheme.colorScheme.surface),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -170,7 +170,8 @@ fun <T> DataTable(
                         .fillMaxWidth()
                         .clickable(
                             onClick = { },
-                        ).padding(horizontal = 16.dp),
+                        ).padding(horizontal = 16.dp)
+                        .height(52.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -178,6 +179,12 @@ fun <T> DataTable(
                     val value = column.accessor(item)
                     Text(
                         text = value?.toString() ?: "",
+                        textAlign =
+                            if (value as? Number != null) {
+                                androidx.compose.ui.text.style.TextAlign.Right
+                            } else {
+                                androidx.compose.ui.text.style.TextAlign.Start
+                            },
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(column.width),
                     )
