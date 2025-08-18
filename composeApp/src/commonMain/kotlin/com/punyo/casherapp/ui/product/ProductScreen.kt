@@ -73,8 +73,14 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                                 width = 3f,
                             ),
                             TableColumn(
-                                header = "バーコード",
-                                accessor = { it.barcode },
+                                header = "二次元コード",
+                                accessor = {
+                                    if (it.barcode == null) {
+                                        "未登録"
+                                    } else {
+                                        "登録済み"
+                                    }
+                                },
                                 width = 1f,
                             ),
                             TableColumn(
