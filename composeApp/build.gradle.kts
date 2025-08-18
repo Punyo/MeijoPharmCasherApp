@@ -51,6 +51,12 @@ kotlin {
     }
 }
 
+ktlint {
+    filter {
+        exclude { element -> element.file.path.contains("generated") }
+    }
+}
+
 sqldelight {
     databases {
         create("AppDatabase") {
