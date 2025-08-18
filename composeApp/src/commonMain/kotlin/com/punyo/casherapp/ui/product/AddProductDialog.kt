@@ -33,19 +33,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.punyo.casherapp.data.product.model.ProductDataModel
 
 @Composable
 fun AddProductDialog(
     onDismiss: () -> Unit,
     onSaveClick: (String, String, Int, Int) -> Unit = { _, _, _, _ -> },
+    onUpdateClick: (Long, String, String, Int, Int) -> Unit = { _, _, _, _, _ -> },
+    editingProduct: ProductDataModel? = null,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
     ) {
-        var productName by remember { mutableStateOf("") }
-        var qrCode by remember { mutableStateOf("") }
-        var price by remember { mutableStateOf("") }
-        var stock by remember { mutableStateOf("") }
+        var productName by remember { mutableStateOf(editingProduct?.name ?: "") }
+        var qrCode by remember { mutableStateOf(editingProduct?.barcode ?: "") }
+        var price by remember { mutableStateOf(editingProduct?.price?.toString() ?: "") }
+        var stock by remember { mutableStateOf(editingProduct?.stock?.toString() ?: "") }
         var showCamera by remember { mutableStateOf(false) }
 
         val productNameError by remember {
@@ -71,7 +74,7 @@ fun AddProductDialog(
                     Modifier.fillMaxSize().padding(24.dp),
             ) {
                 Text(
-                    text = "商品を追加",
+                    text = if (editingProduct != null) "商品を編集" else "商品を追加",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
@@ -186,13 +189,20 @@ fun AddProductDialog(
                     TextButton(
                         onClick = {
                             if (isFormValid) {
-                                onSaveClick(productName, qrCode, price.toInt(), stock.toInt())
+                                if (editingProduct != null) {
+                                    onUpdateClick(editingProduct.id, productName, qrCode, price.toInt(), stock.toInt())
+                                } else {
+                                    onSaveClick(productName, qrCode, price.toInt(), stock.toInt())
+                                }
                                 onDismiss()
                             }
                         },
                         enabled = isFormValid,
                     ) {
-                        Text("保存", color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            text = if (editingProduct != null) "更新" else "保存",
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }

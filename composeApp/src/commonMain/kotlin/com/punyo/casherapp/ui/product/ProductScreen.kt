@@ -97,6 +97,7 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                     actions =
                         mapOf(
                             "編集" to { index ->
+                                viewModel.showEditProductDialog(products[index])
                             },
                             "削除" to { index ->
                                 viewModel.deleteProduct(products[index].id)
@@ -120,10 +121,15 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
         }
     }
 
-    if (uiState.showAddProductDialog) {
+    if (uiState.showAddProductDialog || uiState.editingProduct != null) {
         AddProductDialog(
-            onDismiss = viewModel::hideAddProductDialog,
+            onDismiss = {
+                viewModel.hideAddProductDialog()
+                viewModel.hideEditProductDialog()
+            },
             onSaveClick = viewModel::addProduct,
+            onUpdateClick = viewModel::updateProduct,
+            editingProduct = uiState.editingProduct,
         )
     }
 }
