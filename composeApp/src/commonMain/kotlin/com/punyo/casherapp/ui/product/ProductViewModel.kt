@@ -21,8 +21,7 @@ data class ProductUiState(
             products
         } else {
             products.filter { product ->
-                product.name.contains(searchText, ignoreCase = true) ||
-                    product.barcode.contains(searchText, ignoreCase = true)
+                product.name.contains(searchText, ignoreCase = true)
             }
         }
 }
@@ -68,15 +67,12 @@ class ProductViewModel(
         stock: Int,
     ) {
         viewModelScope.launch {
-            val newProduct =
-                ProductDataModel(
-                    id = UUID.randomUUID().toString(),
-                    name = name,
-                    barcode = barcode,
-                    price = price,
-                    stock = stock,
-                )
-            repository.insertProduct(newProduct)
+            repository.insertProduct(
+                name = name,
+                barcode = barcode.takeIf { it.isNotBlank() },
+                price = price,
+                stock = stock,
+            )
             hideAddProductDialog()
         }
     }
