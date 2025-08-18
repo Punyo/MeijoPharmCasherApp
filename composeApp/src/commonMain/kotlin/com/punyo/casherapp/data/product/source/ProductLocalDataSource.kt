@@ -28,7 +28,7 @@ class ProductLocalDataSource(
                 }
             }
 
-    suspend fun getProductById(id: String): ProductDataModel? =
+    suspend fun getProductById(id: Long): ProductDataModel? =
         database.productQueries.selectById(id).executeAsOneOrNull()?.let { product ->
             ProductDataModel(
                 id = product.id,
@@ -56,13 +56,17 @@ class ProductLocalDataSource(
                 }
             }
 
-    suspend fun insertProduct(product: ProductDataModel) {
+    suspend fun insertProduct(
+        name: String,
+        barcode: String? = null,
+        price: Int,
+        stock: Int,
+    ) {
         database.productQueries.insertProduct(
-            id = product.id,
-            name = product.name,
-            barcode = product.barcode,
-            price = product.price.toLong(),
-            stock = product.stock.toLong(),
+            name = name,
+            barcode = barcode,
+            price = price.toLong(),
+            stock = stock.toLong(),
         )
     }
 
@@ -76,7 +80,7 @@ class ProductLocalDataSource(
         )
     }
 
-    suspend fun deleteProduct(id: String) {
+    suspend fun deleteProduct(id: Long) {
         database.productQueries.deleteProduct(id)
     }
 

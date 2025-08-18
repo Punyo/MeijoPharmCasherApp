@@ -1,9 +1,9 @@
 package com.punyo.casherapp.data.product.model
 
 data class ProductDataModel(
-    val id: String,
+    val id: Long,
     val name: String,
-    val barcode: String,
+    val barcode: String? = null,
     val price: Int,
 //    val category: String,
     val stock: Int,
