@@ -81,11 +81,13 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                                 header = "価格",
                                 accessor = { it.price },
                                 width = 1f,
+                                isRightAligned = true,
                             ),
                             TableColumn(
                                 header = "在庫",
                                 accessor = { it.stock },
                                 width = 1f,
+                                isRightAligned = true,
                             ),
                         )
                     }

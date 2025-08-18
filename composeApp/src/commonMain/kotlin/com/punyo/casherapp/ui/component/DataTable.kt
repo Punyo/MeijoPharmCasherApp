@@ -32,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign.Companion.Right
+import androidx.compose.ui.text.style.TextAlign.Companion.Start
 import androidx.compose.ui.unit.dp
 
 enum class SortDirection {
@@ -48,6 +50,7 @@ data class TableColumn<T>(
     val header: String,
     val accessor: (T) -> Any?,
     val width: Float = 1f,
+    val isRightAligned: Boolean = false,
 )
 
 @Suppress("UNCHECKED_CAST")
@@ -135,6 +138,12 @@ fun <T> DataTable(
                     ) {
                         Text(
                             text = column.header,
+                            textAlign =
+                                if (column.isRightAligned) {
+                                    Right
+                                } else {
+                                    Start
+                                },
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.weight(1f),
                         )
@@ -180,10 +189,10 @@ fun <T> DataTable(
                     Text(
                         text = value?.toString() ?: "",
                         textAlign =
-                            if (value as? Number != null) {
-                                androidx.compose.ui.text.style.TextAlign.Right
+                            if (column.isRightAligned) {
+                                Right
                             } else {
-                                androidx.compose.ui.text.style.TextAlign.Start
+                                Start
                             },
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(column.width),
