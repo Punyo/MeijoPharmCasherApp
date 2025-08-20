@@ -44,9 +44,9 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
     ) {
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // ヘッダー部分
@@ -90,8 +90,14 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                                 isRightAligned = true,
                             ),
                             TableColumn(
-                                header = "在庫",
-                                accessor = { it.stock },
+                                header = "売上個数",
+                                accessor = { it.soldUnit },
+                                width = 1f,
+                                isRightAligned = true,
+                            ),
+                            TableColumn(
+                                header = "売上金額",
+                                accessor = { it.salesAmount },
                                 width = 1f,
                                 isRightAligned = true,
                             ),
@@ -103,14 +109,14 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                     columns = productColumns,
                     modifier = Modifier.fillMaxWidth(),
                     actions =
-                        mapOf(
-                            "編集" to { index ->
-                                viewModel.showEditProductDialog(products[index])
-                            },
-                            "削除" to { index ->
-                                viewModel.deleteProduct(products[index].id)
-                            },
-                        ),
+                    mapOf(
+                        "編集" to { index ->
+                            viewModel.showEditProductDialog(products[index])
+                        },
+                        "削除" to { index ->
+                            viewModel.deleteProduct(products[index].id)
+                        },
+                    ),
                 )
             }
         }
@@ -118,9 +124,9 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
         FloatingActionButton(
             onClick = viewModel::showAddProductDialog,
             modifier =
-                Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
+            Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -172,8 +178,8 @@ private fun EmptyState(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier =
-                    Modifier
-                        .padding(8.dp),
+                Modifier
+                    .padding(8.dp),
             )
         }
     }

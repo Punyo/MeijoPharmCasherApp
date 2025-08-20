@@ -6,5 +6,6 @@ data class ProductDataModel(
     val barcode: String? = null,
     val price: Int,
 //    val category: String,
-    val stock: Int,
+    val soldUnit: Int,
+    val salesAmount: Int,
 )

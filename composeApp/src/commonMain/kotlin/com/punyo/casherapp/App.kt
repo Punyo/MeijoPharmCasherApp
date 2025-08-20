@@ -193,10 +193,10 @@ fun App() {
 fun DrawerHeader() {
     Column(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(16.dp),
+        Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(16.dp),
         horizontalAlignment = Alignment.Start,
     ) {
         Text(
@@ -235,9 +235,9 @@ fun MainContent(
     ) { paddingValues ->
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+            Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
             contentAlignment = Alignment.Center,
         ) {
             when (selectedItem) {

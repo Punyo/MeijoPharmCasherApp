@@ -38,8 +38,8 @@ import com.punyo.casherapp.data.product.model.ProductDataModel
 @Composable
 fun AddProductDialog(
     onDismiss: () -> Unit,
-    onSaveClick: (String, String, Int, Int) -> Unit = { _, _, _, _ -> },
-    onUpdateClick: (Long, String, String, Int, Int) -> Unit = { _, _, _, _, _ -> },
+    onSaveClick: (String, String, Int) -> Unit = { _, _, _ -> },
+    onUpdateClick: (Long, String, String, Int) -> Unit = { _, _, _, _ -> },
     editingProduct: ProductDataModel? = null,
 ) {
     Dialog(
@@ -48,7 +48,6 @@ fun AddProductDialog(
         var productName by remember { mutableStateOf(editingProduct?.name ?: "") }
         var qrCode by remember { mutableStateOf(editingProduct?.barcode ?: "") }
         var price by remember { mutableStateOf(editingProduct?.price?.toString() ?: "") }
-        var stock by remember { mutableStateOf(editingProduct?.stock?.toString() ?: "") }
         var showCamera by remember { mutableStateOf(false) }
 
         val productNameError by remember {
@@ -57,21 +56,18 @@ fun AddProductDialog(
         val priceError by remember {
             derivedStateOf { price.toIntOrNull()?.let { it < 1 } ?: true }
         }
-        val stockError by remember {
-            derivedStateOf { stock.toIntOrNull()?.let { it < 0 } ?: true }
-        }
         val isFormValid by remember {
-            derivedStateOf { !productNameError && !priceError && !stockError }
+            derivedStateOf { !productNameError && !priceError }
         }
 
         Card(
             modifier =
-                Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
         ) {
             Column(
                 modifier =
-                    Modifier.fillMaxSize().padding(24.dp),
+                Modifier.fillMaxSize().padding(24.dp),
             ) {
                 Text(
                     text = if (editingProduct != null) "商品を編集" else "商品を追加",
@@ -82,10 +78,10 @@ fun AddProductDialog(
 
                 Column(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState()),
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     OutlinedTextField(
@@ -122,27 +118,6 @@ fun AddProductDialog(
                     )
 
                     OutlinedTextField(
-                        value = stock,
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() }) {
-                                stock = newValue
-                            }
-                        },
-                        label = { Text("在庫数 *") },
-                        placeholder = { Text("0") },
-                        suffix = { Text("個") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = stockError && stock.isNotEmpty(),
-                        supportingText = {
-                            if (stockError && stock.isNotEmpty()) {
-                                Text("0以上の整数を入力してください")
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                    )
-
-                    OutlinedTextField(
                         value = qrCode,
                         onValueChange = { qrCode = it },
                         label = { Text("二次元コード") },
@@ -169,9 +144,9 @@ fun AddProductDialog(
                             imageVector = Icons.Default.Close,
                             contentDescription = "カメラを閉じる",
                             modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1f),
+                            Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f),
                         )
                     }
                 }
@@ -190,9 +165,9 @@ fun AddProductDialog(
                         onClick = {
                             if (isFormValid) {
                                 if (editingProduct != null) {
-                                    onUpdateClick(editingProduct.id, productName, qrCode, price.toInt(), stock.toInt())
+                                    onUpdateClick(editingProduct.id, productName, qrCode, price.toInt())
                                 } else {
-                                    onSaveClick(productName, qrCode, price.toInt(), stock.toInt())
+                                    onSaveClick(productName, qrCode, price.toInt())
                                 }
                                 onDismiss()
                             }
@@ -201,7 +176,7 @@ fun AddProductDialog(
                     ) {
                         Text(
                             text = if (editingProduct != null) "更新" else "保存",
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }

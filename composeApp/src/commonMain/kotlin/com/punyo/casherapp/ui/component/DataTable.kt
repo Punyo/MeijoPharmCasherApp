@@ -111,39 +111,39 @@ fun <T> DataTable(
         stickyHeader {
             Row(
                 modifier =
-                    Modifier
-                        .height(56.dp)
-                        .padding(horizontal = 16.dp)
-                        .background(MaterialTheme.colorScheme.surface),
+                Modifier
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp)
+                    .background(MaterialTheme.colorScheme.surface),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 columns.forEachIndexed { index, column ->
                     Row(
                         modifier =
-                            Modifier
-                                .fillMaxHeight()
-                                .weight(column.width)
-                                .let { modifier ->
-                                    if (sortedData != null) {
-                                        modifier.clickable(
-                                            indication = null,
-                                            interactionSource = remember { MutableInteractionSource() },
-                                        ) { onSort(index) }
-                                    } else {
-                                        modifier
-                                    }
-                                },
+                        Modifier
+                            .fillMaxHeight()
+                            .weight(column.width)
+                            .let { modifier ->
+                                if (sortedData != null) {
+                                    modifier.clickable(
+                                        indication = null,
+                                        interactionSource = remember { MutableInteractionSource() },
+                                    ) { onSort(index) }
+                                } else {
+                                    modifier
+                                }
+                            },
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         Text(
                             text = column.header,
                             textAlign =
-                                if (column.isRightAligned) {
-                                    Right
-                                } else {
-                                    Start
-                                },
+                            if (column.isRightAligned) {
+                                Right
+                            } else {
+                                Start
+                            },
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.weight(1f),
                         )
@@ -151,10 +151,10 @@ fun <T> DataTable(
                         if (sortedData != null && sortState?.columnIndex == index) {
                             Icon(
                                 imageVector =
-                                    when (sortState!!.direction) {
-                                        SortDirection.ASC -> Icons.Default.KeyboardArrowUp
-                                        SortDirection.DESC -> Icons.Default.KeyboardArrowDown
-                                    },
+                                when (sortState!!.direction) {
+                                    SortDirection.ASC -> Icons.Default.KeyboardArrowUp
+                                    SortDirection.DESC -> Icons.Default.KeyboardArrowDown
+                                },
                                 contentDescription = "Sort ${sortState!!.direction.name}",
                             )
                         }
@@ -175,12 +175,12 @@ fun <T> DataTable(
 
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable(
-                            onClick = { },
-                        ).padding(horizontal = 16.dp)
-                        .height(52.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        onClick = { },
+                    ).padding(horizontal = 16.dp)
+                    .height(52.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -189,11 +189,11 @@ fun <T> DataTable(
                     Text(
                         text = value?.toString() ?: "",
                         textAlign =
-                            if (column.isRightAligned) {
-                                Right
-                            } else {
-                                Start
-                            },
+                        if (column.isRightAligned) {
+                            Right
+                        } else {
+                            Start
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(column.width),
                     )

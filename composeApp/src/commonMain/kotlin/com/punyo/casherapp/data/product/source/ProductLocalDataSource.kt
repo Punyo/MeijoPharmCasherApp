@@ -23,7 +23,8 @@ class ProductLocalDataSource(
                         name = product.name,
                         barcode = product.barcode,
                         price = product.price.toInt(),
-                        stock = product.stock.toInt(),
+                        soldUnit = product.sold_unit.toInt(),
+                        salesAmount = product.sales_amount.toInt(),
                     )
                 }
             }
@@ -35,7 +36,8 @@ class ProductLocalDataSource(
                 name = product.name,
                 barcode = product.barcode,
                 price = product.price.toInt(),
-                stock = product.stock.toInt(),
+                soldUnit = product.sold_unit.toInt(),
+                salesAmount = product.sales_amount.toInt(),
             )
         }
 
@@ -51,7 +53,8 @@ class ProductLocalDataSource(
                         name = product.name,
                         barcode = product.barcode,
                         price = product.price.toInt(),
-                        stock = product.stock.toInt(),
+                        soldUnit = product.sold_unit.toInt(),
+                        salesAmount = product.sales_amount.toInt(),
                     )
                 }
             }
@@ -60,13 +63,15 @@ class ProductLocalDataSource(
         name: String,
         barcode: String? = null,
         price: Int,
-        stock: Int,
+        soldUnit: Int = 0,
+        salesAmount: Int,
     ) {
         database.productQueries.insertProduct(
             name = name,
             barcode = barcode,
             price = price.toLong(),
-            stock = stock.toLong(),
+            sold_unit = soldUnit.toLong(),
+            sales_amount = salesAmount.toLong(),
         )
     }
 
@@ -75,7 +80,8 @@ class ProductLocalDataSource(
             name = product.name,
             barcode = product.barcode,
             price = product.price.toLong(),
-            stock = product.stock.toLong(),
+            sold_unit = product.soldUnit.toLong(),
+            sales_amount = product.salesAmount.toLong(),
             id = product.id,
         )
     }

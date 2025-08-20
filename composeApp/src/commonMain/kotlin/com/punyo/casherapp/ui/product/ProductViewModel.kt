@@ -74,9 +74,9 @@ class ProductViewModel(
         }
         state.value.copy(
             products =
-                state.value.products.filter {
-                    it.id != id
-                },
+            state.value.products.filter {
+                it.id != id
+            },
         )
     }
 
@@ -84,14 +84,14 @@ class ProductViewModel(
         name: String,
         barcode: String,
         price: Int,
-        stock: Int,
     ) {
         viewModelScope.launch {
             repository.insertProduct(
                 name = name,
                 barcode = barcode.takeIf { it.isNotBlank() },
                 price = price,
-                stock = stock,
+                soldUnit = 0,
+                salesAmount = 0,
             )
             hideAddProductDialog()
         }
@@ -102,7 +102,6 @@ class ProductViewModel(
         name: String,
         barcode: String,
         price: Int,
-        stock: Int,
     ) {
         viewModelScope.launch {
             val updatedProduct = ProductDataModel(
@@ -110,7 +109,8 @@ class ProductViewModel(
                 name = name,
                 barcode = barcode.takeIf { it.isNotBlank() },
                 price = price,
-                stock = stock,
+                soldUnit = 0,
+                salesAmount = 0,
             )
             repository.updateProduct(updatedProduct)
             hideEditProductDialog()
