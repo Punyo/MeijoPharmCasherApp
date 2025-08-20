@@ -46,6 +46,9 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutinesSwing)
                 implementation(libs.sqldelight.driver.sqlite)
+                implementation(libs.javacv.platform)
+                implementation(libs.zxing.core)
+                implementation(libs.zxing.javase)
             }
         }
     }
