@@ -11,53 +11,50 @@ import kotlinx.coroutines.flow.map
 class ProductLocalDataSource(
     private val database: AppDatabase,
 ) {
-    fun getAllProducts(): Flow<List<ProductDataModel>> =
-        database.productQueries
-            .selectAll()
-            .asFlow()
-            .mapToList(Dispatchers.IO)
-            .map { products ->
-                products.map { product ->
-                    ProductDataModel(
-                        id = product.id,
-                        name = product.name,
-                        barcode = product.barcode,
-                        price = product.price.toInt(),
-                        soldUnit = product.sold_unit.toInt(),
-                        salesAmount = product.sales_amount.toInt(),
-                    )
-                }
+    fun getAllProducts(): Flow<List<ProductDataModel>> = database.productQueries
+        .selectAll()
+        .asFlow()
+        .mapToList(Dispatchers.IO)
+        .map { products ->
+            products.map { product ->
+                ProductDataModel(
+                    id = product.id,
+                    name = product.name,
+                    barcode = product.barcode,
+                    price = product.price.toInt(),
+                    soldUnit = product.sold_unit.toInt(),
+                    salesAmount = product.sales_amount.toInt(),
+                )
             }
-
-    suspend fun getProductById(id: Long): ProductDataModel? =
-        database.productQueries.selectById(id).executeAsOneOrNull()?.let { product ->
-            ProductDataModel(
-                id = product.id,
-                name = product.name,
-                barcode = product.barcode,
-                price = product.price.toInt(),
-                soldUnit = product.sold_unit.toInt(),
-                salesAmount = product.sales_amount.toInt(),
-            )
         }
 
-    fun searchProducts(query: String): Flow<List<ProductDataModel>> =
-        database.productQueries
-            .searchProducts(query, query)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
-            .map { products ->
-                products.map { product ->
-                    ProductDataModel(
-                        id = product.id,
-                        name = product.name,
-                        barcode = product.barcode,
-                        price = product.price.toInt(),
-                        soldUnit = product.sold_unit.toInt(),
-                        salesAmount = product.sales_amount.toInt(),
-                    )
-                }
+    suspend fun getProductById(id: Long): ProductDataModel? = database.productQueries.selectById(id).executeAsOneOrNull()?.let { product ->
+        ProductDataModel(
+            id = product.id,
+            name = product.name,
+            barcode = product.barcode,
+            price = product.price.toInt(),
+            soldUnit = product.sold_unit.toInt(),
+            salesAmount = product.sales_amount.toInt(),
+        )
+    }
+
+    fun searchProducts(query: String): Flow<List<ProductDataModel>> = database.productQueries
+        .searchProducts(query, query)
+        .asFlow()
+        .mapToList(Dispatchers.IO)
+        .map { products ->
+            products.map { product ->
+                ProductDataModel(
+                    id = product.id,
+                    name = product.name,
+                    barcode = product.barcode,
+                    price = product.price.toInt(),
+                    soldUnit = product.sold_unit.toInt(),
+                    salesAmount = product.sales_amount.toInt(),
+                )
             }
+        }
 
     suspend fun insertProduct(
         name: String,
