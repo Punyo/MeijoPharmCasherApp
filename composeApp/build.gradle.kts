@@ -29,6 +29,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.core.viewmodel)
+                implementation(libs.androidx.navigation.compose)
                 implementation(libs.sqldelight.coroutines.extensions)
                 implementation(libs.aay.chart)
                 implementation(libs.kotlinx.datetime)
