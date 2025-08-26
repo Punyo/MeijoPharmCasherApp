@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,31 +18,21 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -55,7 +44,6 @@ import com.aay.compose.barChart.model.BarParameters
 import kotlinx.datetime.LocalDateTime
 import kotlin.random.Random
 
-// データクラス定義
 data class Transaction(
     val id: String,
     val timestamp: LocalDateTime,
@@ -91,70 +79,121 @@ enum class PaymentMethod {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionsScreen() {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    var searchQuery by remember { mutableStateOf("") }
     val mockTransactions = generateMockTransactions()
     val mockProductSummary = generateMockProductSummary()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 320.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // サマリーカード
-        SummaryCardsSection(
-            transactions = mockTransactions,
-            productSummary = mockProductSummary,
-        )
-
-        // タブレイアウト
-        PrimaryTabRow(
-            selectedTabIndex = selectedTabIndex,
-        ) {
-            Tab(
-                selected = selectedTabIndex == 0,
-                onClick = { selectedTabIndex = 0 },
-                text = { Text("取引履歴") },
-            )
-            Tab(
-                selected = selectedTabIndex == 1,
-                onClick = { selectedTabIndex = 1 },
-                text = { Text("商品別集計") },
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            EnhancedSummaryCardsSection(
+                transactions = mockTransactions,
+                productSummary = mockProductSummary,
             )
         }
 
-        // タブコンテンツ
-        when (selectedTabIndex) {
-            0 -> TransactionHistoryTab(mockTransactions)
-            1 -> ProductSummaryTab(mockProductSummary)
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            ProductSalesBarChart(
+                productData = mockProductSummary.take(8),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp),
+            )
+        }
+
+        item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
+            RecentTransactionsCard(mockTransactions.take(5))
+        }
+
+        item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
+            PopularProductsCard(mockProductSummary.take(5))
         }
     }
 }
 
 @Composable
-fun SummaryCardsSection(
+fun EnhancedSummaryCardsSection(
     transactions: List<Transaction>,
     productSummary: List<ProductSummary>,
 ) {
     val customerCount = transactions.size
     val totalQuantity = productSummary.sumOf { it.totalQuantity }
     val totalAmount = transactions.sumOf { it.totalAmount }
-    val averagePrice = if (totalQuantity > 0) totalAmount / totalQuantity else 0
 
     LazyRow(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp),
     ) {
-        item { SummaryCard("今日の顧客数", "$customerCount 人") }
-        item { SummaryCard("今日の売上個数", "$totalQuantity 個") }
         item {
-            SummaryCard(
-                "今日の売上金額",
-                "¥${totalAmount.toString().reversed().chunked(3).joinToString(",").reversed()}",
+            EnhancedSummaryCard(
+                title = "今日の顧客数",
+                value = "$customerCount 人",
+                icon = Icons.Default.People,
+            )
+        }
+        item {
+            EnhancedSummaryCard(
+                title = "売上個数",
+                value = "$totalQuantity 個",
+                icon = Icons.Default.ShoppingCart,
+            )
+        }
+        item {
+            EnhancedSummaryCard(
+                title = "売上金額",
+                value = "¥${totalAmount.toString().reversed().chunked(3).joinToString(",").reversed()}",
+                icon = Icons.Default.AttachMoney,
             )
         }
     }
+}
 
-    Spacer(modifier = Modifier.height(16.dp))
+@Composable
+fun EnhancedSummaryCard(
+    title: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .width(140.dp)
+            .height(100.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top,
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
 }
 
 @Composable
@@ -249,108 +288,6 @@ fun TransactionItem(transaction: Transaction) {
     }
 }
 
-@Composable
-fun ProductSummaryTab(productSummary: List<ProductSummary>) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 500.dp),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            ProductSalesBarChart(
-                productData = productSummary.take(8),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp)
-                    .padding(vertical = 16.dp),
-            )
-        }
-        items(productSummary) { product ->
-            ProductSummaryItem(product)
-        }
-    }
-}
-
-@Composable
-fun ProductSummaryItem(product: ProductSummary) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            // 上部：商品情報
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-            ) {
-                // 商品画像プレースホルダー
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(4.dp),
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = product.name.first().toString(),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(
-                        text = product.name,
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "売上個数: ${product.totalQuantity}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        text = "売上金額: ¥${product.totalRevenue}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "¥${product.unitPrice}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-
-//            // 下部：単価（右寄せ）
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.End,
-//            ) {
-//                Text(
-//                    text = "¥${product.unitPrice}",
-//                    style = MaterialTheme.typography.titleMedium,
-//                    fontWeight = FontWeight.Bold,
-//                )
-//            }
-        }
-    }
-}
-
-// モックデータ生成関数
 fun generateMockTransactions(): List<Transaction> {
     val products = listOf(
         "感冒薬A",
@@ -414,34 +351,203 @@ fun generateMockProductSummary(): List<ProductSummary> {
     }.sortedByDescending { it.totalRevenue }
 }
 
-// AAY-Chart実装
+@Composable
+fun RecentTransactionsCard(transactions: List<Transaction>) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(400.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = "最近の取引",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(transactions) { transaction ->
+                    CompactTransactionItem(transaction)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CompactTransactionItem(transaction: Transaction) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = transaction.id,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                )
+                Text(
+                    text = "¥${transaction.totalAmount}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            Text(
+                text = "${transaction.items.size}点 | ${transaction.paymentMethod.name}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+fun PopularProductsCard(products: List<ProductSummary>) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(400.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = "人気商品",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(products) { product ->
+                    CompactProductItem(product)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CompactProductItem(product: ProductSummary) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        ),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                        RoundedCornerShape(4.dp),
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = product.name.first().toString(),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = product.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                )
+                Text(
+                    text = "${product.totalQuantity}個売上",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Text(
+                text = "¥${product.totalRevenue}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+        }
+    }
+}
+
 @Composable
 fun ProductSalesBarChart(
     productData: List<ProductSummary>,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        val barParameters = BarParameters(
-            dataName = "商品売上",
-            data = productData.map { it.totalRevenue.toDouble() },
-            barColor = MaterialTheme.colorScheme.primary,
-        )
+    OutlinedCard(
+        modifier = modifier,
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Text(
+                text = "商品売上チャート",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
 
-        BarChart(
-            chartParameters = listOf(barParameters),
-            xAxisData = productData.map {
-                it.name
-            },
-            animateChart = true,
-            showGridWithSpacer = true,
-            yAxisStyle = TextStyle(
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            ),
-            xAxisStyle = TextStyle(
-                fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            ),
-        )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp),
+            ) {
+                val barParameters = BarParameters(
+                    dataName = "商品売上",
+                    data = productData.map { it.totalRevenue.toDouble() },
+                    barColor = MaterialTheme.colorScheme.primary,
+                )
+
+                BarChart(
+                    chartParameters = listOf(barParameters),
+                    xAxisData = productData.map {
+                        if (it.name.length > 6) it.name.take(6) + "..." else it.name
+                    },
+                    animateChart = true,
+                    showGridWithSpacer = true,
+                    yAxisStyle = TextStyle(
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+                    xAxisStyle = TextStyle(
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
+            }
+        }
     }
 }
