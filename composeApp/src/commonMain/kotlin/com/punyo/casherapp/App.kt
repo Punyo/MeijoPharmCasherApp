@@ -35,20 +35,22 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
-import com.punyo.casherapp.ui.about.AboutScreen
-import com.punyo.casherapp.ui.home.HomeScreen
-import com.punyo.casherapp.ui.product.ProductScreen
-import com.punyo.casherapp.ui.settings.SettingsScreen
-import com.punyo.casherapp.ui.transactions.TransactionsScreen
+import com.punyo.casherapp.ui.about.navigateToAbout
+import com.punyo.casherapp.ui.home.navigateToHome
+import com.punyo.casherapp.ui.navigation.CasherAppNavigation
+import com.punyo.casherapp.ui.navigation.NavigationDestinations
+import com.punyo.casherapp.ui.product.navigateToProduct
+import com.punyo.casherapp.ui.settings.navigateToSettings
+import com.punyo.casherapp.ui.transactions.navigateToTransactions
 import kotlinx.coroutines.launch
 import meijopharmcasherapp.composeapp.generated.resources.Res
 import meijopharmcasherapp.composeapp.generated.resources.app_name
@@ -56,7 +58,6 @@ import meijopharmcasherapp.composeapp.generated.resources.app_subtitle
 import meijopharmcasherapp.composeapp.generated.resources.menu
 import meijopharmcasherapp.composeapp.generated.resources.nav_about
 import meijopharmcasherapp.composeapp.generated.resources.nav_home
-import meijopharmcasherapp.composeapp.generated.resources.nav_product
 import meijopharmcasherapp.composeapp.generated.resources.nav_settings
 import meijopharmcasherapp.composeapp.generated.resources.nav_transactions
 import meijopharmcasherapp.composeapp.generated.resources.product_title
@@ -71,7 +72,7 @@ data class DrawerItem(
 @Composable
 fun DrawerContent(
     drawerItems: List<DrawerItem>,
-    selectedItem: String,
+    selectedRoute: String,
     onItemClick: (String) -> Unit,
     onDrawerClose: () -> Unit = {},
 ) {
@@ -82,9 +83,9 @@ fun DrawerContent(
             NavigationDrawerItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(item.title) },
-                selected = selectedItem == item.title,
+                selected = selectedRoute == item.route,
                 onClick = {
-                    onItemClick(item.title)
+                    onItemClick(item.route)
                     onDrawerClose()
                 },
                 modifier = Modifier.padding(horizontal = 12.dp),
@@ -97,7 +98,7 @@ fun DrawerContent(
 @Composable
 fun ResponsiveNavigationDrawer(
     drawerItems: List<DrawerItem>,
-    selectedItem: String,
+    selectedRoute: String,
     onItemClick: (String) -> Unit,
     content: @Composable (showMenuButton: Boolean, onMenuClick: () -> Unit) -> Unit,
 ) {
@@ -110,7 +111,7 @@ fun ResponsiveNavigationDrawer(
                 PermanentDrawerSheet(modifier = Modifier.width(240.dp)) {
                     DrawerContent(
                         drawerItems = drawerItems,
-                        selectedItem = selectedItem,
+                        selectedRoute = selectedRoute,
                         onItemClick = onItemClick,
                     )
                 }
@@ -130,7 +131,7 @@ fun ResponsiveNavigationDrawer(
                 ModalDrawerSheet {
                     DrawerContent(
                         drawerItems = drawerItems,
-                        selectedItem = selectedItem,
+                        selectedRoute = selectedRoute,
                         onItemClick = onItemClick,
                         onDrawerClose = {
                             scope.launch {
@@ -160,28 +161,36 @@ fun ResponsiveNavigationDrawer(
 @Composable
 fun App() {
     MaterialTheme {
-        val homeTitle = stringResource(Res.string.nav_home)
-        var selectedItem by remember { mutableStateOf(homeTitle) }
+        val navController = rememberNavController()
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route ?: NavigationDestinations.HOME_ROUTE
 
         val drawerItems =
             listOf(
-                DrawerItem(Icons.Filled.Home, stringResource(Res.string.nav_home), "home"),
-                DrawerItem(Icons.Filled.AccountBalance, stringResource(Res.string.nav_transactions), "transactions"),
-                DrawerItem(Icons.Filled.Settings, stringResource(Res.string.nav_settings), "settings"),
-                DrawerItem(Icons.Filled.Person, stringResource(Res.string.product_title), "product"),
-                DrawerItem(Icons.Filled.Info, stringResource(Res.string.nav_about), "about"),
+                DrawerItem(Icons.Filled.Home, stringResource(Res.string.nav_home), NavigationDestinations.HOME_ROUTE),
+                DrawerItem(Icons.Filled.AccountBalance, stringResource(Res.string.nav_transactions), NavigationDestinations.TRANSACTIONS_ROUTE),
+                DrawerItem(Icons.Filled.Settings, stringResource(Res.string.nav_settings), NavigationDestinations.SETTINGS_ROUTE),
+                DrawerItem(Icons.Filled.Person, stringResource(Res.string.product_title), NavigationDestinations.PRODUCT_ROUTE),
+                DrawerItem(Icons.Filled.Info, stringResource(Res.string.nav_about), NavigationDestinations.ABOUT_ROUTE),
             )
 
         ResponsiveNavigationDrawer(
             drawerItems = drawerItems,
-            selectedItem = selectedItem,
-            onItemClick = { item ->
-                @Suppress("AssignedValueIsNeverRead")
-                selectedItem = item
+            selectedRoute = currentRoute,
+            onItemClick = { route ->
+                when (route) {
+                    NavigationDestinations.HOME_ROUTE -> navController.navigateToHome()
+                    NavigationDestinations.PRODUCT_ROUTE -> navController.navigateToProduct()
+                    NavigationDestinations.TRANSACTIONS_ROUTE -> navController.navigateToTransactions()
+                    NavigationDestinations.SETTINGS_ROUTE -> navController.navigateToSettings()
+                    NavigationDestinations.ABOUT_ROUTE -> navController.navigateToAbout()
+                }
             },
         ) { showMenuButton, onMenuClick ->
             MainContent(
-                selectedItem = selectedItem,
+                navController = navController,
+                currentRoute = currentRoute,
+                drawerItems = drawerItems,
                 showMenuButton = showMenuButton,
                 onMenuClick = onMenuClick,
             )
@@ -215,14 +224,18 @@ fun DrawerHeader() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(
-    selectedItem: String,
+    navController: NavHostController,
+    currentRoute: String,
+    drawerItems: List<DrawerItem>,
     showMenuButton: Boolean,
     onMenuClick: () -> Unit,
 ) {
+    val currentTitle = drawerItems.find { it.route == currentRoute }?.title ?: stringResource(Res.string.nav_home)
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(selectedItem) },
+                title = { Text(currentTitle) },
                 navigationIcon = {
                     if (showMenuButton) {
                         IconButton(onClick = onMenuClick) {
@@ -238,16 +251,8 @@ fun MainContent(
             Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentAlignment = Alignment.Center,
         ) {
-            when (selectedItem) {
-                stringResource(Res.string.nav_home) -> HomeScreen()
-                stringResource(Res.string.nav_transactions) -> TransactionsScreen()
-                stringResource(Res.string.nav_settings) -> SettingsScreen()
-                stringResource(Res.string.nav_product) -> ProductScreen()
-                stringResource(Res.string.nav_about) -> AboutScreen()
-                else -> HomeScreen()
-            }
+            CasherAppNavigation(navController = navController)
         }
     }
 }
