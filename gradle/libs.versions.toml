@@ -10,6 +10,8 @@ compose-material3-adaptive = "1.1.2"
 sqldelight = "2.0.1"
 javacv = "1.5.10"
 zxing = "3.5.3"
+aay-chart = "1.1.0"
+kotlinx-datetime = "0.6.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -25,6 +27,8 @@ sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-ex
 javacv-platform = { module = "org.bytedeco:javacv-platform", version.ref = "javacv" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
+aay-chart = { module = "io.github.thechance101:chart", version.ref = "aay-chart" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 [plugins]
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
