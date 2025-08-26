@@ -35,6 +35,8 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -105,6 +107,12 @@ fun ResponsiveNavigationDrawer(
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val usePermanentDrawer = windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
 
+    val appContent = remember {
+        movableContentOf { showMenuButton: Boolean, onMenuClick: () -> Unit ->
+            content(showMenuButton, onMenuClick)
+        }
+    }
+
     if (usePermanentDrawer) {
         PermanentNavigationDrawer(
             drawerContent = {
@@ -117,9 +125,7 @@ fun ResponsiveNavigationDrawer(
                 }
             },
         ) {
-            content(
-                false,
-            ) {}
+            appContent(false) {}
         }
     } else {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -142,9 +148,7 @@ fun ResponsiveNavigationDrawer(
                 }
             },
         ) {
-            content(
-                true,
-            ) {
+            appContent(true) {
                 scope.launch {
                     if (drawerState.isClosed) {
                         drawerState.open()
