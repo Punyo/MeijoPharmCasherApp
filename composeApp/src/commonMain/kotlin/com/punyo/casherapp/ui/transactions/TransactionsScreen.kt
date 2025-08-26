@@ -96,60 +96,36 @@ fun TransactionsScreen() {
     val mockTransactions = generateMockTransactions()
     val mockProductSummary = generateMockProductSummary()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("取引履歴") },
-                actions = {
-                    IconButton(onClick = { /* TODO: Filter */ }) {
-                        Icon(Icons.Default.FilterList, contentDescription = "フィルター")
-                    }
-                    IconButton(onClick = { /* TODO: Refresh */ }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "更新")
-                    }
-                },
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO: Export */ },
-            ) {
-                Icon(Icons.Default.Download, contentDescription = "エクスポート")
-            }
-        },
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        // サマリーカード
+        SummaryCardsSection(
+            transactions = mockTransactions,
+            productSummary = mockProductSummary,
+        )
+
+        // タブレイアウト
+        PrimaryTabRow(
+            selectedTabIndex = selectedTabIndex,
         ) {
-            // サマリーカード
-            SummaryCardsSection(
-                transactions = mockTransactions,
-                productSummary = mockProductSummary,
+            Tab(
+                selected = selectedTabIndex == 0,
+                onClick = { selectedTabIndex = 0 },
+                text = { Text("取引履歴") },
             )
+            Tab(
+                selected = selectedTabIndex == 1,
+                onClick = { selectedTabIndex = 1 },
+                text = { Text("商品別集計") },
+            )
+        }
 
-            // タブレイアウト
-            PrimaryTabRow(
-                selectedTabIndex = selectedTabIndex,
-            ) {
-                Tab(
-                    selected = selectedTabIndex == 0,
-                    onClick = { selectedTabIndex = 0 },
-                    text = { Text("取引履歴") },
-                )
-                Tab(
-                    selected = selectedTabIndex == 1,
-                    onClick = { selectedTabIndex = 1 },
-                    text = { Text("商品別集計") },
-                )
-            }
-
-            // タブコンテンツ
-            when (selectedTabIndex) {
-                0 -> TransactionHistoryTab(mockTransactions)
-                1 -> ProductSummaryTab(mockProductSummary)
-            }
+        // タブコンテンツ
+        when (selectedTabIndex) {
+            0 -> TransactionHistoryTab(mockTransactions)
+            1 -> ProductSummaryTab(mockProductSummary)
         }
     }
 }
