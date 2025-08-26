@@ -28,11 +28,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -76,11 +82,32 @@ enum class PaymentMethod {
     QR_CODE,
 }
 
+enum class TimePeriod(val displayName: String) {
+    TODAY("今日"),
+    ALL_TIME("全体"),
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionsScreen() {
+    var selectedPeriod by remember { mutableStateOf(TimePeriod.TODAY) }
     val mockTransactions = generateMockTransactions()
     val mockProductSummary = generateMockProductSummary()
+    
+    // 全期間データの生成（モック）
+    val allTimeTransactions = generateMockTransactions(multiplier = 30) // 30日分のデータ
+    val allTimeProductSummary = generateMockProductSummary(multiplier = 30)
+    
+    // 選択された期間に応じてデータを切り替え
+    val currentTransactions = when (selectedPeriod) {
+        TimePeriod.TODAY -> mockTransactions
+        TimePeriod.ALL_TIME -> allTimeTransactions
+    }
+    
+    val currentProductSummary = when (selectedPeriod) {
+        TimePeriod.TODAY -> mockProductSummary
+        TimePeriod.ALL_TIME -> allTimeProductSummary
+    }
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 320.dp),
@@ -90,15 +117,25 @@ fun TransactionsScreen() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            EnhancedSummaryCardsSection(
-                transactions = mockTransactions,
-                productSummary = mockProductSummary,
-            )
+            Column {
+                // 期間切り替えボタン
+                TimePeriodSelector(
+                    selectedPeriod = selectedPeriod,
+                    onPeriodSelected = { selectedPeriod = it },
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                
+                // サマリーカード
+                EnhancedSummaryCardsSection(
+                    transactions = currentTransactions,
+                    productSummary = currentProductSummary,
+                )
+            }
         }
 
         item(span = { GridItemSpan(maxLineSpan) }) {
             ProductSalesBarChart(
-                productData = mockProductSummary.take(8),
+                productData = currentProductSummary.take(8),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(400.dp),
@@ -106,11 +143,41 @@ fun TransactionsScreen() {
         }
 
         item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-            RecentTransactionsCard(mockTransactions.take(5))
+            RecentTransactionsCard(currentTransactions.take(5))
         }
 
         item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-            PopularProductsCard(mockProductSummary.take(5))
+            PopularProductsCard(currentProductSummary.take(5))
+        }
+    }
+}
+
+@Composable
+fun TimePeriodSelector(
+    selectedPeriod: TimePeriod,
+    onPeriodSelected: (TimePeriod) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+    ) {
+        TimePeriod.values().forEach { period ->
+            FilterChip(
+                selected = selectedPeriod == period,
+                onClick = { onPeriodSelected(period) },
+                label = {
+                    Text(
+                        text = period.displayName,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
+                modifier = Modifier.padding(end = 8.dp),
+            )
         }
     }
 }
@@ -288,7 +355,7 @@ fun TransactionItem(transaction: Transaction) {
     }
 }
 
-fun generateMockTransactions(): List<Transaction> {
+fun generateMockTransactions(multiplier: Int = 1): List<Transaction> {
     val products = listOf(
         "感冒薬A",
         "胃腸薬B",
@@ -298,7 +365,7 @@ fun generateMockTransactions(): List<Transaction> {
     )
     val paymentMethods = PaymentMethod.values()
 
-    return (1..20).map { index ->
+    return (1..(20 * multiplier)).map { index ->
         val items = (1..Random.nextInt(1, 4)).map {
             val product = products.random()
             val unitPrice = Random.nextInt(300, 2000)
@@ -327,7 +394,7 @@ fun generateMockTransactions(): List<Transaction> {
     }
 }
 
-fun generateMockProductSummary(): List<ProductSummary> {
+fun generateMockProductSummary(multiplier: Int = 1): List<ProductSummary> {
     val products = listOf(
         "感冒薬A" to 800,
         "胃腸薬B" to 1200,
@@ -339,7 +406,7 @@ fun generateMockProductSummary(): List<ProductSummary> {
     )
 
     return products.mapIndexed { index, (name, unitPrice) ->
-        val quantity = Random.nextInt(5, 50)
+        val quantity = Random.nextInt(5 * multiplier, 50 * multiplier)
         ProductSummary(
             productId = "P${(index + 1).toString().padStart(3, '0')}",
             name = name,
