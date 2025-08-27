@@ -39,7 +39,7 @@ import com.punyo.casherapp.data.product.model.ProductDataModel
 fun AddProductDialog(
     onDismiss: () -> Unit,
     onSaveClick: (String, String, Int) -> Unit = { _, _, _ -> },
-    onUpdateClick: (Long, String, String, Int) -> Unit = { _, _, _, _ -> },
+    onUpdateClick: (String, String, String, Int) -> Unit = { _, _, _, _ -> },
     editingProduct: ProductDataModel? = null,
 ) {
     Dialog(
