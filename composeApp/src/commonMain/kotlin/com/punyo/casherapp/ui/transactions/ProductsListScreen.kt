@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ElevatedCard
@@ -21,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.punyo.casherapp.ui.component.DateRangePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +42,7 @@ fun ProductsListScreen(
     var searchText by remember { mutableStateOf("") }
 
     val allProducts = generateMockProductSummary(multiplier = 30)
+    var showDatePickerDialog by remember { mutableStateOf(false) }
 
     val filteredProducts = allProducts.filter { product ->
         if (searchText.isBlank()) {
@@ -48,6 +52,10 @@ fun ProductsListScreen(
                 product.productId.contains(searchText, ignoreCase = true)
         }
     }.sortedByDescending { it.totalRevenue }
+
+    val dateRangePickerState = rememberDateRangePickerState()
+    val isRangeSelected = dateRangePickerState.selectedStartDateMillis != null &&
+        dateRangePickerState.selectedEndDateMillis != null
 
     Column(
         modifier = Modifier
@@ -92,10 +100,19 @@ fun ProductsListScreen(
                 modifier = Modifier.weight(1f).height(56.dp),
                 singleLine = true,
             )
-
-            if (searchText.isNotEmpty()) {
+            IconButton(onClick = { showDatePickerDialog = true }) {
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = "日付範囲選択",
+                )
+            }
+            if (searchText.isNotEmpty() || isRangeSelected) {
                 IconButton(onClick = {
                     searchText = ""
+                    dateRangePickerState.setSelection(
+                        startDateMillis = null,
+                        endDateMillis = null,
+                    )
                 }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
@@ -141,6 +158,13 @@ fun ProductsListScreen(
             }
         }
     }
+
+    if (showDatePickerDialog) {
+        DateRangePickerDialog(
+            onDismiss = { showDatePickerDialog = false },
+            dateRangePickerState = dateRangePickerState,
+        )
+    }
 }
 
 @Composable
@@ -162,8 +186,10 @@ fun DetailedProductItem(product: ProductSummary) {
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "¥${product.totalRevenue.toString().reversed().chunked(3)
-                        .joinToString(",").reversed()}",
+                    text = "¥${
+                        product.totalRevenue.toString().reversed().chunked(3)
+                            .joinToString(",").reversed()
+                    }",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
