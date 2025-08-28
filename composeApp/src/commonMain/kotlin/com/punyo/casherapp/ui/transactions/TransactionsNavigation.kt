@@ -11,8 +11,18 @@ fun NavController.navigateToTransactions() {
     }
 }
 
-fun NavGraphBuilder.transactionsScreen() {
+fun NavController.navigateToAllTransactions() {
+    navigate(NavigationDestinations.ALL_TRANSACTIONS_ROUTE)
+}
+
+fun NavGraphBuilder.transactionsScreen(navController: NavController) {
     composable(route = NavigationDestinations.TRANSACTIONS_ROUTE) {
-        TransactionsScreen()
+        TransactionsScreen(navController = navController)
+    }
+}
+
+fun NavGraphBuilder.allTransactionsScreen(navController: NavController) {
+    composable(route = NavigationDestinations.ALL_TRANSACTIONS_ROUTE) {
+        AllTransactionsScreen { navController.popBackStack() }
     }
 }

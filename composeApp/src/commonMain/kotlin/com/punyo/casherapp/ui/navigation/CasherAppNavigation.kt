@@ -8,6 +8,7 @@ import com.punyo.casherapp.ui.about.aboutScreen
 import com.punyo.casherapp.ui.home.homeScreen
 import com.punyo.casherapp.ui.product.productScreen
 import com.punyo.casherapp.ui.settings.settingsScreen
+import com.punyo.casherapp.ui.transactions.allTransactionsScreen
 import com.punyo.casherapp.ui.transactions.transactionsScreen
 
 @Composable
@@ -21,7 +22,8 @@ fun CasherAppNavigation(
     ) {
         homeScreen()
         productScreen()
-        transactionsScreen()
+        transactionsScreen(navController)
+        allTransactionsScreen(navController)
         settingsScreen()
         aboutScreen()
     }

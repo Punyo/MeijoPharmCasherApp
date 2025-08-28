@@ -92,7 +92,7 @@ enum class TimePeriod(val displayName: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionsScreen() {
+fun TransactionsScreen(navController: androidx.navigation.NavController? = null) {
     var selectedPeriod by remember { mutableStateOf(TimePeriod.TODAY) }
     val mockTransactions = generateMockTransactions()
     val mockProductSummary = generateMockProductSummary()
@@ -167,10 +167,13 @@ fun TransactionsScreen() {
 
         item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
             DataListCard(
-                title = "最近の取引",
+                title = "取引",
                 items = currentTransactions.take(5),
                 itemContent = { transaction ->
                     CompactTransactionItem(transaction)
+                },
+                onViewMoreClick = {
+                    navController?.navigateToAllTransactions()
                 },
             )
         }
