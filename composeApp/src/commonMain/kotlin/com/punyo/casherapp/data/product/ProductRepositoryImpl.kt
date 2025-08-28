@@ -17,15 +17,11 @@ class ProductRepositoryImpl(
         name: String,
         barcode: String?,
         price: Int,
-        soldUnit: Int,
-        salesAmount: Int,
     ) {
         localDataSource.insertProduct(
             name = name,
             barcode = barcode,
             price = price,
-            soldUnit = soldUnit,
-            salesAmount = salesAmount,
         )
     }
 

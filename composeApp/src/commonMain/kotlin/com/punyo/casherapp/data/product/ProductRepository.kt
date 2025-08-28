@@ -14,8 +14,6 @@ interface ProductRepository {
         name: String,
         barcode: String?,
         price: Int,
-        soldUnit: Int,
-        salesAmount: Int,
     )
 
     suspend fun updateProduct(product: ProductDataModel)

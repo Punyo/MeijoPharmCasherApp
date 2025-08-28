@@ -2,9 +2,7 @@ CREATE TABLE IF NOT EXISTS product (
     id TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     barcode TEXT,
-    price INTEGER NOT NULL,
-    sold_unit INTEGER NOT NULL DEFAULT 0,
-    sales_amount INTEGER NOT NULL DEFAULT 0
+    price INTEGER NOT NULL
 );
 
 selectAll:
@@ -19,12 +17,12 @@ WHERE name LIKE '%' || ? || '%'
    OR barcode LIKE '%' || ? || '%';
 
 insertProduct:
-INSERT INTO product (id, name, barcode, price, sold_unit, sales_amount)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO product (id, name, barcode, price)
+VALUES (?, ?, ?, ?);
 
 updateProduct:
 UPDATE product 
-SET name = ?, barcode = ?, price = ?, sold_unit = ?, sales_amount = ?
+SET name = ?, barcode = ?, price = ?
 WHERE id = ?;
 
 deleteProduct:
