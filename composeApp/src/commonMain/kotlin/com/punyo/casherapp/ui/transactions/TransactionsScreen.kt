@@ -185,6 +185,9 @@ fun TransactionsScreen(navController: androidx.navigation.NavController? = null)
                 itemContent = { product ->
                     CompactProductItem(product)
                 },
+                onViewMoreClick = {
+                    navController?.navigateToProductsList()
+                },
             )
         }
     }
