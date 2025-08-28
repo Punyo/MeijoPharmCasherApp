@@ -109,6 +109,10 @@ fun TransactionsScreen() {
         TimePeriod.ALL_TIME -> allTimeProductSummary
     }
 
+    val customerCount = currentTransactions.size
+    val totalQuantity = currentProductSummary.sumOf { it.totalQuantity }
+    val totalAmount = currentTransactions.sumOf { it.totalAmount }
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 320.dp),
         modifier = Modifier.fillMaxSize(),
@@ -143,11 +147,23 @@ fun TransactionsScreen() {
         }
 
         item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-            RecentTransactionsCard(currentTransactions.take(5))
+            DataListCard(
+                title = "最近の取引",
+                items = currentTransactions.take(5),
+                itemContent = { transaction ->
+                    CompactTransactionItem(transaction)
+                },
+            )
         }
 
         item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-            PopularProductsCard(currentProductSummary.take(5))
+            DataListCard(
+                title = "人気商品",
+                items = currentProductSummary.take(5),
+                itemContent = { product ->
+                    CompactProductItem(product)
+                },
+            )
         }
     }
 }
@@ -419,29 +435,51 @@ fun generateMockProductSummary(multiplier: Int = 1): List<ProductSummary> {
 }
 
 @Composable
-fun RecentTransactionsCard(transactions: List<Transaction>) {
+fun <T> DataListCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    items: List<T>,
+    itemContent: @Composable (T) -> Unit,
+    onViewMoreClick: () -> Unit = {},
+) {
     OutlinedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(400.dp),
+        modifier = modifier
+            .fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp),
         ) {
-            Text(
-                text = "最近の取引",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-            )
+            Row(
+                modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                if (onViewMoreClick != {}) {
+                    FilledTonalIconButton(
+                        modifier = Modifier.height(40.dp).width(40.dp),
+                        onClick = onViewMoreClick,
+                        shape = CircleShape,
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRightAlt,
+                            contentDescription = "もっと見る",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
 
-            LazyColumn(
+            Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(transactions) { transaction ->
-                    CompactTransactionItem(transaction)
+                items.forEach { item ->
+                    itemContent(item)
                 }
             }
         }
@@ -480,36 +518,6 @@ fun CompactTransactionItem(transaction: Transaction) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-        }
-    }
-}
-
-@Composable
-fun PopularProductsCard(products: List<ProductSummary>) {
-    OutlinedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(400.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-        ) {
-            Text(
-                text = "人気商品",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-            )
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(products) { product ->
-                    CompactProductItem(product)
-                }
-            }
         }
     }
 }
