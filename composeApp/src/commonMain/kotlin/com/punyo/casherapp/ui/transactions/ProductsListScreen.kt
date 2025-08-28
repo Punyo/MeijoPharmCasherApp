@@ -1,9 +1,7 @@
 package com.punyo.casherapp.ui.transactions
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -33,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.ui.component.DateRangePickerDialog
+import com.punyo.casherapp.ui.component.NavigateBackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,23 +60,10 @@ fun ProductsListScreen(
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        Row(
-            modifier = Modifier.height(IntrinsicSize.Min).clickable(
-                onClick = onNavigateBack,
-            ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary,
-            )
-            Text(
-                modifier = Modifier.align(Alignment.CenterVertically),
-                text = "全ての商品",
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
+        NavigateBackButton(
+            onNavigateBack = onNavigateBack,
+            text = "全ての商品",
+        )
 
         Row(
             modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
@@ -107,13 +92,15 @@ fun ProductsListScreen(
                 )
             }
             if (searchText.isNotEmpty() || isRangeSelected) {
-                IconButton(onClick = {
-                    searchText = ""
-                    dateRangePickerState.setSelection(
-                        startDateMillis = null,
-                        endDateMillis = null,
-                    )
-                }) {
+                IconButton(
+                    onClick = {
+                        searchText = ""
+                        dateRangePickerState.setSelection(
+                            startDateMillis = null,
+                            endDateMillis = null,
+                        )
+                    },
+                ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "クリア",
