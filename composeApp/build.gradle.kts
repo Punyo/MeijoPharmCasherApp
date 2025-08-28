@@ -31,6 +31,8 @@ kotlin {
                 implementation(libs.koin.core.viewmodel)
                 implementation(libs.androidx.navigation.compose)
                 implementation(libs.sqldelight.coroutines.extensions)
+                implementation(libs.aay.chart)
+                implementation(libs.kotlinx.datetime)
             }
         }
 
@@ -47,6 +49,9 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutinesSwing)
                 implementation(libs.sqldelight.driver.sqlite)
+                implementation(libs.javacv.platform)
+                implementation(libs.zxing.core)
+                implementation(libs.zxing.javase)
             }
         }
     }
