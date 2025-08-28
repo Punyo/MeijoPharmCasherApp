@@ -90,8 +90,6 @@ class ProductViewModel(
                 name = name,
                 barcode = barcode.takeIf { it.isNotBlank() },
                 price = price,
-                soldUnit = 0,
-                salesAmount = 0,
             )
             hideAddProductDialog()
         }
@@ -109,8 +107,6 @@ class ProductViewModel(
                 name = name,
                 barcode = barcode.takeIf { it.isNotBlank() },
                 price = price,
-                soldUnit = 0,
-                salesAmount = 0,
             )
             repository.updateProduct(updatedProduct)
             hideEditProductDialog()

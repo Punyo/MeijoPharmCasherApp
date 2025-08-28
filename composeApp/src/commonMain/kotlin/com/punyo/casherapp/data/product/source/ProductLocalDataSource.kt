@@ -23,8 +23,6 @@ class ProductLocalDataSource(
                     name = product.name,
                     barcode = product.barcode,
                     price = product.price.toInt(),
-                    soldUnit = product.sold_unit.toInt(),
-                    salesAmount = product.sales_amount.toInt(),
                 )
             }
         }
@@ -35,8 +33,6 @@ class ProductLocalDataSource(
             name = product.name,
             barcode = product.barcode,
             price = product.price.toInt(),
-            soldUnit = product.sold_unit.toInt(),
-            salesAmount = product.sales_amount.toInt(),
         )
     }
 
@@ -51,8 +47,6 @@ class ProductLocalDataSource(
                     name = product.name,
                     barcode = product.barcode,
                     price = product.price.toInt(),
-                    soldUnit = product.sold_unit.toInt(),
-                    salesAmount = product.sales_amount.toInt(),
                 )
             }
         }
@@ -61,8 +55,6 @@ class ProductLocalDataSource(
         name: String,
         barcode: String? = null,
         price: Int,
-        soldUnit: Int = 0,
-        salesAmount: Int,
     ) {
         val uuid = UUID.randomUUID().toString()
         database.productQueries.insertProduct(
@@ -70,8 +62,6 @@ class ProductLocalDataSource(
             name = name,
             barcode = barcode,
             price = price.toLong(),
-            sold_unit = soldUnit.toLong(),
-            sales_amount = salesAmount.toLong(),
         )
     }
 
@@ -80,8 +70,6 @@ class ProductLocalDataSource(
             name = product.name,
             barcode = product.barcode,
             price = product.price.toLong(),
-            sold_unit = product.soldUnit.toLong(),
-            sales_amount = product.salesAmount.toLong(),
             id = product.id,
         )
     }

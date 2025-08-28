@@ -91,13 +91,13 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                             ),
                             TableColumn(
                                 header = "売上個数",
-                                accessor = { it.soldUnit },
+                                accessor = { kotlin.random.Random.nextInt(0, 100) },
                                 width = 1f,
                                 isRightAligned = true,
                             ),
                             TableColumn(
                                 header = "売上金額",
-                                accessor = { it.salesAmount },
+                                accessor = { kotlin.random.Random.nextInt(1000, 50000) },
                                 width = 1f,
                                 isRightAligned = true,
                             ),
