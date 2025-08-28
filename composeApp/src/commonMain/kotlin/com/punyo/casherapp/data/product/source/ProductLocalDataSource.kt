@@ -7,6 +7,7 @@ import com.punyo.casherapp.data.product.model.ProductDataModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 
 class ProductLocalDataSource(
     private val database: AppDatabase,
@@ -28,7 +29,7 @@ class ProductLocalDataSource(
             }
         }
 
-    suspend fun getProductById(id: Long): ProductDataModel? = database.productQueries.selectById(id).executeAsOneOrNull()?.let { product ->
+    suspend fun getProductById(id: String): ProductDataModel? = database.productQueries.selectById(id).executeAsOneOrNull()?.let { product ->
         ProductDataModel(
             id = product.id,
             name = product.name,
@@ -63,7 +64,9 @@ class ProductLocalDataSource(
         soldUnit: Int = 0,
         salesAmount: Int,
     ) {
+        val uuid = UUID.randomUUID().toString()
         database.productQueries.insertProduct(
+            id = uuid,
             name = name,
             barcode = barcode,
             price = price.toLong(),
@@ -83,7 +86,7 @@ class ProductLocalDataSource(
         )
     }
 
-    suspend fun deleteProduct(id: Long) {
+    suspend fun deleteProduct(id: String) {
         database.productQueries.deleteProduct(id)
     }
 

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS product (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     barcode TEXT,
     price INTEGER NOT NULL,
@@ -19,8 +19,8 @@ WHERE name LIKE '%' || ? || '%'
    OR barcode LIKE '%' || ? || '%';
 
 insertProduct:
-INSERT INTO product (name, barcode, price, sold_unit, sales_amount)
-VALUES (?, ?, ?, ?, ?);
+INSERT INTO product (id, name, barcode, price, sold_unit, sales_amount)
+VALUES (?, ?, ?, ?, ?, ?);
 
 updateProduct:
 UPDATE product 

@@ -9,7 +9,7 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     override fun getAllProducts(): Flow<List<ProductDataModel>> = localDataSource.getAllProducts()
 
-    override suspend fun getProductById(id: Long): ProductDataModel? = localDataSource.getProductById(id)
+    override suspend fun getProductById(id: String): ProductDataModel? = localDataSource.getProductById(id)
 
     override fun searchProducts(query: String): Flow<List<ProductDataModel>> = localDataSource.searchProducts(query)
 
@@ -33,7 +33,7 @@ class ProductRepositoryImpl(
         localDataSource.updateProduct(product)
     }
 
-    override suspend fun deleteProduct(id: Long) {
+    override suspend fun deleteProduct(id: String) {
         localDataSource.deleteProduct(id)
     }
 

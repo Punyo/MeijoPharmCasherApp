@@ -68,7 +68,7 @@ class ProductViewModel(
         state.value = state.value.copy(editingProduct = null)
     }
 
-    fun deleteProduct(id: Long) {
+    fun deleteProduct(id: String) {
         viewModelScope.launch {
             repository.deleteProduct(id)
         }
@@ -98,7 +98,7 @@ class ProductViewModel(
     }
 
     fun updateProduct(
-        id: Long,
+        id: String,
         name: String,
         barcode: String,
         price: Int,
