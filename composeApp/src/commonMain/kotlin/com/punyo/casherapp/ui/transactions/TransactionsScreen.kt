@@ -4,23 +4,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -28,6 +30,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -93,17 +96,17 @@ fun TransactionsScreen() {
     var selectedPeriod by remember { mutableStateOf(TimePeriod.TODAY) }
     val mockTransactions = generateMockTransactions()
     val mockProductSummary = generateMockProductSummary()
-    
+
     // 全期間データの生成（モック）
     val allTimeTransactions = generateMockTransactions(multiplier = 30) // 30日分のデータ
     val allTimeProductSummary = generateMockProductSummary(multiplier = 30)
-    
+
     // 選択された期間に応じてデータを切り替え
     val currentTransactions = when (selectedPeriod) {
         TimePeriod.TODAY -> mockTransactions
         TimePeriod.ALL_TIME -> allTimeTransactions
     }
-    
+
     val currentProductSummary = when (selectedPeriod) {
         TimePeriod.TODAY -> mockProductSummary
         TimePeriod.ALL_TIME -> allTimeProductSummary
@@ -121,18 +124,34 @@ fun TransactionsScreen() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            Column {
-                // 期間切り替えボタン
-                TimePeriodSelector(
-                    selectedPeriod = selectedPeriod,
-                    onPeriodSelected = { selectedPeriod = it },
-                    modifier = Modifier.padding(bottom = 16.dp)
+            // 期間切り替えボタン
+            TimePeriodSelector(
+                selectedPeriod = selectedPeriod,
+                onPeriodSelected = {
+                    selectedPeriod = it
+                },
+            )
+        }
+
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                EnhancedSummaryCard(
+                    modifier = Modifier.weight(1f),
+                    title = "今日の顧客数",
+                    value = "$customerCount 人",
+                    icon = Icons.Default.People,
                 )
-                
-                // サマリーカード
-                EnhancedSummaryCardsSection(
-                    transactions = currentTransactions,
-                    productSummary = currentProductSummary,
+                EnhancedSummaryCard(
+                    modifier = Modifier.weight(1f),
+                    title = "売上個数",
+                    value = "$totalQuantity 個",
+                    icon = Icons.Default.ShoppingCart,
+                )
+                EnhancedSummaryCard(
+                    modifier = Modifier.weight(1f),
+                    title = "売上金額",
+                    value = "¥${totalAmount.toString().reversed().chunked(3).joinToString(",").reversed()}",
+                    icon = Icons.Default.AttachMoney,
                 )
             }
         }
@@ -178,7 +197,7 @@ fun TimePeriodSelector(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
     ) {
-        TimePeriod.values().forEach { period ->
+        TimePeriod.entries.forEach { period ->
             FilterChip(
                 selected = selectedPeriod == period,
                 onClick = { onPeriodSelected(period) },
@@ -199,64 +218,23 @@ fun TimePeriodSelector(
 }
 
 @Composable
-fun EnhancedSummaryCardsSection(
-    transactions: List<Transaction>,
-    productSummary: List<ProductSummary>,
-) {
-    val customerCount = transactions.size
-    val totalQuantity = productSummary.sumOf { it.totalQuantity }
-    val totalAmount = transactions.sumOf { it.totalAmount }
-
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 4.dp),
-    ) {
-        item {
-            EnhancedSummaryCard(
-                title = "今日の顧客数",
-                value = "$customerCount 人",
-                icon = Icons.Default.People,
-            )
-        }
-        item {
-            EnhancedSummaryCard(
-                title = "売上個数",
-                value = "$totalQuantity 個",
-                icon = Icons.Default.ShoppingCart,
-            )
-        }
-        item {
-            EnhancedSummaryCard(
-                title = "売上金額",
-                value = "¥${totalAmount.toString().reversed().chunked(3).joinToString(",").reversed()}",
-                icon = Icons.Default.AttachMoney,
-            )
-        }
-    }
-}
-
-@Composable
 fun EnhancedSummaryCard(
+    modifier: Modifier = Modifier,
     title: String,
     value: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
 ) {
     ElevatedCard(
-        modifier = Modifier
-            .width(140.dp)
-            .height(100.dp),
+        modifier = modifier
+            .height(72.dp),
     ) {
-        Column(
-            modifier = Modifier
+        Row(
+            modifier = modifier
                 .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+                .padding(16.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top,
+            Column(
+                modifier = modifier.fillMaxWidth(),
             ) {
                 Text(
                     text = title,
@@ -264,108 +242,16 @@ fun EnhancedSummaryCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}
-
-@Composable
-fun SummaryCard(
-    title: String,
-    value: String,
-) {
-    ElevatedCard(
-        modifier = Modifier
-            .width(120.dp)
-            .height(80.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}
-
-@Composable
-fun TransactionHistoryTab(transactions: List<Transaction>) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items(transactions) { transaction ->
-            TransactionItem(transaction)
-        }
-    }
-}
-
-@Composable
-fun TransactionItem(transaction: Transaction) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
                 Text(
-                    text = "ID: ${transaction.id}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = transaction.paymentMethod.name,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    text = value,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                 )
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            transaction.items.forEach { item ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(item.name)
-                    Text("×${item.quantity}")
-                    Text("¥${item.totalPrice}")
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "合計: ¥${transaction.totalAmount}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.fillMaxHeight().aspectRatio(1f),
             )
         }
     }
@@ -379,7 +265,7 @@ fun generateMockTransactions(multiplier: Int = 1): List<Transaction> {
         "目薬D",
         "絆創膏E",
     )
-    val paymentMethods = PaymentMethod.values()
+    val paymentMethods = PaymentMethod.entries.toTypedArray()
 
     return (1..(20 * multiplier)).map { index ->
         val items = (1..Random.nextInt(1, 4)).map {
