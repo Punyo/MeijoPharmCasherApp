@@ -1,0 +1,66 @@
+PRAGMA foreign_keys = true;
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id TEXT PRIMARY KEY NOT NULL,
+    created_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS transaction_item (
+    id              INTEGER PRIMARY KEY NOT NULL,
+    quantity        INTEGER NOT NULL DEFAULT 1
+                    CHECK (quantity >= 1),
+    unit_price      INTEGER NOT NULL,
+    transaction_id  TEXT NOT NULL,
+    product_id      TEXT,
+    discount_percent        REAL NOT NULL DEFAULT 0
+                    CHECK (discount_percent >= 0 AND discount_percent <= 100),
+
+    FOREIGN KEY (transaction_id)
+        REFERENCES transactions(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (product_id)
+        REFERENCES product(id)
+        ON DELETE SET NULL
+);
+
+-- Transaction queries
+selectAllTransactions:
+SELECT * FROM transactions ORDER BY created_at DESC;
+
+selectTransactionById:
+SELECT * FROM transactions WHERE id = ?;
+
+selectTransactionsByDateRange:
+SELECT * FROM transactions
+WHERE created_at >= ? AND created_at <= ? 
+ORDER BY created_at DESC;
+
+insertTransaction:
+INSERT INTO transactions (id, created_at) VALUES (?, ?);
+
+deleteTransaction:
+DELETE FROM transactions WHERE id = ?;
+
+deleteAllTransactions:
+DELETE FROM transactions;
+
+-- Transaction item queries
+selectTransactionItems:
+SELECT * FROM transaction_item WHERE transaction_id = ? ORDER BY id;
+
+selectTransactionIdsByDateRange:
+SELECT id FROM transactions
+WHERE created_at >= ? AND created_at <= ?
+ORDER BY created_at DESC;
+
+selectTransactionItemsByTransactionIds:
+SELECT * FROM transaction_item
+WHERE transaction_id IN ?
+ORDER BY transaction_id, id;
+
+insertTransactionItem:
+INSERT INTO transaction_item (quantity, unit_price, transaction_id, product_id, discount_percent)
+VALUES (?, ?, ?, ?, ?);
+
+deleteTransactionItem:
+DELETE FROM transaction_item WHERE id = ?;
