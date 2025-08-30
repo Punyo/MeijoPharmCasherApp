@@ -25,14 +25,14 @@ fun NavGraphBuilder.transactionsScreen(navController: NavController) {
     }
 }
 
-fun NavGraphBuilder.allTransactionsScreen(navController: NavController) {
+fun NavGraphBuilder.allTransactionsSubScreen(navController: NavController) {
     composable(route = NavigationDestinations.ALL_TRANSACTIONS_ROUTE) {
-        AllTransactionsScreen { navController.popBackStack() }
+        AllTransactionsSubScreen { navController.popBackStack() }
     }
 }
 
-fun NavGraphBuilder.productsListScreen(navController: NavController) {
+fun NavGraphBuilder.productsListSubScreen(navController: NavController) {
     composable(route = NavigationDestinations.PRODUCTS_LIST_ROUTE) {
-        ProductsListScreen { navController.popBackStack() }
+        ProductsListSubScreen { navController.popBackStack() }
     }
 }

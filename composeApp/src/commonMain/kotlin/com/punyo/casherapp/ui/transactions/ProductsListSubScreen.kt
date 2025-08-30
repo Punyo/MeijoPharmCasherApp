@@ -28,7 +28,7 @@ import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductsListScreen(
+fun ProductsListSubScreen(
     onNavigateBack: () -> Unit,
 ) {
     var searchText by remember { mutableStateOf("") }

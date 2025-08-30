@@ -26,12 +26,18 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllTransactionsScreen(
-    viewModel: AllTransactionsScreenViewModel = koinInject(),
+fun AllTransactionsSubScreen(
+    timePeriod: TimePeriod = TimePeriod.TODAY,
+    viewModel: AllTransactionsSubScreenViewModel = koinInject(),
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val dateRangePickerState = rememberDateRangePickerState()
+
+    // TimePeriodが変更された場合はViewModelに反映
+    if (uiState.timePeriod != timePeriod) {
+        viewModel.setTimePeriod(timePeriod)
+    }
 
     val allTransactions = generateMockTransactions(multiplier = 30)
 
