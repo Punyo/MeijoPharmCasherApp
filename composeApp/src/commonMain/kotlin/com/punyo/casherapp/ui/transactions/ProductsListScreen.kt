@@ -40,8 +40,8 @@ fun ProductsListScreen(
         if (searchText.isBlank()) {
             true
         } else {
-            product.name.contains(searchText, ignoreCase = true) ||
-                product.productId.contains(searchText, ignoreCase = true)
+            product.name.contains(searchText, ignoreCase = true)
+//                product.productId.contains(searchText, ignoreCase = true)
         }
     }.sortedByDescending { it.totalRevenue }
 

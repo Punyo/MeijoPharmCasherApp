@@ -13,10 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,24 +22,25 @@ import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.ui.component.DateRangePickerDialog
 import com.punyo.casherapp.ui.component.NavigateBackButton
 import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllTransactionsScreen(
+    viewModel: AllTransactionsScreenViewModel = koinInject(),
     onNavigateBack: () -> Unit,
 ) {
-    var searchText by remember { mutableStateOf("") }
-    var showDatePickerDialog by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
     val dateRangePickerState = rememberDateRangePickerState()
 
     val allTransactions = generateMockTransactions(multiplier = 30)
 
     val filteredTransactions = allTransactions.filter { transaction ->
-        val matchesSearch = if (searchText.isBlank()) {
+        val matchesSearch = if (uiState.searchText.isBlank()) {
             true
         } else {
-            transaction.id.contains(searchText, ignoreCase = true) ||
-                transaction.items.any { it.name.contains(searchText, ignoreCase = true) }
+            transaction.id.contains(uiState.searchText, ignoreCase = true)
+//                transaction.items.any { it.name.contains(uiState.searchText, ignoreCase = true) }
         }
 
         matchesSearch
@@ -58,10 +57,10 @@ fun AllTransactionsScreen(
         )
 
         SearchAndDateFilterTextField(
-            searchText = searchText,
-            onSearchTextChange = { searchText = it },
+            searchText = uiState.searchText,
+            onSearchTextChange = { viewModel.setSearchText(it) },
             placeholderText = "商品名またはバーコードで検索",
-            onShowDatePickerDialog = { showDatePickerDialog = it },
+            onShowDatePickerDialog = { viewModel.setShowDatePickerDialog(it) },
             dateRangePickerState = dateRangePickerState,
         )
 
@@ -80,15 +79,15 @@ fun AllTransactionsScreen(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
-                Text(
-                    text = "総額: ¥${
-                        filteredTransactions.sumOf { it.totalAmount }.toString().reversed().chunked(3)
-                            .joinToString(",").reversed()
-                    }",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                )
+//                Text(
+//                    text = "総額: ¥${
+//                        filteredTransactions.sumOf { it.totalAmount }.toString().reversed().chunked(3)
+//                            .joinToString(",").reversed()
+//                    }",
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = MaterialTheme.colorScheme.primary,
+//                    fontWeight = FontWeight.Bold,
+//                )
             }
 
             LazyColumn(
@@ -101,9 +100,9 @@ fun AllTransactionsScreen(
             }
         }
 
-        if (showDatePickerDialog) {
+        if (uiState.showDatePickerDialog) {
             DateRangePickerDialog(
-                onDismiss = { showDatePickerDialog = false },
+                onDismiss = { viewModel.setShowDatePickerDialog(false) },
                 dateRangePickerState = dateRangePickerState,
             )
         }
@@ -128,12 +127,12 @@ fun DetailedTransactionItem(transaction: Transaction) {
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
-                Text(
-                    text = "¥${transaction.totalAmount}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                )
+//                Text(
+//                    text = "¥${transaction.totalAmount}",
+//                    style = MaterialTheme.typography.titleMedium,
+//                    fontWeight = FontWeight.Bold,
+//                    color = MaterialTheme.colorScheme.primary,
+//                )
             }
 
             Text(
@@ -155,15 +154,15 @@ fun DetailedTransactionItem(transaction: Transaction) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text(
-                            text = "${item.name} × ${item.quantity}",
+                            text = "$item × ${item.quantity}",
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f),
                         )
-                        Text(
-                            text = "¥${item.totalPrice}",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Medium,
-                        )
+//                        Text(
+//                            text = "¥${item.totalPrice}",
+//                            style = MaterialTheme.typography.bodySmall,
+//                            fontWeight = FontWeight.Medium,
+//                        )
                     }
                 }
             }
@@ -172,22 +171,22 @@ fun DetailedTransactionItem(transaction: Transaction) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(
-                    text = when (transaction.paymentMethod) {
-                        PaymentMethod.CASH -> "現金"
-                        PaymentMethod.CARD -> "カード"
-                        PaymentMethod.QR_CODE -> "QR決済"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                if (transaction.discount > 0) {
-                    Text(
-                        text = "割引: ${transaction.discount.toInt()}%",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
+//                Text(
+//                    text = when (transaction.paymentMethod) {
+//                        PaymentMethod.CASH -> "現金"
+//                        PaymentMethod.CARD -> "カード"
+//                        PaymentMethod.QR_CODE -> "QR決済"
+//                    },
+//                    style = MaterialTheme.typography.bodySmall,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                )
+//                if (transaction.discount > 0) {
+//                    Text(
+//                        text = "割引: ${transaction.discount.toInt()}%",
+//                        style = MaterialTheme.typography.bodySmall,
+//                        color = MaterialTheme.colorScheme.error,
+//                    )
+//                }
             }
         }
     }
