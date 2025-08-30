@@ -23,19 +23,19 @@ class TransactionLocalDataSource(
                 val items = getTransactionItemsSync(transaction.id)
                 TransactionDataModel(
                     id = transaction.id,
-                    createdAt = Instant.fromEpochMilliseconds(transaction.created_at),
+                    createdAt = Instant.fromEpochSeconds(transaction.created_at),
                     items = items,
                 )
             }
         }
 
-    suspend fun getTransactionById(id: String): TransactionDataModel? {
+    fun getTransactionById(id: String): TransactionDataModel? {
         val transaction = database.transactionQueries.selectTransactionById(id).executeAsOneOrNull()
         return transaction?.let {
             val items = getTransactionItemsSync(it.id)
             TransactionDataModel(
                 id = it.id,
-                createdAt = Instant.fromEpochMilliseconds(it.created_at),
+                createdAt = Instant.fromEpochSeconds(it.created_at),
                 items = items,
             )
         }
@@ -46,8 +46,8 @@ class TransactionLocalDataSource(
         endDate: Instant,
     ): Flow<List<TransactionDataModel>> = database.transactionQueries
         .selectTransactionsByDateRange(
-            startDate.toEpochMilliseconds(),
-            endDate.toEpochMilliseconds(),
+            startDate.epochSeconds,
+            endDate.epochSeconds,
         )
         .asFlow()
         .mapToList(Dispatchers.IO)
@@ -56,24 +56,24 @@ class TransactionLocalDataSource(
                 val items = getTransactionItemsSync(transaction.id)
                 TransactionDataModel(
                     id = transaction.id,
-                    createdAt = Instant.fromEpochMilliseconds(transaction.created_at),
+                    createdAt = Instant.fromEpochSeconds(transaction.created_at),
                     items = items,
                 )
             }
         }
 
-    suspend fun insertTransaction(
+    fun insertTransaction(
         id: String = UUID.randomUUID().toString(),
         createdAt: Instant,
     ): String {
         database.transactionQueries.insertTransaction(
             id = id,
-            created_at = createdAt.toEpochMilliseconds(),
+            created_at = createdAt.epochSeconds,
         )
         return id
     }
 
-    suspend fun addItemToTransaction(
+    fun addItemToTransaction(
         transactionId: String,
         productId: String?,
         quantity: Int,
@@ -89,15 +89,15 @@ class TransactionLocalDataSource(
         )
     }
 
-    suspend fun removeItemFromTransaction(itemId: Long) {
+    fun removeItemFromTransaction(itemId: Long) {
         database.transactionQueries.deleteTransactionItem(itemId)
     }
 
-    suspend fun deleteTransaction(id: String) {
+    fun deleteTransaction(id: String) {
         database.transactionQueries.deleteTransaction(id)
     }
 
-    suspend fun deleteAllTransactions() {
+    fun deleteAllTransactions() {
         database.transactionQueries.deleteAllTransactions()
     }
 
