@@ -11,6 +11,6 @@ val viewModelModule =
     module {
         viewModel { ProductViewModel(get()) }
         viewModel { AllTransactionsScreenViewModel(get(), get()) }
-        viewModel { TransactionsScreenViewModel(get()) }
+        viewModel { TransactionsScreenViewModel(get(), get()) }
         viewModel { ProductsListScreenViewModel(get()) }
     }
