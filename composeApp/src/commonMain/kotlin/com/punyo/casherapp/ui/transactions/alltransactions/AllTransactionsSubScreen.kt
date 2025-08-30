@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,6 +26,10 @@ import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
 import com.punyo.casherapp.ui.transactions.TimePeriod
 import com.punyo.casherapp.ui.transactions.Transaction
 import com.punyo.casherapp.ui.transactions.generateMockTransactions
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,9 +42,15 @@ fun AllTransactionsSubScreen(
     val uiState by viewModel.uiState.collectAsState()
     val dateRangePickerState = rememberDateRangePickerState()
 
-    // TimePeriodが変更された場合はViewModelに反映
-    if (uiState.timePeriod != timePeriod) {
-        viewModel.setTimePeriod(timePeriod)
+    LaunchedEffect(true) {
+        if (timePeriod == TimePeriod.TODAY) {
+            val timeZone = TimeZone.currentSystemDefault()
+            val utcMillis = Clock.System.now().toLocalDateTime(timeZone).toInstant(TimeZone.UTC).toEpochMilliseconds()
+            dateRangePickerState.setSelection(
+                startDateMillis = utcMillis,
+                endDateMillis = utcMillis,
+            )
+        }
     }
 
     val allTransactions = generateMockTransactions(multiplier = 30)
