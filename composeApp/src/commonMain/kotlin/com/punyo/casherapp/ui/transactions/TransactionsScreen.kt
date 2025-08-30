@@ -3,6 +3,7 @@ package com.punyo.casherapp.ui.transactions
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
@@ -38,10 +40,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -50,144 +50,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aay.compose.barChart.BarChart
 import com.aay.compose.barChart.model.BarParameters
+import com.aay.compose.baseComponents.model.LegendPosition
+import com.punyo.casherapp.data.transaction.model.TransactionDataModel
+import com.punyo.casherapp.extensions.toDateString
 import kotlinx.datetime.LocalDateTime
+import org.koin.compose.koinInject
 import kotlin.random.Random
-
-data class Transaction(
-    val id: String,
-    val timestamp: LocalDateTime,
-    val items: List<TransactionItem>,
-    val totalAmount: Int,
-    val discount: Float,
-    val paymentMethod: PaymentMethod,
-)
-
-data class TransactionItem(
-    val productId: String,
-    val name: String,
-    val quantity: Int,
-    val unitPrice: Int,
-    val totalPrice: Int,
-)
-
-data class ProductSummary(
-    val productId: String,
-    val name: String,
-    val image: String?,
-    val totalQuantity: Int,
-    val totalRevenue: Int,
-    val unitPrice: Int,
-)
-
-enum class PaymentMethod {
-    CASH,
-    CARD,
-    QR_CODE,
-}
-
-enum class TimePeriod(val displayName: String) {
-    TODAY("今日"),
-    ALL_TIME("全体"),
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionsScreen(navController: androidx.navigation.NavController? = null) {
-    var selectedPeriod by remember { mutableStateOf(TimePeriod.TODAY) }
-    val mockTransactions = generateMockTransactions()
-    val mockProductSummary = generateMockProductSummary()
-
-    // 全期間データの生成（モック）
-    val allTimeTransactions = generateMockTransactions(multiplier = 30) // 30日分のデータ
-    val allTimeProductSummary = generateMockProductSummary(multiplier = 30)
-
-    // 選択された期間に応じてデータを切り替え
-    val currentTransactions = when (selectedPeriod) {
-        TimePeriod.TODAY -> mockTransactions
-        TimePeriod.ALL_TIME -> allTimeTransactions
-    }
-
-    val currentProductSummary = when (selectedPeriod) {
-        TimePeriod.TODAY -> mockProductSummary
-        TimePeriod.ALL_TIME -> allTimeProductSummary
-    }
-
-    val customerCount = currentTransactions.size
-    val totalQuantity = currentProductSummary.sumOf { it.totalQuantity }
-    val totalAmount = currentTransactions.sumOf { it.totalAmount }
-
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 320.dp),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            // 期間切り替えボタン
-            TimePeriodSelector(
-                selectedPeriod = selectedPeriod,
-                onPeriodSelected = {
-                    selectedPeriod = it
-                },
-            )
-        }
-
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                EnhancedSummaryCard(
-                    modifier = Modifier.weight(1f),
-                    title = "今日の顧客数",
-                    value = "$customerCount 人",
-                    icon = Icons.Default.People,
-                )
-                EnhancedSummaryCard(
-                    modifier = Modifier.weight(1f),
-                    title = "売上個数",
-                    value = "$totalQuantity 個",
-                    icon = Icons.Default.ShoppingCart,
-                )
-                EnhancedSummaryCard(
-                    modifier = Modifier.weight(1f),
-                    title = "売上金額",
-                    value = "¥${totalAmount.toString().reversed().chunked(3).joinToString(",").reversed()}",
-                    icon = Icons.Default.AttachMoney,
-                )
-            }
-        }
-
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            ProductSalesBarChart(
-                productData = currentProductSummary.take(8),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp),
-            )
-        }
-
-        item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-            DataListCard(
-                title = "取引",
-                items = currentTransactions.take(5),
-                itemContent = { transaction ->
-                    CompactTransactionItem(transaction)
-                },
-                onViewMoreClick = {
-                    navController?.navigateToAllTransactions()
-                },
-            )
-        }
-
-        item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-            DataListCard(
-                title = "人気商品",
-                items = currentProductSummary.take(5),
-                itemContent = { product ->
-                    CompactProductItem(product)
-                },
-                onViewMoreClick = {
-                    navController?.navigateToProductsList()
-                },
+fun TransactionsScreen(
+    viewModel: TransactionsScreenViewModel = koinInject(),
+    navController: androidx.navigation.NavController? = null,
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    if (uiState.collectedTransactions != null && uiState.productSummaries != null) {
+        TransactionsScreenContent(
+            currentPeriod = uiState.currentPeriod,
+            productSummaries = uiState.productSummaries!!,
+            currentTransactions = viewModel.getTransactionsByPeriod(uiState.currentPeriod),
+            customerCount = viewModel.getCustomerCountByPeriod(uiState.currentPeriod),
+            totalQuantity = viewModel.getTotalQuantityByPeriod(uiState.currentPeriod),
+            totalRevenue = viewModel.getTotalRevenueByPeriod(uiState.currentPeriod),
+            onPeriodSelected = { viewModel.setCurrentPeriod(it) },
+            onNavigateToAllTransactions = { navController?.navigateToAllTransactions() },
+            onNavigateToProductsList = { navController?.navigateToProductsList() },
+        )
+    } else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.width(64.dp).aspectRatio(1f),
             )
         }
     }
@@ -209,7 +104,10 @@ fun TimePeriodSelector(
                 onClick = { onPeriodSelected(period) },
                 label = {
                     Text(
-                        text = period.displayName,
+                        text = when (period) {
+                            TimePeriod.TODAY -> "今日"
+                            TimePeriod.ALL_TIME -> "全期間"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 },
@@ -263,43 +161,25 @@ fun EnhancedSummaryCard(
     }
 }
 
-fun generateMockTransactions(multiplier: Int = 1): List<Transaction> {
-    val products = listOf(
-        "感冒薬A",
-        "胃腸薬B",
-        "湿布C",
-        "目薬D",
-        "絆創膏E",
-    )
-    val paymentMethods = PaymentMethod.entries.toTypedArray()
-
-    return (1..(20 * multiplier)).map { index ->
-        val items = (1..Random.nextInt(1, 4)).map {
-            val product = products.random()
-            val unitPrice = Random.nextInt(300, 2000)
-            val quantity = Random.nextInt(1, 3)
-            TransactionItem(
-                productId = "P${Random.nextInt(1, 100)}",
-                name = product,
-                quantity = quantity,
-                unitPrice = unitPrice,
-                totalPrice = unitPrice * quantity,
-            )
-        }
-
-        val subtotal = items.sumOf { it.totalPrice }
-        val discount = if (Random.nextBoolean()) Random.nextFloat() * 10 else 0f
-        val total = (subtotal * (1 - discount / 100)).toInt()
-
-        Transaction(
-            id = "T${index.toString().padStart(3, '0')}",
-            timestamp = LocalDateTime(2024, 1, 1, Random.nextInt(9, 18), Random.nextInt(0, 60)),
-            items = items,
-            totalAmount = total,
-            discount = discount,
-            paymentMethod = paymentMethods.random(),
+fun generateMockTransactions(multiplier: Int = 1): List<Transaction> = (1..(20 * multiplier)).map { index ->
+    val items = (1..Random.nextInt(1, 4)).map {
+        val unitPrice = Random.nextInt(300, 2000)
+        val quantity = Random.nextInt(1, 3)
+        TransactionItem(
+            productId = "P${Random.nextInt(1, 100)}",
+            quantity = quantity,
+            unitPrice = unitPrice,
         )
     }
+
+    val subtotal = items.sumOf { it.quantity * it.unitPrice }
+    val discount = if (Random.nextBoolean()) Random.nextFloat() * 10 else 0f
+
+    Transaction(
+        id = "T${index.toString().padStart(3, '0')}",
+        timestamp = LocalDateTime(2024, 1, 1, Random.nextInt(9, 18), Random.nextInt(0, 60)),
+        items = items,
+    )
 }
 
 fun generateMockProductSummary(multiplier: Int = 1): List<ProductSummary> {
@@ -318,7 +198,6 @@ fun generateMockProductSummary(multiplier: Int = 1): List<ProductSummary> {
         ProductSummary(
             productId = "P${(index + 1).toString().padStart(3, '0')}",
             name = name,
-            image = null,
             totalQuantity = quantity,
             totalRevenue = unitPrice * quantity,
             unitPrice = unitPrice,
@@ -336,6 +215,7 @@ fun <T> DataListCard(
 ) {
     OutlinedCard(
         modifier = modifier
+            .height(420.dp)
             .fillMaxWidth(),
     ) {
         Column(
@@ -379,7 +259,7 @@ fun <T> DataListCard(
 }
 
 @Composable
-fun CompactTransactionItem(transaction: Transaction) {
+fun CompactTransactionItem(transaction: TransactionDataModel) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
@@ -406,7 +286,7 @@ fun CompactTransactionItem(transaction: Transaction) {
                 )
             }
             Text(
-                text = "${transaction.items.size}点 | ${transaction.paymentMethod.name}",
+                text = "${transaction.totalQuantity}点 | ${transaction.createdAt.toDateString()}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -489,8 +369,7 @@ fun ProductSalesBarChart(
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp),
+                    .fillMaxWidth(),
             ) {
                 val barParameters = BarParameters(
                     dataName = "商品売上",
@@ -503,6 +382,7 @@ fun ProductSalesBarChart(
                     xAxisData = productData.map {
                         if (it.name.length > 6) it.name.take(6) + "..." else it.name
                     },
+                    isShowGrid = true,
                     animateChart = true,
                     showGridWithSpacer = true,
                     yAxisStyle = TextStyle(
@@ -513,8 +393,115 @@ fun ProductSalesBarChart(
                         fontSize = 10.sp,
                         color = MaterialTheme.colorScheme.onSurface,
                     ),
+                    legendPosition = LegendPosition.DISAPPEAR,
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TransactionsScreenContent(
+    currentPeriod: TimePeriod,
+    productSummaries: List<ProductSummary>,
+    currentTransactions: List<TransactionDataModel>,
+    customerCount: Int,
+    totalQuantity: Int,
+    totalRevenue: Int,
+    onPeriodSelected: (TimePeriod) -> Unit,
+    onNavigateToAllTransactions: () -> Unit,
+    onNavigateToProductsList: () -> Unit,
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val minCellWidth = 320.dp
+        val horizontalPadding = 16.dp * 2
+        val interItemSpacing = 16.dp
+        val canFitTwo = (maxWidth - horizontalPadding) >= (minCellWidth * 2 + interItemSpacing)
+        val gridColumns = if (canFitTwo) 2 else 1
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(gridColumns),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                TimePeriodSelector(
+                    selectedPeriod = currentPeriod,
+                    onPeriodSelected = onPeriodSelected,
+                )
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SummaryCardsRow(
+                    customerCount = customerCount,
+                    totalQuantity = totalQuantity,
+                    totalRevenue = totalRevenue,
+                )
+            }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                ProductSalesBarChart(
+                    productData = productSummaries,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(420.dp),
+                )
+            }
+
+            item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
+                DataListCard(
+                    title = "取引",
+                    items = currentTransactions.take(5),
+                    itemContent = { transaction ->
+                        CompactTransactionItem(transaction)
+                    },
+                    onViewMoreClick = onNavigateToAllTransactions,
+                )
+            }
+
+            item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
+                DataListCard(
+                    title = "人気商品",
+                    items = productSummaries.take(5),
+                    itemContent = { product ->
+                        CompactProductItem(product)
+                    },
+                    onViewMoreClick = onNavigateToProductsList,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummaryCardsRow(
+    customerCount: Int,
+    totalQuantity: Int,
+    totalRevenue: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        EnhancedSummaryCard(
+            modifier = Modifier.weight(1f),
+            title = "顧客数",
+            value = customerCount.toString(),
+            icon = Icons.Default.People,
+        )
+        EnhancedSummaryCard(
+            modifier = Modifier.weight(1f),
+            title = "売上個数",
+            value = totalQuantity.toString(),
+            icon = Icons.Default.ShoppingCart,
+        )
+        EnhancedSummaryCard(
+            modifier = Modifier.weight(1f),
+            title = "売上金額",
+            value = totalRevenue.toString(),
+            icon = Icons.Default.AttachMoney,
+        )
     }
 }
