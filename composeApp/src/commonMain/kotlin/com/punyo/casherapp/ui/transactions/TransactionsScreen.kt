@@ -73,8 +73,8 @@ fun TransactionsScreen(
             totalQuantity = viewModel.getTotalQuantityByPeriod(uiState.currentPeriod),
             totalRevenue = viewModel.getTotalRevenueByPeriod(uiState.currentPeriod),
             onPeriodSelected = { viewModel.setCurrentPeriod(it) },
-            onNavigateToAllTransactions = { navController?.navigateToAllTransactions() },
-            onNavigateToProductsList = { navController?.navigateToProductsList() },
+            onNavigateToAllTransactions = { navController?.navigateToAllTransactions(uiState.currentPeriod) },
+            onNavigateToProductsList = { navController?.navigateToProductsList(uiState.currentPeriod) },
         )
     } else {
         Box(

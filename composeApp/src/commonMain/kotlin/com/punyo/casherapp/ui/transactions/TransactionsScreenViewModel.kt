@@ -18,6 +18,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.Serializable
 import kotlin.collections.forEach
 
 class TransactionsScreenViewModel(
@@ -193,6 +194,7 @@ data class TransactionsScreenUiState(
     val onlyTodayDateLoaded: Boolean = false,
 )
 
+@Serializable
 enum class TimePeriod {
     TODAY,
     ALL_TIME,
