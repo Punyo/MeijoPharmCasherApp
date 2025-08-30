@@ -4,6 +4,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.punyo.casherapp.ui.navigation.NavigationDestinations
+import com.punyo.casherapp.ui.transactions.alltransactions.AllTransactionsSubScreen
+import com.punyo.casherapp.ui.transactions.productlist.ProductsListSubScreen
 
 fun NavController.navigateToTransactions() {
     navigate(NavigationDestinations.TRANSACTIONS_ROUTE) {
