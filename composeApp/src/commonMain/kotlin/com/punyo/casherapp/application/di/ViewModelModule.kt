@@ -10,7 +10,7 @@ import org.koin.dsl.module
 val viewModelModule =
     module {
         viewModel { ProductViewModel(get()) }
-        viewModel { AllTransactionsSubScreenViewModel(get(), get()) }
+        viewModel { AllTransactionsSubScreenViewModel(get()) }
         viewModel { TransactionsScreenViewModel(get(), get()) }
         viewModel { ProductsListSubScreenViewModel(get()) }
     }

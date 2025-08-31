@@ -6,26 +6,29 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.punyo.casherapp.data.product.ProductRepository
+import com.punyo.casherapp.data.transaction.model.TransactionDataModel
+import com.punyo.casherapp.extensions.toDateString
 import com.punyo.casherapp.ui.component.DateRangePickerDialog
 import com.punyo.casherapp.ui.component.NavigateBackButton
 import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
 import com.punyo.casherapp.ui.transactions.TimePeriod
-import com.punyo.casherapp.ui.transactions.Transaction
-import com.punyo.casherapp.ui.transactions.generateMockTransactions
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -40,31 +43,25 @@ fun AllTransactionsSubScreen(
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val dateRangePickerState = rememberDateRangePickerState()
+    val dateRangePickerState = uiState.dateRangePickerState
 
-    LaunchedEffect(true) {
+    LaunchedEffect(timePeriod) {
         if (timePeriod == TimePeriod.TODAY) {
             val timeZone = TimeZone.currentSystemDefault()
             val utcMillis = Clock.System.now().toLocalDateTime(timeZone).toInstant(TimeZone.UTC).toEpochMilliseconds()
             dateRangePickerState.setSelection(
                 startDateMillis = utcMillis,
-                endDateMillis = utcMillis,
+                endDateMillis = utcMillis + viewModel.oneDay,
             )
+            viewModel.setDateRange()
         }
     }
 
-    val allTransactions = generateMockTransactions(multiplier = 30)
+    LaunchedEffect(dateRangePickerState.selectedStartDateMillis, dateRangePickerState.selectedEndDateMillis) {
+        viewModel.setDateRange()
+    }
 
-    val filteredTransactions = allTransactions.filter { transaction ->
-        val matchesSearch = if (uiState.searchText.isBlank()) {
-            true
-        } else {
-            transaction.id.contains(uiState.searchText, ignoreCase = true)
-//                transaction.items.any { it.name.contains(uiState.searchText, ignoreCase = true) }
-        }
-
-        matchesSearch
-    }.sortedByDescending { it.timestamp }
+    val displayTransactions = uiState.transactions
 
     Column(
         modifier = Modifier
@@ -79,7 +76,7 @@ fun AllTransactionsSubScreen(
         SearchAndDateFilterTextField(
             searchText = uiState.searchText,
             onSearchTextChange = { viewModel.setSearchText(it) },
-            placeholderText = "商品名またはバーコードで検索",
+            placeholderText = "取引に含まれている商品名で検索",
             onShowDatePickerDialog = { viewModel.setShowDatePickerDialog(it) },
             dateRangePickerState = dateRangePickerState,
         )
@@ -87,35 +84,60 @@ fun AllTransactionsSubScreen(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "取引一覧 (${filteredTransactions.size}件)",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
                 )
-//                Text(
-//                    text = "総額: ¥${
-//                        filteredTransactions.sumOf { it.totalAmount }.toString().reversed().chunked(3)
-//                            .joinToString(",").reversed()
-//                    }",
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = MaterialTheme.colorScheme.primary,
-//                    fontWeight = FontWeight.Bold,
-//                )
-            }
+            } else if (uiState.error != null) {
+                Text(
+                    text = "エラー: ${uiState.error}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                )
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "取引一覧",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(filteredTransactions.size) { index ->
-                    val transaction = filteredTransactions[index]
-                    DetailedTransactionItem(transaction)
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(displayTransactions.size) { index ->
+                        val transaction = displayTransactions[index]
+                        if (index >= displayTransactions.size - 3 && uiState.hasMorePages && !uiState.isLoadingMore) {
+                            LaunchedEffect(displayTransactions.size) {
+                                viewModel.loadMoreTransactions()
+                            }
+                        }
+
+                        DetailedTransactionItem(
+                            transaction = transaction,
+                            productRepository = koinInject(),
+                        )
+                    }
+
+                    // ローディングインジケーター
+                    if (uiState.isLoadingMore) {
+                        item {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentWidth(Alignment.CenterHorizontally)
+                                    .padding(16.dp),
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -130,7 +152,12 @@ fun AllTransactionsSubScreen(
 }
 
 @Composable
-fun DetailedTransactionItem(transaction: Transaction) {
+fun DetailedTransactionItem(
+    transaction: TransactionDataModel,
+    productRepository: ProductRepository,
+) {
+    val dateTime = transaction.createdAt.toLocalDateTime(TimeZone.currentSystemDefault())
+
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -143,22 +170,20 @@ fun DetailedTransactionItem(transaction: Transaction) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = transaction.id,
+                    text = dateTime.toDateString(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
-//                Text(
-//                    text = "¥${transaction.totalAmount}",
-//                    style = MaterialTheme.typography.titleMedium,
-//                    fontWeight = FontWeight.Bold,
-//                    color = MaterialTheme.colorScheme.primary,
-//                )
+                Text(
+                    text = "¥${transaction.totalAmount}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
 
             Text(
-                text = "${
-                    transaction.timestamp.hour.toString().padStart(2, '0')
-                }:${transaction.timestamp.minute.toString().padStart(2, '0')}",
+                text = transaction.id,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -169,44 +194,44 @@ fun DetailedTransactionItem(transaction: Transaction) {
                 modifier = Modifier.padding(bottom = 8.dp),
             ) {
                 transaction.items.forEach { item ->
+                    val productName by produceState(
+                        initialValue = "読み込み中...",
+                        key1 = item.productId,
+                    ) {
+                        value = item.productId?.let { productId ->
+                            productRepository.getProductById(productId)?.name
+                        } ?: "不明な商品"
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "$productName × ${item.quantity}",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            if (item.discountPercent != 0.0) {
+                                Text(
+                                    text = "${item.discountPercent}% 割引",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        }
                         Text(
-                            text = "$item × ${item.quantity}",
+                            text = "¥${item.totalPrice}",
                             style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Medium,
+                            color = if (item.discountPercent != 0.0) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
                         )
-//                        Text(
-//                            text = "¥${item.totalPrice}",
-//                            style = MaterialTheme.typography.bodySmall,
-//                            fontWeight = FontWeight.Medium,
-//                        )
                     }
                 }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-//                Text(
-//                    text = when (transaction.paymentMethod) {
-//                        PaymentMethod.CASH -> "現金"
-//                        PaymentMethod.CARD -> "カード"
-//                        PaymentMethod.QR_CODE -> "QR決済"
-//                    },
-//                    style = MaterialTheme.typography.bodySmall,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                )
-//                if (transaction.discount > 0) {
-//                    Text(
-//                        text = "割引: ${transaction.discount.toInt()}%",
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = MaterialTheme.colorScheme.error,
-//                    )
-//                }
             }
         }
     }
