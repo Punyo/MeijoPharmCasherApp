@@ -101,6 +101,86 @@ class TransactionLocalDataSource(
         database.transactionQueries.deleteAllTransactions()
     }
 
+    fun getTransactionsPaged(
+        limit: Long,
+        offset: Long,
+        startDate: Instant? = null,
+        endDate: Instant? = null,
+        searchQuery: String? = null,
+    ): Flow<List<TransactionDataModel>> = when {
+        startDate != null && endDate != null && searchQuery != null -> {
+            database.transactionQueries.selectTransactionsPagedWithDateRangeAndSearch(
+                startDate.epochSeconds,
+                endDate.epochSeconds,
+                "%$searchQuery%",
+                "%$searchQuery%",
+                limit,
+                offset,
+            )
+        }
+        startDate != null && endDate != null -> {
+            database.transactionQueries.selectTransactionsPagedWithDateRange(
+                startDate.epochSeconds,
+                endDate.epochSeconds,
+                limit,
+                offset,
+            )
+        }
+        searchQuery != null -> {
+            database.transactionQueries.selectTransactionsPagedWithSearch(
+                "%$searchQuery%",
+                "%$searchQuery%",
+                limit,
+                offset,
+            )
+        }
+        else -> {
+            database.transactionQueries.selectTransactionsPaged(limit, offset)
+        }
+    }
+        .asFlow()
+        .mapToList(Dispatchers.IO)
+        .map { transactions ->
+            transactions.map { transaction ->
+                val items = getTransactionItemsSync(transaction.id)
+                TransactionDataModel(
+                    id = transaction.id,
+                    createdAt = Instant.fromEpochSeconds(transaction.created_at),
+                    items = items,
+                )
+            }
+        }
+
+    fun getTransactionCount(
+        startDate: Instant? = null,
+        endDate: Instant? = null,
+        searchQuery: String? = null,
+    ): Long = when {
+        startDate != null && endDate != null && searchQuery != null -> {
+            database.transactionQueries.countTransactionsWithDateRangeAndSearch(
+                startDate.epochSeconds,
+                endDate.epochSeconds,
+                "%$searchQuery%",
+                "%$searchQuery%",
+            ).executeAsOne()
+        }
+        startDate != null && endDate != null -> {
+            database.transactionQueries.countTransactionsWithDateRange(
+                startDate.epochSeconds,
+                endDate.epochSeconds,
+            ).executeAsOne()
+        }
+        searchQuery != null -> {
+            database.transactionQueries.countTransactionsWithSearch(
+                "%$searchQuery%",
+                "%$searchQuery%",
+            ).executeAsOne()
+        }
+        else -> {
+            database.transactionQueries.countAllTransactions().executeAsOne()
+        }
+    }
+
     private fun getTransactionItemsSync(transactionId: String): List<TransactionItemDataModel> = database.transactionQueries.selectTransactionItems(transactionId).executeAsList().map { item ->
         TransactionItemDataModel(
             id = item.id,

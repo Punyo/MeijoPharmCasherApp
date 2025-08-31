@@ -44,6 +44,56 @@ DELETE FROM transactions WHERE id = ?;
 deleteAllTransactions:
 DELETE FROM transactions;
 
+-- Paging queries
+selectTransactionsPaged:
+SELECT * FROM transactions 
+ORDER BY created_at DESC 
+LIMIT ? OFFSET ?;
+
+selectTransactionsPagedWithDateRange:
+SELECT * FROM transactions 
+WHERE created_at >= ? AND created_at <= ?
+ORDER BY created_at DESC 
+LIMIT ? OFFSET ?;
+
+selectTransactionsPagedWithSearch:
+SELECT DISTINCT t.* FROM transactions t
+LEFT JOIN transaction_item ti ON t.id = ti.transaction_id
+LEFT JOIN product p ON ti.product_id = p.id
+WHERE t.id LIKE ? OR p.name LIKE ?
+ORDER BY t.created_at DESC
+LIMIT ? OFFSET ?;
+
+selectTransactionsPagedWithDateRangeAndSearch:
+SELECT DISTINCT t.* FROM transactions t
+LEFT JOIN transaction_item ti ON t.id = ti.transaction_id
+LEFT JOIN product p ON ti.product_id = p.id
+WHERE (t.created_at >= ? AND t.created_at <= ?)
+   AND (t.id LIKE ? OR p.name LIKE ?)
+ORDER BY t.created_at DESC
+LIMIT ? OFFSET ?;
+
+-- Count queries
+countAllTransactions:
+SELECT COUNT(*) FROM transactions;
+
+countTransactionsWithDateRange:
+SELECT COUNT(*) FROM transactions 
+WHERE created_at >= ? AND created_at <= ?;
+
+countTransactionsWithSearch:
+SELECT COUNT(DISTINCT t.id) FROM transactions t
+LEFT JOIN transaction_item ti ON t.id = ti.transaction_id
+LEFT JOIN product p ON ti.product_id = p.id
+WHERE t.id LIKE ? OR p.name LIKE ?;
+
+countTransactionsWithDateRangeAndSearch:
+SELECT COUNT(DISTINCT t.id) FROM transactions t
+LEFT JOIN transaction_item ti ON t.id = ti.transaction_id
+LEFT JOIN product p ON ti.product_id = p.id
+WHERE (t.created_at >= ? AND t.created_at <= ?)
+   AND (t.id LIKE ? OR p.name LIKE ?);
+
 -- Transaction item queries
 selectTransactionItems:
 SELECT * FROM transaction_item WHERE transaction_id = ? ORDER BY id;
