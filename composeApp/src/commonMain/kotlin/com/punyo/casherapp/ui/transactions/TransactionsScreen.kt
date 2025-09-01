@@ -53,7 +53,6 @@ import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.baseComponents.model.LegendPosition
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.extensions.toDateString
-import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
 import kotlin.random.Random
 
@@ -161,27 +160,6 @@ fun EnhancedSummaryCard(
     }
 }
 
-fun generateMockTransactions(multiplier: Int = 1): List<Transaction> = (1..(20 * multiplier)).map { index ->
-    val items = (1..Random.nextInt(1, 4)).map {
-        val unitPrice = Random.nextInt(300, 2000)
-        val quantity = Random.nextInt(1, 3)
-        TransactionItem(
-            productId = "P${Random.nextInt(1, 100)}",
-            quantity = quantity,
-            unitPrice = unitPrice,
-        )
-    }
-
-    val subtotal = items.sumOf { it.quantity * it.unitPrice }
-    val discount = if (Random.nextBoolean()) Random.nextFloat() * 10 else 0f
-
-    Transaction(
-        id = "T${index.toString().padStart(3, '0')}",
-        timestamp = LocalDateTime(2024, 1, 1, Random.nextInt(9, 18), Random.nextInt(0, 60)),
-        items = items,
-    )
-}
-
 fun generateMockProductSummary(multiplier: Int = 1): List<ProductSummary> {
     val products = listOf(
         "感冒薬A" to 800,
@@ -274,7 +252,7 @@ fun CompactTransactionItem(transaction: TransactionDataModel) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = transaction.id,
+                    text = transaction.createdAt.toDateString(),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Medium,
                 )
@@ -286,7 +264,7 @@ fun CompactTransactionItem(transaction: TransactionDataModel) {
                 )
             }
             Text(
-                text = "${transaction.totalQuantity}点 | ${transaction.createdAt.toDateString()}",
+                text = "${transaction.totalQuantity}点 | ${transaction.id}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
