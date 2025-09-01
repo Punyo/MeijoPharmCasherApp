@@ -15,6 +15,20 @@ interface TransactionRepository {
         endDate: Instant,
     ): Flow<List<TransactionDataModel>>
 
+    fun getTransactionsPaged(
+        limit: Int,
+        offset: Int,
+        startDate: Instant? = null,
+        endDate: Instant? = null,
+        searchQuery: String? = null,
+    ): Flow<List<TransactionDataModel>>
+
+    suspend fun getTransactionCount(
+        startDate: Instant? = null,
+        endDate: Instant? = null,
+        searchQuery: String? = null,
+    ): Int
+
     suspend fun insertTransaction(transaction: TransactionDataModel): String
 
     suspend fun insertTransactionWithItems(

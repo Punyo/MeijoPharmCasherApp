@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import java.time.Instant
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,14 +83,14 @@ fun SearchAndDateFilterTextField(
                 modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
                 text = "選択中: ${
                     dateRangePickerState.selectedStartDateMillis?.let { startMillis ->
-                        val startDate = java.time.Instant.ofEpochMilli(startMillis)
-                            .atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                        val startDate = Instant.ofEpochMilli(startMillis)
+                            .atZone(ZoneId.of("UTC")).toLocalDate()
                         startDate.toString()
                     } ?: "開始日未選択"
                 } 〜 ${
                     dateRangePickerState.selectedEndDateMillis?.let { endMillis ->
-                        val endDate = java.time.Instant.ofEpochMilli(endMillis)
-                            .atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                        val endDate = Instant.ofEpochMilli(endMillis)
+                            .atZone(ZoneId.of("UTC")).toLocalDate()
                         endDate.toString()
                     } ?: "終了日未選択"
                 }",

@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.Serializable
 import kotlin.collections.forEach
 
 class TransactionsScreenViewModel(
@@ -193,23 +193,11 @@ data class TransactionsScreenUiState(
     val onlyTodayDateLoaded: Boolean = false,
 )
 
+@Serializable
 enum class TimePeriod {
     TODAY,
     ALL_TIME,
 }
-
-data class Transaction(
-    val id: String,
-    val timestamp: LocalDateTime,
-    val items: List<TransactionItem>,
-)
-
-data class TransactionItem(
-    val productId: String,
-    val quantity: Int,
-    val unitPrice: Int,
-    val discountPercent: Float = 0f,
-)
 
 data class ProductSummary(
     val productId: String?,

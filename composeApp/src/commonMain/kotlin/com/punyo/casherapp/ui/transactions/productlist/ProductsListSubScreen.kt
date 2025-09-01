@@ -1,4 +1,4 @@
-package com.punyo.casherapp.ui.transactions
+package com.punyo.casherapp.ui.transactions.productlist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,10 +25,14 @@ import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.ui.component.DateRangePickerDialog
 import com.punyo.casherapp.ui.component.NavigateBackButton
 import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
+import com.punyo.casherapp.ui.transactions.ProductSummary
+import com.punyo.casherapp.ui.transactions.TimePeriod
+import com.punyo.casherapp.ui.transactions.generateMockProductSummary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductsListScreen(
+fun ProductsListSubScreen(
+    timePeriod: TimePeriod = TimePeriod.TODAY,
     onNavigateBack: () -> Unit,
 ) {
     var searchText by remember { mutableStateOf("") }

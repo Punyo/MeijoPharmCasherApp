@@ -4,7 +4,6 @@ import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.data.transaction.model.TransactionItemDataModel
 import com.punyo.casherapp.data.transaction.source.TransactionLocalDataSource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 
 class TransactionRepositoryImpl(
@@ -83,4 +82,28 @@ class TransactionRepositoryImpl(
     override suspend fun deleteAllTransactions() {
         localDataSource.deleteAllTransactions()
     }
+
+    override fun getTransactionsPaged(
+        limit: Int,
+        offset: Int,
+        startDate: Instant?,
+        endDate: Instant?,
+        searchQuery: String?,
+    ): Flow<List<TransactionDataModel>> = localDataSource.getTransactionsPaged(
+        limit = limit.toLong(),
+        offset = offset.toLong(),
+        startDate = startDate,
+        endDate = endDate,
+        searchQuery = searchQuery,
+    )
+
+    override suspend fun getTransactionCount(
+        startDate: Instant?,
+        endDate: Instant?,
+        searchQuery: String?,
+    ): Int = localDataSource.getTransactionCount(
+        startDate = startDate,
+        endDate = endDate,
+        searchQuery = searchQuery,
+    ).toInt()
 }
