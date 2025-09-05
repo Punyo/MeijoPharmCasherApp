@@ -51,14 +51,13 @@ fun AllTransactionsSubScreen(
             val utcMillis = Clock.System.now().toLocalDateTime(timeZone).toInstant(TimeZone.UTC).toEpochMilliseconds()
             dateRangePickerState.setSelection(
                 startDateMillis = utcMillis,
-                endDateMillis = utcMillis + viewModel.oneDay,
+                endDateMillis = utcMillis,
             )
-            viewModel.setDateRange()
         }
     }
 
     LaunchedEffect(dateRangePickerState.selectedStartDateMillis, dateRangePickerState.selectedEndDateMillis) {
-        viewModel.setDateRange()
+        viewModel.applyDateRange()
     }
 
     val displayTransactions = uiState.transactions
