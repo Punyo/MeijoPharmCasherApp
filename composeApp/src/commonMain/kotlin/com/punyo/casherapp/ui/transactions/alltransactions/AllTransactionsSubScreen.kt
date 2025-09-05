@@ -225,7 +225,7 @@ fun DetailedTransactionItem(
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium,
                             color = if (item.discountPercent != 0.0) {
-                                MaterialTheme.colorScheme.primary
+                                MaterialTheme.colorScheme.error
                             } else {
                                 MaterialTheme.colorScheme.onSurface
                             },
