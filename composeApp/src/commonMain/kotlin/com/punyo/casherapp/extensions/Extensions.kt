@@ -25,9 +25,9 @@ fun LocalDateTime.endOfDay(): LocalDateTime = LocalDateTime(
 )
 
 fun LocalDateTime.toDateString(): String = "${this.year}/${this.monthNumber.toString().padStart(2, '0')}/${
-    this.dayOfMonth.toString().padStart(2, '0')
+this.dayOfMonth.toString().padStart(2, '0')
 } ${this.hour.toString().padStart(2, '0')}:${this.minute.toString().padStart(2, '0')}:${
-    this.second.toString().padStart(2, '0')
+this.second.toString().padStart(2, '0')
 }"
 
 fun Instant.toDateString(timeZone: TimeZone = TimeZone.currentSystemDefault()): String {

@@ -6,7 +6,7 @@ data class TransactionItemDataModel(
     val unitPrice: Int,
     val transactionId: String,
     val productId: String?,
-    val discountPercent: Double = 0.0
+    val discountPercent: Double = 0.0,
 ) {
     val discountAmount: Int
         get() = (unitPrice * discountPercent / 100).toInt()
