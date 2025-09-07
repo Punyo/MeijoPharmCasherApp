@@ -3,7 +3,6 @@ package com.punyo.casherapp.ui.transactions.alltransactions
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -14,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -25,9 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.extensions.toDateString
-import com.punyo.casherapp.ui.component.DateRangePickerDialog
-import com.punyo.casherapp.ui.component.NavigateBackButton
-import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
+import com.punyo.casherapp.ui.transactions.BaseTransactionSubScreen
 import com.punyo.casherapp.ui.transactions.TimePeriod
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -41,36 +37,27 @@ fun AllTransactionsSubScreen(
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val dateRangePickerState = uiState.dateRangePickerState
 
-    LaunchedEffect(timePeriod) {
-        viewModel.loadTransactionsForDateRange(timePeriod)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+    BaseTransactionSubScreen(
+        timePeriod = timePeriod,
+        onNavigateBack = onNavigateBack,
+        navigationTitle = "全ての取引",
+        searchPlaceholder = "取引に含まれている商品名で検索",
+        searchText = uiState.searchText,
+        showDatePickerDialog = uiState.showDatePickerDialog,
+        dateRangePickerState = uiState.dateRangePickerState,
+        onLoadDataForDateRange = viewModel::loadDataForDateRange,
+        onSearchTextChange = viewModel::setSearchText,
+        onSearchQueryClearButtonClick = viewModel::onSearchQueryClearButtonClick,
+        onShowDatePickerDialogButtonClick = viewModel::setShowDatePickerDialog,
+        onDateRangePickerConfirm = viewModel::onDateRangePickerConfirm,
     ) {
-        NavigateBackButton(
-            onNavigateBack = onNavigateBack,
-            text = "全ての取引",
-        )
-
-        SearchAndDateFilterTextField(
-            searchText = uiState.searchText,
-            placeholderText = "取引に含まれている商品名で検索",
-            onSearchTextChange = { viewModel.setSearchText(it) },
-            onSearchQueryClearButtonClick = { viewModel.onSearchQueryClearButtonClick() },
-            onShowDatePickerDialogButtonClick = { viewModel.setShowDatePickerDialog(true) },
-            dateRangePickerState = dateRangePickerState,
-        )
-
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
         ) {
-            if (uiState.transactions != null) {
-                val transactions = uiState.transactions!!
+            if (uiState.data != null) {
+                val transactions = uiState.data!!
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -105,14 +92,6 @@ fun AllTransactionsSubScreen(
                         .padding(32.dp),
                 )
             }
-        }
-
-        if (uiState.showDatePickerDialog) {
-            DateRangePickerDialog(
-                onConfirm = viewModel::onDateRangePickerConfirm,
-                onDismiss = { viewModel.setShowDatePickerDialog(false) },
-                dateRangePickerState = dateRangePickerState,
-            )
         }
     }
 }
