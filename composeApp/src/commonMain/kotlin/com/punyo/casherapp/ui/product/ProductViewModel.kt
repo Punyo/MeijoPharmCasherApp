@@ -11,16 +11,16 @@ import kotlinx.coroutines.launch
 
 data class ProductUiState(
     val searchText: String = "",
-    val products: List<ProductDataModel> = emptyList(),
+    val products: List<ProductDataModel>? = null,
     val showAddProductDialog: Boolean = false,
     val editingProduct: ProductDataModel? = null,
     val isLoading: Boolean = false,
 ) {
-    val filteredProducts: List<ProductDataModel> =
+    val filteredProducts: List<ProductDataModel>? =
         if (searchText.isBlank()) {
             products
         } else {
-            products.filter { product ->
+            products?.filter { product ->
                 product.name.contains(searchText, ignoreCase = true)
             }
         }
@@ -74,7 +74,7 @@ class ProductViewModel(
         }
         state.value.copy(
             products =
-            state.value.products.filter {
+            state.value.products?.filter {
                 it.id != id
             },
         )
@@ -111,14 +111,6 @@ class ProductViewModel(
             repository.updateProduct(updatedProduct)
             hideEditProductDialog()
         }
-    }
-
-    fun onProductClick(product: ProductDataModel) {
-        // TODO: 商品詳細画面への遷移
-    }
-
-    fun onProductMenuClick(product: ProductDataModel) {
-        // TODO: 商品メニュー表示
     }
 
     fun onBarcodeClick() {
