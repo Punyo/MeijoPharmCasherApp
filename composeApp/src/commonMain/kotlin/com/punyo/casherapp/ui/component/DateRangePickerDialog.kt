@@ -8,6 +8,7 @@ import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -15,15 +16,23 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateRangePickerDialog(
+    onConfirm: (startDateMillis: Long?, endDateMillis: Long?) -> Unit,
     onDismiss: () -> Unit,
     dateRangePickerState: DateRangePickerState,
 ) {
+    val tempDateRangePickerState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = dateRangePickerState.selectedStartDateMillis,
+        initialSelectedEndDateMillis = dateRangePickerState.selectedEndDateMillis,
+    )
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
                 onClick = {
-                    onDismiss()
+                    onConfirm(
+                        tempDateRangePickerState.selectedStartDateMillis,
+                        tempDateRangePickerState.selectedEndDateMillis,
+                    )
                 },
             ) {
                 Text("OK")
@@ -36,7 +45,7 @@ fun DateRangePickerDialog(
         },
     ) {
         DateRangePicker(
-            state = dateRangePickerState,
+            state = tempDateRangePickerState,
             title = {
                 Text(
                     text = "日時の範囲を選択",

@@ -44,34 +44,21 @@ DELETE FROM transactions WHERE id = ?;
 deleteAllTransactions:
 DELETE FROM transactions;
 
--- Paging queries
-selectTransactionsPaged:
-SELECT * FROM transactions 
-ORDER BY created_at DESC 
-LIMIT ? OFFSET ?;
-
-selectTransactionsPagedWithDateRange:
-SELECT * FROM transactions 
-WHERE created_at >= ? AND created_at <= ?
-ORDER BY created_at DESC 
-LIMIT ? OFFSET ?;
-
-selectTransactionsPagedWithSearch:
+-- Search queries (without paging)
+selectTransactionsWithSearch:
 SELECT DISTINCT t.* FROM transactions t
 LEFT JOIN transaction_item ti ON t.id = ti.transaction_id
 LEFT JOIN product p ON ti.product_id = p.id
 WHERE t.id LIKE ? OR p.name LIKE ?
-ORDER BY t.created_at DESC
-LIMIT ? OFFSET ?;
+ORDER BY t.created_at DESC;
 
-selectTransactionsPagedWithDateRangeAndSearch:
+selectTransactionsWithDateRangeAndSearch:
 SELECT DISTINCT t.* FROM transactions t
 LEFT JOIN transaction_item ti ON t.id = ti.transaction_id
 LEFT JOIN product p ON ti.product_id = p.id
 WHERE (t.created_at >= ? AND t.created_at <= ?)
    AND (t.id LIKE ? OR p.name LIKE ?)
-ORDER BY t.created_at DESC
-LIMIT ? OFFSET ?;
+ORDER BY t.created_at DESC;
 
 -- Count queries
 countAllTransactions:
