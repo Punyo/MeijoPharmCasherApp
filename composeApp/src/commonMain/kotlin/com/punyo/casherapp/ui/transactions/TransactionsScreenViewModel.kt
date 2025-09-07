@@ -45,7 +45,7 @@ class TransactionsScreenViewModel(
     private fun startCollectTodayTransaction() {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         todayTransactionCollectJob = viewModelScope.launch {
-            transactionRepository.getTransactionsByDateRange(
+            transactionRepository.searchTransactions(
                 startDate = today.startOfDay().toInstant(TimeZone.currentSystemDefault()),
                 endDate = today.endOfDay().toInstant(TimeZone.currentSystemDefault()),
             ).collect { transactions ->

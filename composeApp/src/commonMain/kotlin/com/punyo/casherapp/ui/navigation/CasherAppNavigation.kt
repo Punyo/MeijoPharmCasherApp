@@ -8,8 +8,6 @@ import com.punyo.casherapp.ui.about.aboutScreen
 import com.punyo.casherapp.ui.home.homeScreen
 import com.punyo.casherapp.ui.product.productScreen
 import com.punyo.casherapp.ui.settings.settingsScreen
-// import com.punyo.casherapp.ui.transactions.allTransactionsSubScreen
-// import com.punyo.casherapp.ui.transactions.productsListSubScreen
 import com.punyo.casherapp.ui.transactions.transactionsScreen
 import com.punyo.casherapp.ui.transactions.transactionsSubScreen
 

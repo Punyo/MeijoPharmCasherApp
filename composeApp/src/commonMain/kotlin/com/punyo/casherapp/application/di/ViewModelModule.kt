@@ -12,5 +12,5 @@ val viewModelModule =
         viewModel { ProductViewModel(get()) }
         viewModel { AllTransactionsSubScreenViewModel(get()) }
         viewModel { TransactionsScreenViewModel(get(), get()) }
-        viewModel { ProductsListSubScreenViewModel(get()) }
+        viewModel { ProductsListSubScreenViewModel(get(), get()) }
     }

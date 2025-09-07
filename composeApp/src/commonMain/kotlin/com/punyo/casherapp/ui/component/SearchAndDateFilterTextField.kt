@@ -28,10 +28,11 @@ import java.time.ZoneId
 @Composable
 fun SearchAndDateFilterTextField(
     searchText: String,
-    onSearchTextChange: (String) -> Unit,
     placeholderText: String,
-    onShowDatePickerDialog: (Boolean) -> Unit,
     dateRangePickerState: DateRangePickerState,
+    onSearchTextChange: (String) -> Unit = {},
+    onSearchQueryClearButtonClick: () -> Unit = {},
+    onShowDatePickerDialogButtonClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isRangeSelected = dateRangePickerState.selectedStartDateMillis != null ||
@@ -55,7 +56,7 @@ fun SearchAndDateFilterTextField(
                 modifier = Modifier.weight(1f).height(56.dp),
                 singleLine = true,
             )
-            IconButton(onClick = { onShowDatePickerDialog(true) }) {
+            IconButton(onClick = onShowDatePickerDialogButtonClick) {
                 Icon(
                     imageVector = Icons.Default.CalendarMonth,
                     contentDescription = "日付範囲選択",
@@ -63,13 +64,7 @@ fun SearchAndDateFilterTextField(
             }
             if (searchText.isNotEmpty() || isRangeSelected) {
                 IconButton(
-                    onClick = {
-                        onSearchTextChange("")
-                        dateRangePickerState.setSelection(
-                            startDateMillis = null,
-                            endDateMillis = null,
-                        )
-                    },
+                    onClick = onSearchQueryClearButtonClick,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
@@ -82,17 +77,17 @@ fun SearchAndDateFilterTextField(
             Text(
                 modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
                 text = "選択中: ${
-                    dateRangePickerState.selectedStartDateMillis?.let { startMillis ->
-                        val startDate = Instant.ofEpochMilli(startMillis)
-                            .atZone(ZoneId.of("UTC")).toLocalDate()
-                        startDate.toString()
-                    } ?: "開始日未選択"
+                dateRangePickerState.selectedStartDateMillis?.let { startMillis ->
+                    val startDate = Instant.ofEpochMilli(startMillis)
+                        .atZone(ZoneId.of("UTC")).toLocalDate()
+                    startDate.toString()
+                } ?: "開始日未選択"
                 } 〜 ${
-                    dateRangePickerState.selectedEndDateMillis?.let { endMillis ->
-                        val endDate = Instant.ofEpochMilli(endMillis)
-                            .atZone(ZoneId.of("UTC")).toLocalDate()
-                        endDate.toString()
-                    } ?: "終了日未選択"
+                dateRangePickerState.selectedEndDateMillis?.let { endMillis ->
+                    val endDate = Instant.ofEpochMilli(endMillis)
+                        .atZone(ZoneId.of("UTC")).toLocalDate()
+                    endDate.toString()
+                } ?: "終了日未選択"
                 }",
                 style = MaterialTheme.typography.bodySmall,
             )

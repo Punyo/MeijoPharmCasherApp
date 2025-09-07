@@ -13,10 +13,15 @@ class TransactionRepositoryImpl(
 
     override suspend fun getTransactionById(id: String): TransactionDataModel? = localDataSource.getTransactionById(id)
 
-    override fun getTransactionsByDateRange(
-        startDate: Instant,
-        endDate: Instant,
-    ): Flow<List<TransactionDataModel>> = localDataSource.getTransactionsByDateRange(startDate, endDate)
+    override fun searchTransactions(
+        startDate: Instant?,
+        endDate: Instant?,
+        searchQuery: String?,
+    ): Flow<List<TransactionDataModel>> = localDataSource.searchTransactions(
+        startDate = startDate,
+        endDate = endDate,
+        searchQuery = searchQuery,
+    )
 
     override suspend fun insertTransaction(transaction: TransactionDataModel): String {
         val transactionId = localDataSource.insertTransaction(
@@ -82,20 +87,6 @@ class TransactionRepositoryImpl(
     override suspend fun deleteAllTransactions() {
         localDataSource.deleteAllTransactions()
     }
-
-    override fun getTransactionsPaged(
-        limit: Int,
-        offset: Int,
-        startDate: Instant?,
-        endDate: Instant?,
-        searchQuery: String?,
-    ): Flow<List<TransactionDataModel>> = localDataSource.getTransactionsPaged(
-        limit = limit.toLong(),
-        offset = offset.toLong(),
-        startDate = startDate,
-        endDate = endDate,
-        searchQuery = searchQuery,
-    )
 
     override suspend fun getTransactionCount(
         startDate: Instant?,

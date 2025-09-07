@@ -29,9 +29,7 @@ import com.punyo.casherapp.ui.component.DateRangePickerDialog
 import com.punyo.casherapp.ui.component.NavigateBackButton
 import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
 import com.punyo.casherapp.ui.transactions.TimePeriod
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.koinInject
 
@@ -46,22 +44,8 @@ fun AllTransactionsSubScreen(
     val dateRangePickerState = uiState.dateRangePickerState
 
     LaunchedEffect(timePeriod) {
-        if (timePeriod == TimePeriod.TODAY) {
-            val timeZone = TimeZone.currentSystemDefault()
-            val utcMillis = Clock.System.now().toLocalDateTime(timeZone).toInstant(TimeZone.UTC).toEpochMilliseconds()
-            dateRangePickerState.setSelection(
-                startDateMillis = utcMillis,
-                endDateMillis = utcMillis + viewModel.oneDay,
-            )
-            viewModel.setDateRange()
-        }
+        viewModel.loadTransactionsForDateRange(timePeriod)
     }
-
-    LaunchedEffect(dateRangePickerState.selectedStartDateMillis, dateRangePickerState.selectedEndDateMillis) {
-        viewModel.setDateRange()
-    }
-
-    val displayTransactions = uiState.transactions
 
     Column(
         modifier = Modifier
@@ -75,27 +59,18 @@ fun AllTransactionsSubScreen(
 
         SearchAndDateFilterTextField(
             searchText = uiState.searchText,
-            onSearchTextChange = { viewModel.setSearchText(it) },
             placeholderText = "取引に含まれている商品名で検索",
-            onShowDatePickerDialog = { viewModel.setShowDatePickerDialog(it) },
+            onSearchTextChange = { viewModel.setSearchText(it) },
+            onSearchQueryClearButtonClick = { viewModel.onSearchQueryClearButtonClick() },
+            onShowDatePickerDialogButtonClick = { viewModel.setShowDatePickerDialog(true) },
             dateRangePickerState = dateRangePickerState,
         )
 
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                )
-            } else if (uiState.error != null) {
-                Text(
-                    text = "エラー: ${uiState.error}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                )
-            } else {
+            if (uiState.transactions != null) {
+                val transactions = uiState.transactions!!
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -113,37 +88,28 @@ fun AllTransactionsSubScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(displayTransactions.size) { index ->
-                        val transaction = displayTransactions[index]
-                        if (index >= displayTransactions.size - 3 && uiState.hasMorePages && !uiState.isLoadingMore) {
-                            LaunchedEffect(displayTransactions.size) {
-                                viewModel.loadMoreTransactions()
-                            }
-                        }
+                    items(transactions.size) { index ->
+                        val transaction = transactions[index]
 
                         DetailedTransactionItem(
                             transaction = transaction,
                             productRepository = koinInject(),
                         )
                     }
-
-                    // ローディングインジケーター
-                    if (uiState.isLoadingMore) {
-                        item {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentWidth(Alignment.CenterHorizontally)
-                                    .padding(16.dp),
-                            )
-                        }
-                    }
                 }
+            } else {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .padding(32.dp),
+                )
             }
         }
 
         if (uiState.showDatePickerDialog) {
             DateRangePickerDialog(
+                onConfirm = viewModel::onDateRangePickerConfirm,
                 onDismiss = { viewModel.setShowDatePickerDialog(false) },
                 dateRangePickerState = dateRangePickerState,
             )
@@ -225,7 +191,7 @@ fun DetailedTransactionItem(
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium,
                             color = if (item.discountPercent != 0.0) {
-                                MaterialTheme.colorScheme.primary
+                                MaterialTheme.colorScheme.error
                             } else {
                                 MaterialTheme.colorScheme.onSurface
                             },

@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 data class TransactionDataModel(
     val id: String,
     val createdAt: Instant,
-    val items: List<TransactionItemDataModel> = emptyList()
+    val items: List<TransactionItemDataModel> = emptyList(),
 ) {
     val totalAmount: Int
         get() = items.sumOf { it.totalPrice }

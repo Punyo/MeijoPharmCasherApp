@@ -6,18 +6,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -27,29 +27,33 @@ import com.punyo.casherapp.ui.component.NavigateBackButton
 import com.punyo.casherapp.ui.component.SearchAndDateFilterTextField
 import com.punyo.casherapp.ui.transactions.ProductSummary
 import com.punyo.casherapp.ui.transactions.TimePeriod
-import com.punyo.casherapp.ui.transactions.generateMockProductSummary
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsListSubScreen(
     timePeriod: TimePeriod = TimePeriod.TODAY,
+    viewModel: ProductsListSubScreenViewModel = koinInject(),
     onNavigateBack: () -> Unit,
 ) {
-    var searchText by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    val dateRangePickerState = uiState.dateRangePickerState
 
-    val allProducts = generateMockProductSummary(multiplier = 30)
-    var showDatePickerDialog by remember { mutableStateOf(false) }
-
-    val filteredProducts = allProducts.filter { product ->
-        if (searchText.isBlank()) {
-            true
-        } else {
-            product.name.contains(searchText, ignoreCase = true)
-//                product.productId.contains(searchText, ignoreCase = true)
+    LaunchedEffect(timePeriod) {
+        if (timePeriod == TimePeriod.TODAY) {
+            val timeZone = TimeZone.currentSystemDefault()
+            val utcMillis = Clock.System.now().toLocalDateTime(timeZone).toInstant(TimeZone.UTC).toEpochMilliseconds()
+            dateRangePickerState.setSelection(
+                startDateMillis = utcMillis,
+                endDateMillis = utcMillis,
+            )
         }
-    }.sortedByDescending { it.totalRevenue }
-
-    val dateRangePickerState = rememberDateRangePickerState()
+        viewModel.loadProductsForDateRange(timePeriod)
+    }
 
     Column(
         modifier = Modifier
@@ -62,55 +66,67 @@ fun ProductsListSubScreen(
         )
 
         SearchAndDateFilterTextField(
-            searchText = searchText,
-            onSearchTextChange = { searchText = it },
+            searchText = uiState.searchText,
             placeholderText = "商品名またはIDで検索",
-            onShowDatePickerDialog = { showDatePickerDialog = it },
+            onSearchTextChange = { viewModel.setSearchText(it) },
+            onSearchQueryClearButtonClick = { viewModel.onSearchQueryClearButtonClick() },
+            onShowDatePickerDialogButtonClick = { viewModel.setShowDatePickerDialog(true) },
             dateRangePickerState = dateRangePickerState,
         )
 
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "商品一覧 (${filteredProducts.size}件)",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+            if (uiState.filteredProducts == null) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .padding(32.dp),
                 )
-                Text(
-                    text = "総売上: ¥${
+            } else {
+                val filteredProducts = uiState.filteredProducts!!
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "商品一覧 (${filteredProducts.size}件)",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "総売上: ¥${
                         filteredProducts.sumOf { it.totalRevenue }.toString().reversed().chunked(3)
                             .joinToString(",").reversed()
-                    }",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+                        }",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
 
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 400.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(filteredProducts.size) { index ->
-                    val product = filteredProducts[index]
-                    DetailedProductItem(product)
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 400.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(filteredProducts.size) { index ->
+                        val product = filteredProducts[index]
+                        DetailedProductItem(product)
+                    }
                 }
             }
         }
     }
 
-    if (showDatePickerDialog) {
+    if (uiState.showDatePickerDialog) {
         DateRangePickerDialog(
-            onDismiss = { showDatePickerDialog = false },
+            onConfirm = viewModel::onDateRangePickerConfirm,
+            onDismiss = { viewModel.setShowDatePickerDialog(false) },
             dateRangePickerState = dateRangePickerState,
         )
     }
@@ -136,8 +152,8 @@ fun DetailedProductItem(product: ProductSummary) {
                 )
                 Text(
                     text = "¥${
-                        product.totalRevenue.toString().reversed().chunked(3)
-                            .joinToString(",").reversed()
+                    product.totalRevenue.toString().reversed().chunked(3)
+                        .joinToString(",").reversed()
                     }",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,

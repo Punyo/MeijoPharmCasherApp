@@ -3,13 +3,18 @@ package com.punyo.casherapp.data.transaction.source
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.punyo.casherapp.application.db.AppDatabase
+import com.punyo.casherapp.data.transaction.db.Transactions
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.data.transaction.model.TransactionItemDataModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import java.util.UUID
+import kotlin.collections.map
 
 class TransactionLocalDataSource(
     private val database: AppDatabase,
@@ -19,48 +24,35 @@ class TransactionLocalDataSource(
         .asFlow()
         .mapToList(Dispatchers.IO)
         .map { transactions ->
-            transactions.map { transaction ->
-                val items = getTransactionItemsSync(transaction.id)
+            mapTransactionsToTransactionDataModels(transactions)
+        }
+
+    suspend fun mapTransactionsToTransactionDataModels(transactions: List<Transactions>): List<TransactionDataModel> = withContext(Dispatchers.IO) {
+        transactions.map { transaction ->
+            async(Dispatchers.IO) {
+                val items = getTransactionItems(transaction.id)
                 TransactionDataModel(
                     id = transaction.id,
                     createdAt = Instant.fromEpochSeconds(transaction.created_at),
                     items = items,
                 )
             }
-        }
-
-    fun getTransactionById(id: String): TransactionDataModel? {
-        val transaction = database.transactionQueries.selectTransactionById(id).executeAsOneOrNull()
-        return transaction?.let {
-            val items = getTransactionItemsSync(it.id)
-            TransactionDataModel(
-                id = it.id,
-                createdAt = Instant.fromEpochSeconds(it.created_at),
-                items = items,
-            )
-        }
+        }.awaitAll()
     }
 
-    fun getTransactionsByDateRange(
-        startDate: Instant,
-        endDate: Instant,
-    ): Flow<List<TransactionDataModel>> = database.transactionQueries
-        .selectTransactionsByDateRange(
-            startDate.epochSeconds,
-            endDate.epochSeconds,
-        )
-        .asFlow()
-        .mapToList(Dispatchers.IO)
-        .map { transactions ->
-            transactions.map { transaction ->
-                val items = getTransactionItemsSync(transaction.id)
+    suspend fun getTransactionById(id: String): TransactionDataModel? {
+        val transaction = database.transactionQueries.selectTransactionById(id).executeAsOneOrNull()
+        return withContext(Dispatchers.IO) {
+            transaction?.let {
+                val items = getTransactionItems(it.id)
                 TransactionDataModel(
-                    id = transaction.id,
-                    createdAt = Instant.fromEpochSeconds(transaction.created_at),
+                    id = it.id,
+                    createdAt = Instant.fromEpochSeconds(it.created_at),
                     items = items,
                 )
             }
         }
+    }
 
     fun insertTransaction(
         id: String = UUID.randomUUID().toString(),
@@ -101,54 +93,42 @@ class TransactionLocalDataSource(
         database.transactionQueries.deleteAllTransactions()
     }
 
-    fun getTransactionsPaged(
-        limit: Long,
-        offset: Long,
+    fun searchTransactions(
         startDate: Instant? = null,
         endDate: Instant? = null,
         searchQuery: String? = null,
     ): Flow<List<TransactionDataModel>> = when {
         startDate != null && endDate != null && searchQuery != null -> {
-            database.transactionQueries.selectTransactionsPagedWithDateRangeAndSearch(
+            database.transactionQueries.selectTransactionsWithDateRangeAndSearch(
                 startDate.epochSeconds,
                 endDate.epochSeconds,
                 "%$searchQuery%",
                 "%$searchQuery%",
-                limit,
-                offset,
             )
         }
+
         startDate != null && endDate != null -> {
-            database.transactionQueries.selectTransactionsPagedWithDateRange(
+            database.transactionQueries.selectTransactionsByDateRange(
                 startDate.epochSeconds,
                 endDate.epochSeconds,
-                limit,
-                offset,
             )
         }
+
         searchQuery != null -> {
-            database.transactionQueries.selectTransactionsPagedWithSearch(
+            database.transactionQueries.selectTransactionsWithSearch(
                 "%$searchQuery%",
                 "%$searchQuery%",
-                limit,
-                offset,
             )
         }
+
         else -> {
-            database.transactionQueries.selectTransactionsPaged(limit, offset)
+            database.transactionQueries.selectAllTransactions()
         }
     }
         .asFlow()
         .mapToList(Dispatchers.IO)
         .map { transactions ->
-            transactions.map { transaction ->
-                val items = getTransactionItemsSync(transaction.id)
-                TransactionDataModel(
-                    id = transaction.id,
-                    createdAt = Instant.fromEpochSeconds(transaction.created_at),
-                    items = items,
-                )
-            }
+            mapTransactionsToTransactionDataModels(transactions)
         }
 
     fun getTransactionCount(
@@ -164,31 +144,36 @@ class TransactionLocalDataSource(
                 "%$searchQuery%",
             ).executeAsOne()
         }
+
         startDate != null && endDate != null -> {
             database.transactionQueries.countTransactionsWithDateRange(
                 startDate.epochSeconds,
                 endDate.epochSeconds,
             ).executeAsOne()
         }
+
         searchQuery != null -> {
             database.transactionQueries.countTransactionsWithSearch(
                 "%$searchQuery%",
                 "%$searchQuery%",
             ).executeAsOne()
         }
+
         else -> {
             database.transactionQueries.countAllTransactions().executeAsOne()
         }
     }
 
-    private fun getTransactionItemsSync(transactionId: String): List<TransactionItemDataModel> = database.transactionQueries.selectTransactionItems(transactionId).executeAsList().map { item ->
-        TransactionItemDataModel(
-            id = item.id,
-            quantity = item.quantity.toInt(),
-            unitPrice = item.unit_price.toInt(),
-            transactionId = item.transaction_id,
-            productId = item.product_id,
-            discountPercent = item.discount_percent,
-        )
-    }
+    private fun getTransactionItems(transactionId: String): List<TransactionItemDataModel> = database.transactionQueries.selectTransactionItems(transactionId)
+        .executeAsList()
+        .map { item ->
+            TransactionItemDataModel(
+                id = item.id,
+                quantity = item.quantity.toInt(),
+                unitPrice = item.unit_price.toInt(),
+                transactionId = item.transaction_id,
+                productId = item.product_id,
+                discountPercent = item.discount_percent,
+            )
+        }
 }

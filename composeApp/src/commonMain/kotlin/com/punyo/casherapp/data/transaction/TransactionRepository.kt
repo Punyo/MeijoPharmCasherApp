@@ -10,14 +10,7 @@ interface TransactionRepository {
 
     suspend fun getTransactionById(id: String): TransactionDataModel?
 
-    fun getTransactionsByDateRange(
-        startDate: Instant,
-        endDate: Instant,
-    ): Flow<List<TransactionDataModel>>
-
-    fun getTransactionsPaged(
-        limit: Int,
-        offset: Int,
+    fun searchTransactions(
         startDate: Instant? = null,
         endDate: Instant? = null,
         searchQuery: String? = null,
