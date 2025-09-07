@@ -9,18 +9,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,7 +40,6 @@ import kotlin.collections.listOf
 @Composable
 fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
     val uiState by viewModel.uiState.collectAsState()
-    val products = uiState.filteredProducts
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -46,77 +48,72 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
             modifier =
             Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // ヘッダー部分
             ProductHeader(
                 searchText = uiState.searchText,
                 onSearchTextChange = viewModel::updateSearchText,
                 onBarcodeClick = viewModel::onBarcodeClick,
                 onMenuClick = viewModel::onMenuClick,
             )
+            if (uiState.products != null) {
+                val products = uiState.filteredProducts!!
+                if (products.isEmpty()) {
+                    EmptyState(
+                        searchText = uiState.searchText,
+                        onClearSearch = viewModel::clearSearch,
+                    )
+                } else {
+                    val productColumns =
+                        remember {
+                            listOf<TableColumn<ProductDataModel>>(
+                                TableColumn(
+                                    header = "商品名",
+                                    accessor = { it.name },
+                                    width = 3f,
+                                ),
+                                TableColumn(
+                                    header = "二次元コード",
+                                    accessor = {
+                                        if (it.barcode == null) {
+                                            "未登録"
+                                        } else {
+                                            "登録済み"
+                                        }
+                                    },
+                                    width = 1f,
+                                ),
+                                TableColumn(
+                                    header = "価格",
+                                    accessor = { it.price },
+                                    width = 1f,
+                                    isRightAligned = true,
+                                ),
+                            )
+                        }
 
-            if (products.isEmpty()) {
-                // 空状態表示
-                EmptyState(
-                    searchText = uiState.searchText,
-                    onClearSearch = viewModel::clearSearch,
-                )
+                    DataTable(
+                        data = products,
+                        columns = productColumns,
+                        modifier = Modifier.fillMaxWidth(),
+                        actions =
+                        mapOf(
+                            "編集" to { index ->
+                                viewModel.showEditProductDialog(products[index])
+                            },
+                            "削除" to { index ->
+                                viewModel.deleteProduct(products[index].id)
+                            },
+                        ),
+                    )
+                }
             } else {
-                val productColumns =
-                    remember {
-                        listOf<TableColumn<ProductDataModel>>(
-                            TableColumn(
-                                header = "商品名",
-                                accessor = { it.name },
-                                width = 3f,
-                            ),
-                            TableColumn(
-                                header = "二次元コード",
-                                accessor = {
-                                    if (it.barcode == null) {
-                                        "未登録"
-                                    } else {
-                                        "登録済み"
-                                    }
-                                },
-                                width = 1f,
-                            ),
-                            TableColumn(
-                                header = "価格",
-                                accessor = { it.price },
-                                width = 1f,
-                                isRightAligned = true,
-                            ),
-                            TableColumn(
-                                header = "売上個数",
-                                accessor = { kotlin.random.Random.nextInt(0, 100) },
-                                width = 1f,
-                                isRightAligned = true,
-                            ),
-                            TableColumn(
-                                header = "売上金額",
-                                accessor = { kotlin.random.Random.nextInt(1000, 50000) },
-                                width = 1f,
-                                isRightAligned = true,
-                            ),
-                        )
-                    }
-
-                DataTable(
-                    data = products,
-                    columns = productColumns,
-                    modifier = Modifier.fillMaxWidth(),
-                    actions =
-                    mapOf(
-                        "編集" to { index ->
-                            viewModel.showEditProductDialog(products[index])
-                        },
-                        "削除" to { index ->
-                            viewModel.deleteProduct(products[index].id)
-                        },
-                    ),
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .padding(32.dp),
                 )
             }
         }
@@ -173,14 +170,16 @@ private fun EmptyState(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "検索条件をクリア",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier =
-                Modifier
-                    .padding(8.dp),
-            )
+            TextButton(
+                modifier = Modifier.padding(8.dp),
+                onClick = onClearSearch,
+            ) {
+                Text(
+                    text = "検索条件をクリア",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }

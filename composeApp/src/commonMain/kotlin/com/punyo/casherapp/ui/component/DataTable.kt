@@ -6,11 +6,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign.Companion.Right
 import androidx.compose.ui.text.style.TextAlign.Companion.Start
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 enum class SortDirection {
@@ -113,7 +114,6 @@ fun <T> DataTable(
                 modifier =
                 Modifier
                     .height(56.dp)
-                    .padding(horizontal = 16.dp)
                     .background(MaterialTheme.colorScheme.surface),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -144,6 +144,8 @@ fun <T> DataTable(
                             } else {
                                 Start
                             },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.weight(1f),
                         )
@@ -179,7 +181,7 @@ fun <T> DataTable(
                     .fillMaxWidth()
                     .clickable(
                         onClick = { },
-                    ).padding(horizontal = 16.dp)
+                    )
                     .height(52.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -194,6 +196,8 @@ fun <T> DataTable(
                         } else {
                             Start
                         },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(column.width),
                     )
@@ -233,6 +237,11 @@ fun <T> DataTable(
             if (displayIndex < (sortedData ?: data).lastIndex) {
                 HorizontalDivider()
             }
+        }
+        item {
+            Spacer(
+                modifier = Modifier.height(52.dp),
+            )
         }
     }
 }
