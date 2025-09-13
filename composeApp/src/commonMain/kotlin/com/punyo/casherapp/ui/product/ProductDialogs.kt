@@ -125,6 +125,7 @@ private fun ProductDialog(
                         label = { Text("価格 *") },
                         suffix = { Text("円") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        supportingText = {},
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                     )

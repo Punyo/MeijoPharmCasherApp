@@ -23,7 +23,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 @Composable
-actual fun BarcodeScanner(
+fun BarcodeScanner(
     modifier: Modifier,
     onResult: (String) -> Unit,
 ) {
