@@ -1,10 +1,8 @@
 package com.punyo.casherapp.ui.product
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,7 +12,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.ui.component.BarcodeScanner
 
 @Composable
 fun AddProductDialog(
@@ -140,13 +138,13 @@ fun AddProductDialog(
                     )
 
                     if (showCamera) {
-                        Image(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "カメラを閉じる",
-                            modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f),
+                        BarcodeScanner(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onResult = {
+                                qrCode = it
+                                showCamera = false
+                            },
                         )
                     }
                 }

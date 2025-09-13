@@ -54,6 +54,7 @@ kotlin {
                 implementation(libs.javacv.platform)
                 implementation(libs.zxing.core)
                 implementation(libs.zxing.javase)
+                implementation(libs.webcam.capture)
             }
         }
     }
