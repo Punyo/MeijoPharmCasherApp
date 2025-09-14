@@ -24,7 +24,7 @@ data class ProductUiState(
         }
 }
 
-class ProductViewModel(
+class ProductScreenViewModel(
     private val repository: ProductRepository,
 ) : ViewModel() {
     private val state = MutableStateFlow(ProductUiState())
