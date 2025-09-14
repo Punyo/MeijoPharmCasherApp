@@ -2,14 +2,11 @@ package com.punyo.casherapp.ui.product
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,27 +34,19 @@ actual fun ProductDialogBarcodeArea(
     }
     LaunchedEffect(Unit) {
         availableWebcams = Webcam.getWebcams()
+        availableWebcams.forEach {
+            it.close()
+        }
         if (availableWebcams.isNotEmpty() && selectedWebcam == null) {
             selectedWebcam = availableWebcams.first()
         }
     }
     Column(modifier = modifier) {
-        OutlinedTextField(
-            value = barcode,
-            onValueChange = onBarcodeChange,
-            label = { Text("二次元コード") },
-            placeholder = { Text("カメラで読み取りまたは手入力") },
-            trailingIcon = {
-                IconButton(onClick = { showCamera = !showCamera }) {
-                    Icon(
-                        imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "カメラで読み取り",
-                    )
-                }
-            },
-            supportingText = {},
+        ProductDialogBarcodeAreaCommonTextField(
+            barcode = barcode,
+            onBarcodeChange = onBarcodeChange,
+            onCameraClick = { showCamera = !showCamera },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
         )
 
         if (showCamera) {
@@ -76,7 +65,12 @@ actual fun ProductDialogBarcodeArea(
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
+                        readOnly = true,
                         modifier = Modifier
+                            .menuAnchor(
+                                type = MenuAnchorType.PrimaryNotEditable,
+                                enabled = true,
+                            )
                             .fillMaxWidth(),
                     )
                     ExposedDropdownMenu(
