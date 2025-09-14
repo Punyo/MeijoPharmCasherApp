@@ -12,12 +12,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,11 +45,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
-import com.punyo.casherapp.ui.about.navigateToAbout
-import com.punyo.casherapp.ui.home.navigateToHome
 import com.punyo.casherapp.ui.navigation.CasherAppNavigation
 import com.punyo.casherapp.ui.navigation.NavigationDestinations
 import com.punyo.casherapp.ui.product.navigateToProduct
+import com.punyo.casherapp.ui.register.navigateToRegister
 import com.punyo.casherapp.ui.settings.navigateToSettings
 import com.punyo.casherapp.ui.transactions.navigateToTransactions
 import kotlinx.coroutines.launch
@@ -58,8 +56,7 @@ import meijopharmcasherapp.composeapp.generated.resources.Res
 import meijopharmcasherapp.composeapp.generated.resources.app_name
 import meijopharmcasherapp.composeapp.generated.resources.app_subtitle
 import meijopharmcasherapp.composeapp.generated.resources.menu
-import meijopharmcasherapp.composeapp.generated.resources.nav_about
-import meijopharmcasherapp.composeapp.generated.resources.nav_home
+import meijopharmcasherapp.composeapp.generated.resources.nav_register
 import meijopharmcasherapp.composeapp.generated.resources.nav_settings
 import meijopharmcasherapp.composeapp.generated.resources.nav_transactions
 import meijopharmcasherapp.composeapp.generated.resources.product_title
@@ -167,15 +164,31 @@ fun App() {
     MaterialTheme {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route ?: NavigationDestinations.HOME_ROUTE
+        val currentRoute = navBackStackEntry?.destination?.route ?: NavigationDestinations.TRANSACTIONS_ROUTE
 
         val drawerItems =
             listOf(
-                DrawerItem(Icons.Filled.Home, stringResource(Res.string.nav_home), NavigationDestinations.HOME_ROUTE),
-                DrawerItem(Icons.Filled.AccountBalance, stringResource(Res.string.nav_transactions), NavigationDestinations.TRANSACTIONS_ROUTE),
-                DrawerItem(Icons.Filled.Settings, stringResource(Res.string.nav_settings), NavigationDestinations.SETTINGS_ROUTE),
-                DrawerItem(Icons.Filled.Person, stringResource(Res.string.product_title), NavigationDestinations.PRODUCT_ROUTE),
-                DrawerItem(Icons.Filled.Info, stringResource(Res.string.nav_about), NavigationDestinations.ABOUT_ROUTE),
+                DrawerItem(
+                    Icons.Filled.Analytics,
+                    stringResource(Res.string.nav_transactions),
+                    NavigationDestinations.TRANSACTIONS_ROUTE,
+                ),
+                DrawerItem(
+                    Icons.Filled.PointOfSale,
+                    stringResource(Res.string.nav_register),
+                    NavigationDestinations.REGISTER_ROUTE,
+                ),
+
+                DrawerItem(
+                    Icons.Filled.Store,
+                    stringResource(Res.string.product_title),
+                    NavigationDestinations.PRODUCT_ROUTE,
+                ),
+                DrawerItem(
+                    Icons.Filled.Settings,
+                    stringResource(Res.string.nav_settings),
+                    NavigationDestinations.SETTINGS_ROUTE,
+                ),
             )
 
         ResponsiveNavigationDrawer(
@@ -183,11 +196,10 @@ fun App() {
             selectedRoute = currentRoute,
             onItemClick = { route ->
                 when (route) {
-                    NavigationDestinations.HOME_ROUTE -> navController.navigateToHome()
-                    NavigationDestinations.PRODUCT_ROUTE -> navController.navigateToProduct()
                     NavigationDestinations.TRANSACTIONS_ROUTE -> navController.navigateToTransactions()
+                    NavigationDestinations.REGISTER_ROUTE -> navController.navigateToRegister()
+                    NavigationDestinations.PRODUCT_ROUTE -> navController.navigateToProduct()
                     NavigationDestinations.SETTINGS_ROUTE -> navController.navigateToSettings()
-                    NavigationDestinations.ABOUT_ROUTE -> navController.navigateToAbout()
                 }
             },
         ) { showMenuButton, onMenuClick ->
@@ -234,7 +246,7 @@ fun MainContent(
     showMenuButton: Boolean,
     onMenuClick: () -> Unit,
 ) {
-    val currentTitle = drawerItems.find { it.route == currentRoute }?.title ?: stringResource(Res.string.nav_home)
+    val currentTitle = drawerItems.find { it.route == currentRoute }?.title ?: ""
 
     Scaffold(
         topBar = {

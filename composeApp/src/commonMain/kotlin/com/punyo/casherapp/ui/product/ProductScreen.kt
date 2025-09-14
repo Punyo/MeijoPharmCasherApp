@@ -38,7 +38,7 @@ import org.koin.compose.koinInject
 import kotlin.collections.listOf
 
 @Composable
-fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
+fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddProductDialog by remember { mutableStateOf(false) }
     var showEditProductDialog by remember { mutableStateOf(false) }
