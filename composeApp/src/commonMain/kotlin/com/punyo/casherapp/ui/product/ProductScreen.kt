@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -27,7 +25,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,6 +40,11 @@ import kotlin.collections.listOf
 @Composable
 fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
     val uiState by viewModel.uiState.collectAsState()
+    var showAddProductDialog by remember { mutableStateOf(false) }
+    var showEditProductDialog by remember { mutableStateOf(false) }
+    var editingProductId by remember { mutableStateOf("") }
+
+    val editingProductDialogState = rememberProductDialogState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -54,8 +59,6 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
             ProductHeader(
                 searchText = uiState.searchText,
                 onSearchTextChange = viewModel::updateSearchText,
-                onBarcodeClick = viewModel::onBarcodeClick,
-                onMenuClick = viewModel::onMenuClick,
             )
             if (uiState.products != null) {
                 val products = uiState.filteredProducts!!
@@ -100,7 +103,11 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                         actions =
                         mapOf(
                             "編集" to { index ->
-                                viewModel.showEditProductDialog(products[index])
+                                editingProductId = products[index].id
+                                editingProductDialogState.productName = products[index].name
+                                editingProductDialogState.barcode = products[index].barcode
+                                editingProductDialogState.price = products[index].price.toUInt()
+                                showEditProductDialog = true
                             },
                             "削除" to { index ->
                                 viewModel.deleteProduct(products[index].id)
@@ -119,7 +126,7 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
         }
 
         FloatingActionButton(
-            onClick = viewModel::showAddProductDialog,
+            onClick = { showAddProductDialog = true },
             modifier =
             Modifier
                 .align(Alignment.BottomEnd)
@@ -132,15 +139,25 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
         }
     }
 
-    if (uiState.showAddProductDialog || uiState.editingProduct != null) {
+    if (showAddProductDialog) {
         AddProductDialog(
-            onDismiss = {
-                viewModel.hideAddProductDialog()
-                viewModel.hideEditProductDialog()
+            onDismiss = { showAddProductDialog = false },
+            onConfirm = { name, barcode, price ->
+                viewModel.addProduct(name, barcode, price)
+                showAddProductDialog = false
             },
-            onSaveClick = viewModel::addProduct,
-            onUpdateClick = viewModel::updateProduct,
-            editingProduct = uiState.editingProduct,
+        )
+    }
+
+    if (showEditProductDialog) {
+        EditProductDialog(
+            onDismiss = { showEditProductDialog = false },
+            onConfirm = { id, name, barcode, price ->
+                viewModel.updateProduct(id, name, barcode, price)
+                showEditProductDialog = false
+            },
+            editingProductId = editingProductId,
+            productDialogState = editingProductDialogState,
         )
     }
 }
@@ -188,8 +205,6 @@ private fun EmptyState(
 private fun ProductHeader(
     searchText: String,
     onSearchTextChange: (String) -> Unit,
-    onBarcodeClick: () -> Unit,
-    onMenuClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -219,19 +234,5 @@ private fun ProductHeader(
             modifier = Modifier.weight(1f).height(56.dp),
             singleLine = true,
         )
-
-        IconButton(onClick = onBarcodeClick) {
-            Icon(
-                imageVector = Icons.Default.CameraAlt,
-                contentDescription = "バーコードスキャン",
-            )
-        }
-
-        IconButton(onClick = onMenuClick) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "メニュー",
-            )
-        }
     }
 }

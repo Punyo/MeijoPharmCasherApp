@@ -9,7 +9,7 @@ fun main() = application {
     startKoin {
         modules(appModule)
     }
-
+    System.setProperty("compose.interop.blending", "true")
     Window(
         onCloseRequest = ::exitApplication,
         title = "CasherApplication",

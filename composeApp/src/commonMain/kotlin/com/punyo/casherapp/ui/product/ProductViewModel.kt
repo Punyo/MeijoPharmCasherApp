@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 data class ProductUiState(
     val searchText: String = "",
     val products: List<ProductDataModel>? = null,
-    val showAddProductDialog: Boolean = false,
-    val editingProduct: ProductDataModel? = null,
     val isLoading: Boolean = false,
 ) {
     val filteredProducts: List<ProductDataModel>? =
@@ -52,22 +50,6 @@ class ProductViewModel(
         state.value = state.value.copy(searchText = "")
     }
 
-    fun showAddProductDialog() {
-        state.value = state.value.copy(showAddProductDialog = true)
-    }
-
-    fun hideAddProductDialog() {
-        state.value = state.value.copy(showAddProductDialog = false)
-    }
-
-    fun showEditProductDialog(product: ProductDataModel) {
-        state.value = state.value.copy(editingProduct = product)
-    }
-
-    fun hideEditProductDialog() {
-        state.value = state.value.copy(editingProduct = null)
-    }
-
     fun deleteProduct(id: String) {
         viewModelScope.launch {
             repository.deleteProduct(id)
@@ -82,42 +64,32 @@ class ProductViewModel(
 
     fun addProduct(
         name: String,
-        barcode: String,
-        price: Int,
+        barcode: String?,
+        price: UInt,
     ) {
         viewModelScope.launch {
             repository.insertProduct(
                 name = name,
-                barcode = barcode.takeIf { it.isNotBlank() },
-                price = price,
+                barcode = barcode,
+                price = price.toInt(),
             )
-            hideAddProductDialog()
         }
     }
 
     fun updateProduct(
         id: String,
         name: String,
-        barcode: String,
-        price: Int,
+        barcode: String?,
+        price: UInt,
     ) {
         viewModelScope.launch {
             val updatedProduct = ProductDataModel(
                 id = id,
                 name = name,
-                barcode = barcode.takeIf { it.isNotBlank() },
-                price = price,
+                barcode = barcode,
+                price = price.toInt(),
             )
             repository.updateProduct(updatedProduct)
-            hideEditProductDialog()
         }
-    }
-
-    fun onBarcodeClick() {
-        // TODO: バーコードスキャン
-    }
-
-    fun onMenuClick() {
-        // TODO: メニュー表示
     }
 }
