@@ -54,7 +54,6 @@ import com.aay.compose.baseComponents.model.LegendPosition
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.extensions.toDateString
 import org.koin.compose.koinInject
-import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,29 +157,6 @@ fun EnhancedSummaryCard(
             )
         }
     }
-}
-
-fun generateMockProductSummary(multiplier: Int = 1): List<ProductSummary> {
-    val products = listOf(
-        "感冒薬A" to 800,
-        "胃腸薬B" to 1200,
-        "湿布C" to 600,
-        "目薬D" to 900,
-        "絆創膏E" to 300,
-        "頭痛薬F" to 700,
-        "咳止め薬G" to 1100,
-    )
-
-    return products.mapIndexed { index, (name, unitPrice) ->
-        val quantity = Random.nextInt(5 * multiplier, 50 * multiplier)
-        ProductSummary(
-            productId = "P${(index + 1).toString().padStart(3, '0')}",
-            name = name,
-            totalQuantity = quantity,
-            totalRevenue = unitPrice * quantity,
-            unitPrice = unitPrice,
-        )
-    }.sortedByDescending { it.totalRevenue }
 }
 
 @Composable
