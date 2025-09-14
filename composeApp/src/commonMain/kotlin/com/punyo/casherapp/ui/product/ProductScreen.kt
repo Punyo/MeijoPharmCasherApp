@@ -42,8 +42,10 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddProductDialog by remember { mutableStateOf(false) }
     var showEditProductDialog by remember { mutableStateOf(false) }
-    val editingProductId = remember { mutableStateOf("") }
+    var editingProductId by remember { mutableStateOf("") }
+
     val editingProductDialogState = rememberProductDialogState()
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -101,7 +103,7 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                         actions =
                         mapOf(
                             "編集" to { index ->
-                                editingProductId.value = products[index].id
+                                editingProductId = products[index].id
                                 editingProductDialogState.productName = products[index].name
                                 editingProductDialogState.barcode = products[index].barcode
                                 editingProductDialogState.price = products[index].price.toUInt()
@@ -154,7 +156,7 @@ fun ProductScreen(viewModel: ProductViewModel = koinInject()) {
                 viewModel.updateProduct(id, name, barcode, price)
                 showEditProductDialog = false
             },
-            editingProductId = editingProductId.value,
+            editingProductId = editingProductId,
             productDialogState = editingProductDialogState,
         )
     }

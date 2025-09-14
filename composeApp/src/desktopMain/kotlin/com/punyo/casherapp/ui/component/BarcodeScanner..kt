@@ -3,6 +3,7 @@ package com.punyo.casherapp.ui.component
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
@@ -18,32 +19,25 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import java.awt.image.BufferedImage
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.swing.JComponent
-import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 @Composable
 fun BarcodeScanner(
-    modifier: Modifier,
+    webcam: Webcam,
     onResult: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Webcam.getWebcams()
-    val webcam = remember {
-        Webcam.getDefault()?.apply {
+    val panel = remember(webcam) {
+        if (webcam.isOpen) webcam.close()
+        webcam.apply {
             val sizes = viewSizes.toList()
             val maxByArea = sizes.maxByOrNull { it.width * it.height }
             if (maxByArea != null) {
                 viewSize = maxByArea
             }
         }
-    }
-
-    val panel = remember(webcam) {
-        webcam?.let {
-            WebcamPanel(it, true).apply {
-                isMirrored = true
-                preferredSize = it.viewSize
-            }
+        WebcamPanel(webcam, true).apply {
+            preferredSize = webcam.viewSize
         }
     }
     DisposableEffect(webcam) {
@@ -86,14 +80,12 @@ fun BarcodeScanner(
 
         val scanThread = Thread {
             try {
-                if (webcam != null) {
-                    try {
-                        if (!webcam.isOpen) webcam.open(true)
-                    } catch (_: Throwable) {
-                        scanning.set(false)
-                    }
+                try {
+                    if (!webcam.isOpen) webcam.open(true)
+                } catch (_: Throwable) {
+                    scanning.set(false)
                 }
-                while (scanning.get() && webcam != null && webcam.isOpen) {
+                while (scanning.get() && webcam.isOpen) {
                     val image = try {
                         webcam.image
                     } catch (_: Throwable) {
@@ -113,7 +105,7 @@ fun BarcodeScanner(
                     }
                 }
             } finally {
-                // onDispose へ委譲
+                webcam.close()
             }
         }.apply { isDaemon = true }
 
@@ -123,23 +115,17 @@ fun BarcodeScanner(
             scanning.set(false)
             scanThread.interrupt()
             scanThread.join(250)
-            if (webcam != null && webcam.isOpen) {
-                webcam.close()
-            }
+            webcam.close()
         }
     }
-    webcam?.viewSize?.let {
-        val density = LocalDensity.current
+
+    val density = LocalDensity.current
+    key(panel) {
         SwingPanel(
-            factory = {
-                (panel as JComponent?) ?: JPanel().apply {
-                    preferredSize = webcam.viewSize
-                }
-            },
+            factory = { panel },
             modifier = modifier.height(
-                with(density) { it.height.toDp() },
+                with(density) { webcam.viewSize.height.toDp() },
             ),
-            update = { /* no-op */ },
         )
     }
 }
