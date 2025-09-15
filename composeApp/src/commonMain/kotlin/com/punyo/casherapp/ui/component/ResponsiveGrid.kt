@@ -1,4 +1,4 @@
-package com.punyo.casherapp.ui.components
+package com.punyo.casherapp.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
