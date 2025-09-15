@@ -27,11 +27,10 @@ fun ResponsiveGrid(
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val horizontalPadding = contentPadding.calculateLeftPadding(LayoutDirection.Ltr) +
             contentPadding.calculateRightPadding(LayoutDirection.Ltr)
-        val interItemSpacing = horizontalSpacing
 
         val availableColumns = (
-            (maxWidth - horizontalPadding + interItemSpacing) /
-                (minCellWidth + interItemSpacing)
+            (maxWidth - horizontalPadding + horizontalSpacing) /
+                (minCellWidth + horizontalSpacing)
             ).toInt()
 
         val gridColumns = min(maxColumns, availableColumns).coerceAtLeast(1)

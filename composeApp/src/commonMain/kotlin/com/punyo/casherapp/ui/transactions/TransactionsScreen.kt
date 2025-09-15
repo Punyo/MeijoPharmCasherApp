@@ -71,6 +71,7 @@ fun TransactionsScreen(
             onPeriodSelected = { viewModel.setCurrentPeriod(it) },
             onNavigateToAllTransactions = { navController?.navigateToAllTransactions(uiState.currentPeriod) },
             onNavigateToProductsList = { navController?.navigateToProductsList(uiState.currentPeriod) },
+            modifier = Modifier.fillMaxSize(),
         )
     } else {
         Box(
@@ -386,8 +387,9 @@ private fun TransactionsScreenContent(
     onPeriodSelected: (TimePeriod) -> Unit,
     onNavigateToAllTransactions: () -> Unit,
     onNavigateToProductsList: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    ResponsiveGrid {
+    ResponsiveGrid(modifier = modifier) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             TimePeriodSelector(
                 selectedPeriod = currentPeriod,
