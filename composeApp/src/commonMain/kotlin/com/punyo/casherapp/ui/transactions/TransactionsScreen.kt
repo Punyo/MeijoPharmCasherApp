@@ -49,7 +49,7 @@ import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.baseComponents.model.LegendPosition
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.extensions.toDateString
-import com.punyo.casherapp.ui.components.ResponsiveGrid
+import com.punyo.casherapp.ui.component.ResponsiveGrid
 import org.koin.compose.koinInject
 import kotlin.random.Random
 
@@ -71,7 +71,7 @@ fun TransactionsScreen(
             onPeriodSelected = { viewModel.setCurrentPeriod(it) },
             onNavigateToAllTransactions = { navController?.navigateToAllTransactions(uiState.currentPeriod) },
             onNavigateToProductsList = { navController?.navigateToProductsList(uiState.currentPeriod) },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(8.dp),
         )
     } else {
         Box(
@@ -389,7 +389,7 @@ private fun TransactionsScreenContent(
     onNavigateToProductsList: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ResponsiveGrid(modifier = modifier) {
+    ResponsiveGrid(modifier = modifier) { _, _, _ ->
         item(span = { GridItemSpan(maxLineSpan) }) {
             TimePeriodSelector(
                 selectedPeriod = currentPeriod,
@@ -413,7 +413,7 @@ private fun TransactionsScreenContent(
             )
         }
 
-        item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
+        item(span = { GridItemSpan(1) }) {
             DataListCard(
                 title = "取引",
                 items = currentTransactions.take(5),
@@ -424,7 +424,7 @@ private fun TransactionsScreenContent(
             )
         }
 
-        item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
+        item(span = { GridItemSpan(1) }) {
             DataListCard(
                 title = "人気商品",
                 items = productSummaries.take(5),

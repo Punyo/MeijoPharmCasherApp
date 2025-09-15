@@ -2,15 +2,15 @@ package com.punyo.casherapp.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
 
@@ -19,17 +19,13 @@ fun ResponsiveGrid(
     modifier: Modifier = Modifier,
     minCellWidth: Dp = 320.dp,
     maxColumns: Int = 2,
-    contentPadding: PaddingValues = PaddingValues(16.dp),
     verticalSpacing: Dp = 16.dp,
     horizontalSpacing: Dp = 16.dp,
-    content: LazyGridScope.() -> Unit,
+    content: LazyGridScope.(maxWidth: Dp, maxHeight: Dp, gridColumns: Int) -> Unit,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val horizontalPadding = contentPadding.calculateLeftPadding(LayoutDirection.Ltr) +
-            contentPadding.calculateRightPadding(LayoutDirection.Ltr)
-
         val availableColumns = (
-            (maxWidth - horizontalPadding + horizontalSpacing) /
+            (maxWidth + horizontalSpacing) /
                 (minCellWidth + horizontalSpacing)
             ).toInt()
 
@@ -37,11 +33,15 @@ fun ResponsiveGrid(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(gridColumns),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = contentPadding,
+            modifier = Modifier.height(maxHeight).width(maxWidth),
             verticalArrangement = Arrangement.spacedBy(verticalSpacing),
             horizontalArrangement = Arrangement.spacedBy(horizontalSpacing),
-            content = content,
-        )
+        ) {
+            content(
+                maxWidth,
+                maxHeight,
+                gridColumns,
+            )
+        }
     }
 }
