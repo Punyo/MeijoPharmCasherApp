@@ -3,10 +3,8 @@ package com.punyo.casherapp.ui.transactions
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,9 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -53,6 +49,7 @@ import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.baseComponents.model.LegendPosition
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.extensions.toDateString
+import com.punyo.casherapp.ui.component.ResponsiveGrid
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +70,7 @@ fun TransactionsScreen(
             onPeriodSelected = { viewModel.setCurrentPeriod(it) },
             onNavigateToAllTransactions = { navController?.navigateToAllTransactions(uiState.currentPeriod) },
             onNavigateToProductsList = { navController?.navigateToProductsList(uiState.currentPeriod) },
+            modifier = Modifier.fillMaxSize().padding(8.dp),
         )
     } else {
         Box(
@@ -365,65 +363,52 @@ private fun TransactionsScreenContent(
     onPeriodSelected: (TimePeriod) -> Unit,
     onNavigateToAllTransactions: () -> Unit,
     onNavigateToProductsList: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val minCellWidth = 320.dp
-        val horizontalPadding = 16.dp * 2
-        val interItemSpacing = 16.dp
-        val canFitTwo = (maxWidth - horizontalPadding) >= (minCellWidth * 2 + interItemSpacing)
-        val gridColumns = if (canFitTwo) 2 else 1
+    ResponsiveGrid(modifier = modifier) { _, _, _ ->
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            TimePeriodSelector(
+                selectedPeriod = currentPeriod,
+                onPeriodSelected = onPeriodSelected,
+            )
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            SummaryCardsRow(
+                customerCount = customerCount,
+                totalQuantity = totalQuantity,
+                totalRevenue = totalRevenue,
+            )
+        }
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(gridColumns),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                TimePeriodSelector(
-                    selectedPeriod = currentPeriod,
-                    onPeriodSelected = onPeriodSelected,
-                )
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                SummaryCardsRow(
-                    customerCount = customerCount,
-                    totalQuantity = totalQuantity,
-                    totalRevenue = totalRevenue,
-                )
-            }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            ProductSalesBarChart(
+                productData = productSummaries,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(420.dp),
+            )
+        }
 
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                ProductSalesBarChart(
-                    productData = productSummaries,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(420.dp),
-                )
-            }
+        item(span = { GridItemSpan(1) }) {
+            DataListCard(
+                title = "取引",
+                items = currentTransactions.take(5),
+                itemContent = { transaction ->
+                    CompactTransactionItem(transaction)
+                },
+                onViewMoreClick = onNavigateToAllTransactions,
+            )
+        }
 
-            item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-                DataListCard(
-                    title = "取引",
-                    items = currentTransactions.take(5),
-                    itemContent = { transaction ->
-                        CompactTransactionItem(transaction)
-                    },
-                    onViewMoreClick = onNavigateToAllTransactions,
-                )
-            }
-
-            item(span = { GridItemSpan(if (maxLineSpan >= 2) maxLineSpan / 2 else maxLineSpan) }) {
-                DataListCard(
-                    title = "人気商品",
-                    items = productSummaries.take(5),
-                    itemContent = { product ->
-                        CompactProductItem(product)
-                    },
-                    onViewMoreClick = onNavigateToProductsList,
-                )
-            }
+        item(span = { GridItemSpan(1) }) {
+            DataListCard(
+                title = "人気商品",
+                items = productSummaries.take(5),
+                itemContent = { product ->
+                    CompactProductItem(product)
+                },
+                onViewMoreClick = onNavigateToProductsList,
+            )
         }
     }
 }
