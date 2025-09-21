@@ -12,9 +12,21 @@ selectById:
 SELECT * FROM product WHERE id = ?;
 
 searchProducts:
-SELECT * FROM product 
-WHERE name LIKE '%' || ? || '%' 
+SELECT * FROM product
+WHERE name LIKE '%' || ? || '%'
    OR barcode LIKE '%' || ? || '%';
+
+selectWithPaging:
+SELECT * FROM product
+ORDER BY id ASC
+LIMIT ? OFFSET ?;
+
+searchWithPaging:
+SELECT * FROM product
+WHERE name LIKE '%' || ? || '%'
+   OR barcode LIKE '%' || ? || '%'
+ORDER BY id ASC
+LIMIT ? OFFSET ?;
 
 insertProduct:
 INSERT INTO product (id, name, barcode, price)
