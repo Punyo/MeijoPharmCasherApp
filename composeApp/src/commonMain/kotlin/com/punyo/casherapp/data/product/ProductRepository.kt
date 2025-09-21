@@ -1,5 +1,6 @@
 package com.punyo.casherapp.data.product
 
+import androidx.paging.PagingData
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import kotlinx.coroutines.flow.Flow
 
@@ -21,4 +22,8 @@ interface ProductRepository {
     suspend fun deleteProduct(id: String)
 
     suspend fun deleteAllProducts()
+
+    fun getAllProductsPaged(): Flow<PagingData<ProductDataModel>>
+
+    fun searchProductsPaged(query: String): Flow<PagingData<ProductDataModel>>
 }

@@ -15,6 +15,7 @@ aay-chart = "1.1.0"
 kotlinx-datetime = "0.6.1"
 kotlinx-serialization = "1.7.3"
 webcam-capture = "0.3.12"
+androidx-paging = "3.4.0-alpha04"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -35,6 +36,8 @@ zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
 aay-chart = { module = "io.github.thechance101:chart", version.ref = "aay-chart" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "androidx-paging" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
 
 [plugins]
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }

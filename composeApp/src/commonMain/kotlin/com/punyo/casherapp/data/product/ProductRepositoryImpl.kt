@@ -1,11 +1,17 @@
 package com.punyo.casherapp.data.product
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.punyo.casherapp.application.db.AppDatabase
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.data.product.source.ProductLocalDataSource
+import com.punyo.casherapp.data.product.source.ProductPagingSource
 import kotlinx.coroutines.flow.Flow
 
 class ProductRepositoryImpl(
     private val localDataSource: ProductLocalDataSource,
+    private val database: AppDatabase,
 ) : ProductRepository {
     override fun getAllProducts(): Flow<List<ProductDataModel>> = localDataSource.getAllProducts()
 
@@ -36,4 +42,20 @@ class ProductRepositoryImpl(
     override suspend fun deleteAllProducts() {
         localDataSource.deleteAllProducts()
     }
+
+    override fun getAllProductsPaged(): Flow<PagingData<ProductDataModel>> = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+        ),
+        pagingSourceFactory = { ProductPagingSource(database) },
+    ).flow
+
+    override fun searchProductsPaged(query: String): Flow<PagingData<ProductDataModel>> = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+        ),
+        pagingSourceFactory = { ProductPagingSource(database, query) },
+    ).flow
 }
