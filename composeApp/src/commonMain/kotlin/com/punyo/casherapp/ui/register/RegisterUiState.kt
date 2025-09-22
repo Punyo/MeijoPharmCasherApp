@@ -7,7 +7,6 @@ data class RegisterUiState(
     val cart: Cart = Cart(),
     val inputMode: InputMode = InputMode.SEARCH,
     val searchQuery: String = "",
-    val searchResults: List<ProductDataModel> = emptyList(),
     val error: String? = null,
 )
 

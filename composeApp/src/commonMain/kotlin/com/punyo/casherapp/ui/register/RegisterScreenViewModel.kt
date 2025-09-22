@@ -2,11 +2,16 @@ package com.punyo.casherapp.ui.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class RegisterScreenViewModel(
@@ -15,7 +20,21 @@ class RegisterScreenViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
+    private val searchQueryFlow = MutableStateFlow("")
+
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
+    val searchQuery: StateFlow<String> = searchQueryFlow.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val pagingDataFlow: Flow<PagingData<ProductDataModel>> = searchQueryFlow
+        .flatMapLatest { query ->
+            if (query.isBlank()) {
+                productRepository.getAllProductsPaged()
+            } else {
+                productRepository.searchProductsPaged(query)
+            }
+        }
+        .cachedIn(viewModelScope)
 
     fun onBarcodeScanned(barcode: String) {
         viewModelScope.launch {
@@ -101,24 +120,7 @@ class RegisterScreenViewModel(
     }
 
     fun updateSearchQuery(query: String) {
-        _uiState.value = _uiState.value.copy(searchQuery = query)
-        if (query.isNotBlank()) {
-            searchProducts(query)
-        } else {
-            _uiState.value = _uiState.value.copy(searchResults = emptyList())
-        }
-    }
-
-    private fun searchProducts(query: String) {
-        viewModelScope.launch {
-            try {
-                productRepository.searchProducts(query).collect { products ->
-                    _uiState.value = _uiState.value.copy(searchResults = products)
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
-            }
-        }
+        searchQueryFlow.value = query
     }
 
     fun setInputMode(mode: InputMode) {

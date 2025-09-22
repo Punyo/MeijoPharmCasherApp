@@ -45,27 +45,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.ui.component.ResponsiveGrid
+import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
-
-val fakeProduct = ProductDataModel(
-    id = "1",
-    name = "nya",
-    price = 810,
-    barcode = "1234567890123",
-)
-
-val fakeProductLongName = ProductDataModel(
-    id = "2",
-    name = "nyaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    price = 810,
-    barcode = "1234567890123",
-)
 
 @Composable
 fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject()) {
     val uiState by registerScreenViewModel.uiState.collectAsState()
+    val searchQuery by registerScreenViewModel.searchQuery.collectAsState()
 
     var quantityDialogState by remember { mutableStateOf<QuantityDialogState?>(null) }
     var discountDialogState by remember { mutableStateOf<DiscountDialogState?>(null) }
@@ -95,8 +85,8 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
 
                     InputMode.SEARCH -> ProductSearchArea(
                         modifier = Modifier.fillMaxSize(),
-                        searchQuery = uiState.searchQuery,
-                        searchResults = uiState.searchResults,
+                        searchQuery = searchQuery,
+                        searchResults = registerScreenViewModel.pagingDataFlow,
                         onSearchQueryChange = registerScreenViewModel::updateSearchQuery,
                         onProductSelected = registerScreenViewModel::addProductToCart,
                     )
@@ -230,7 +220,7 @@ private fun CameraArea(
 private fun ProductSearchArea(
     modifier: Modifier = Modifier,
     searchQuery: String,
-    searchResults: List<ProductDataModel>,
+    searchResults: Flow<PagingData<ProductDataModel>>?,
     onSearchQueryChange: (String) -> Unit,
     onProductSelected: (ProductDataModel) -> Unit,
 ) {
@@ -253,35 +243,23 @@ private fun ProductSearchArea(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyHorizontalGrid(
-            rows = GridCells.Adaptive(72.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) {
-//            items(searchResults) { product ->
-//                ProductSearchItem(
-//                    product = product,
-//                    onClick = { onProductSelected(product) },
-//                )
-//            }
-            for (i in 1..100) {
-                val product = fakeProduct.copy(
-                    id = i.toString(),
-                    name = "nya $i",
-                )
-                item {
-                    ProductSearchItem(
-                        product = product,
-                        onClick = { onProductSelected(product) },
-                    )
+        searchResults?.let { pagingFlow ->
+            val lazyPagingItems = pagingFlow.collectAsLazyPagingItems()
+
+            LazyHorizontalGrid(
+                rows = GridCells.Adaptive(72.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                items(lazyPagingItems.itemCount) { index ->
+                    lazyPagingItems[index]?.let { product ->
+                        ProductSearchItem(
+                            product = product,
+                            onClick = { onProductSelected(product) },
+                        )
+                    }
                 }
-            }
-            item {
-                ProductSearchItem(
-                    product = fakeProductLongName,
-                    onClick = { onProductSelected(fakeProductLongName) },
-                )
             }
         }
     }
