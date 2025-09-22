@@ -174,7 +174,7 @@ private fun ProductDialog(
 @Composable
 fun rememberProductDialogState(
     productName: String = "",
-    barcode: String? = "",
+    barcode: String? = null,
     price: UInt = 0u,
 ): ProductDialogState = rememberSaveable(saver = ProductDialogState.Saver) {
     ProductDialogStateImpl(
