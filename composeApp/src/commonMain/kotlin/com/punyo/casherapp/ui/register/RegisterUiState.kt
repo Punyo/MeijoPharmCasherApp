@@ -1,6 +1,7 @@
 package com.punyo.casherapp.ui.register
 
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.data.transaction.model.TransactionItem
 import kotlin.math.roundToInt
 
 data class RegisterUiState(
@@ -37,4 +38,13 @@ data class Cart(
     val totalDiscountAmount: Int = itemDiscountTotal + totalDiscount
     val finalTotal: Int = subtotal - totalDiscount
     val totalQuantity: Int = items.sumOf { it.quantity }
+}
+
+fun Cart.toTransactionItems(): List<TransactionItem> = items.map { cartItem ->
+    TransactionItem(
+        quantity = cartItem.quantity,
+        unitPrice = cartItem.unitPrice,
+        productId = cartItem.product.id,
+        discountPercent = cartItem.discountPercent.toDouble(),
+    )
 }
