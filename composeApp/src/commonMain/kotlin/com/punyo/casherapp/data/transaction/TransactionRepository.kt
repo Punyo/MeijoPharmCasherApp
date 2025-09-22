@@ -22,20 +22,9 @@ interface TransactionRepository {
         searchQuery: String? = null,
     ): Int
 
-    suspend fun insertTransaction(transaction: TransactionDataModel): String
-
     suspend fun insertTransactionWithItems(
-        transactionId: String,
         createdAt: Instant,
         items: List<TransactionItemDataModel>,
-    )
-
-    suspend fun addItemToTransaction(
-        transactionId: String,
-        productId: String?,
-        quantity: Int,
-        unitPrice: Int,
-        discountPercent: Double = 0.0,
     )
 
     suspend fun removeItemFromTransaction(itemId: Long)
