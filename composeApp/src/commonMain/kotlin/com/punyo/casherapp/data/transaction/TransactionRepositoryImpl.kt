@@ -1,7 +1,7 @@
 package com.punyo.casherapp.data.transaction
 
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
-import com.punyo.casherapp.data.transaction.model.TransactionItemDataModel
+import com.punyo.casherapp.data.transaction.model.TransactionItem
 import com.punyo.casherapp.data.transaction.source.TransactionLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
@@ -28,17 +28,14 @@ class TransactionRepositoryImpl(
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun insertTransactionWithItems(
         createdAt: Instant,
-        items: List<TransactionItemDataModel>,
+        items: List<TransactionItem>,
     ) {
         val uuid = Uuid.random().toString()
         localDataSource.insertTransaction(uuid, createdAt)
         items.forEach { item ->
             localDataSource.addItemToTransaction(
                 transactionId = uuid,
-                productId = item.productId,
-                quantity = item.quantity,
-                unitPrice = item.unitPrice,
-                discountPercent = item.discountPercent,
+                item = item,
             )
         }
     }

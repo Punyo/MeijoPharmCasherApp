@@ -1,7 +1,7 @@
 package com.punyo.casherapp.data.transaction
 
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
-import com.punyo.casherapp.data.transaction.model.TransactionItemDataModel
+import com.punyo.casherapp.data.transaction.model.TransactionItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 
@@ -24,7 +24,7 @@ interface TransactionRepository {
 
     suspend fun insertTransactionWithItems(
         createdAt: Instant,
-        items: List<TransactionItemDataModel>,
+        items: List<TransactionItem>,
     )
 
     suspend fun removeItemFromTransaction(itemId: Long)
