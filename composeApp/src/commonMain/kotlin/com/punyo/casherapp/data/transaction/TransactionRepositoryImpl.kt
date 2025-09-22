@@ -1,10 +1,12 @@
 package com.punyo.casherapp.data.transaction
 
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
-import com.punyo.casherapp.data.transaction.model.TransactionItemDataModel
+import com.punyo.casherapp.data.transaction.model.TransactionItem
 import com.punyo.casherapp.data.transaction.source.TransactionLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class TransactionRepositoryImpl(
     private val localDataSource: TransactionLocalDataSource,
@@ -23,57 +25,19 @@ class TransactionRepositoryImpl(
         searchQuery = searchQuery,
     )
 
-    override suspend fun insertTransaction(transaction: TransactionDataModel): String {
-        val transactionId = localDataSource.insertTransaction(
-            id = transaction.id,
-            createdAt = transaction.createdAt,
-        )
-
-        transaction.items.forEach { item ->
-            localDataSource.addItemToTransaction(
-                transactionId = transactionId,
-                productId = item.productId,
-                quantity = item.quantity,
-                unitPrice = item.unitPrice,
-                discountPercent = item.discountPercent,
-            )
-        }
-
-        return transactionId
-    }
-
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun insertTransactionWithItems(
-        transactionId: String,
         createdAt: Instant,
-        items: List<TransactionItemDataModel>,
+        items: List<TransactionItem>,
     ) {
-        localDataSource.insertTransaction(transactionId, createdAt)
-
+        val uuid = Uuid.random().toString()
+        localDataSource.insertTransaction(uuid, createdAt)
         items.forEach { item ->
             localDataSource.addItemToTransaction(
-                transactionId = transactionId,
-                productId = item.productId,
-                quantity = item.quantity,
-                unitPrice = item.unitPrice,
-                discountPercent = item.discountPercent,
+                transactionId = uuid,
+                item = item,
             )
         }
-    }
-
-    override suspend fun addItemToTransaction(
-        transactionId: String,
-        productId: String?,
-        quantity: Int,
-        unitPrice: Int,
-        discountPercent: Double,
-    ) {
-        localDataSource.addItemToTransaction(
-            transactionId = transactionId,
-            productId = productId,
-            quantity = quantity,
-            unitPrice = unitPrice,
-            discountPercent = discountPercent,
-        )
     }
 
     override suspend fun removeItemFromTransaction(itemId: Long) {

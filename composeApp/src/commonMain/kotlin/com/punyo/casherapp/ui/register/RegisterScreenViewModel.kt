@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.data.transaction.TransactionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,10 +14,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 
 class RegisterScreenViewModel(
     private val productRepository: ProductRepository,
-//    private val transactionRepository: TransactionRepository,
+    private val transactionRepository: TransactionRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -123,7 +125,25 @@ class RegisterScreenViewModel(
         searchQueryFlow.value = query
     }
 
+    private fun clearCart() {
+        _uiState.value = _uiState.value.copy(cart = Cart())
+    }
+
     fun setInputMode(mode: InputMode) {
         _uiState.value = _uiState.value.copy(inputMode = mode)
+    }
+
+    fun confirmTransaction() {
+        viewModelScope.launch {
+            val cart = _uiState.value.cart
+            val currentTime = Clock.System.now()
+
+            val transactionItems = cart.toTransactionItems()
+            transactionRepository.insertTransactionWithItems(
+                createdAt = currentTime,
+                items = transactionItems,
+            )
+            clearCart()
+        }
     }
 }

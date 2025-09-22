@@ -5,6 +5,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import com.punyo.casherapp.application.db.AppDatabase
 import com.punyo.casherapp.data.transaction.db.Transactions
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
+import com.punyo.casherapp.data.transaction.model.TransactionItem
 import com.punyo.casherapp.data.transaction.model.TransactionItemDataModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -67,17 +68,14 @@ class TransactionLocalDataSource(
 
     fun addItemToTransaction(
         transactionId: String,
-        productId: String?,
-        quantity: Int,
-        unitPrice: Int,
-        discountPercent: Double = 0.0,
+        item: TransactionItem,
     ) {
         database.transactionQueries.insertTransactionItem(
-            quantity = quantity.toLong(),
-            unit_price = unitPrice.toLong(),
+            quantity = item.quantity.toLong(),
+            unit_price = item.unitPrice.toLong(),
             transaction_id = transactionId,
-            product_id = productId,
-            discount_percent = discountPercent,
+            product_id = item.productId,
+            discount_percent = item.discountPercent,
         )
     }
 

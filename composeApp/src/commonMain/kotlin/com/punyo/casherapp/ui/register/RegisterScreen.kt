@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -33,6 +34,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,6 +61,7 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
 
     var quantityDialogState by remember { mutableStateOf<QuantityDialogState?>(null) }
     var discountDialogState by remember { mutableStateOf<DiscountDialogState?>(null) }
+    var showDialogState by remember { mutableStateOf(false) }
 
     ResponsiveGrid(
         modifier = Modifier.fillMaxSize().padding(8.dp),
@@ -120,6 +123,9 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
                     onShowDeleteDialog = { index, _ ->
                         registerScreenViewModel.removeCartItem(index)
                     },
+                    onShowConfirmDialog = {
+                        showDialogState = true
+                    },
                 )
             }
         }
@@ -146,6 +152,35 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
                 discountDialogState = null
             },
             onDismiss = { discountDialogState = null },
+        )
+    }
+
+    if (showDialogState) {
+        AlertDialog(
+            onDismissRequest = { showDialogState = false },
+            title = { Text("取引確認") },
+            text = {
+                Column {
+                    Text("取引を確定しますか？")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("合計金額: ¥${String.format("%,d", uiState.cart.finalTotal)}")
+                    Text("商品数: ${uiState.cart.totalQuantity}点")
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { registerScreenViewModel.confirmTransaction() },
+                ) {
+                    Text("確定")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialogState = false },
+                ) {
+                    Text("キャンセル")
+                }
+            },
         )
     }
 }
@@ -313,6 +348,7 @@ private fun RightPanel(
     onShowQuantityDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDiscountDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDeleteDialog: (Int, CartItem) -> Unit = { _, _ -> },
+    onShowConfirmDialog: () -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -339,7 +375,7 @@ private fun RightPanel(
         )
 
         Button(
-            onClick = { /* TODO: 会計処理 */ },
+            onClick = onShowConfirmDialog,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
