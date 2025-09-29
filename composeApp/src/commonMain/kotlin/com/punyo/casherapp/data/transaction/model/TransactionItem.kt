@@ -4,5 +4,5 @@ data class TransactionItem(
     val quantity: Int,
     val unitPrice: Int,
     val productId: String?,
-    val discountPercent: Double = 0.0,
+    val discountAmount: Int = 0,
 )

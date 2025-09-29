@@ -45,6 +45,6 @@ fun Cart.toTransactionItems(): List<TransactionItem> = items.map { cartItem ->
         quantity = cartItem.quantity,
         unitPrice = cartItem.unitPrice,
         productId = cartItem.product.id,
-        discountPercent = cartItem.discountPercent.toDouble(),
+        discountAmount = (cartItem.unitPrice * cartItem.discountPercent / 100).roundToInt(),
     )
 }

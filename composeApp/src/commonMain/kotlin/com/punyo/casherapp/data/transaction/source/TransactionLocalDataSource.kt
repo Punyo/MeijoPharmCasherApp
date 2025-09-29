@@ -75,7 +75,7 @@ class TransactionLocalDataSource(
             unit_price = item.unitPrice.toLong(),
             transaction_id = transactionId,
             product_id = item.productId,
-            discount_percent = item.discountPercent,
+            discount_amount = item.discountAmount.toLong(),
         )
     }
 
@@ -171,7 +171,7 @@ class TransactionLocalDataSource(
                 unitPrice = item.unit_price.toInt(),
                 transactionId = item.transaction_id,
                 productId = item.product_id,
-                discountPercent = item.discount_percent,
+                discountAmount = item.discount_amount.toInt(),
             )
         }
 }

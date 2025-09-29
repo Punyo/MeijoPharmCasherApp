@@ -157,9 +157,9 @@ fun DetailedTransactionItem(
                                 text = "$productName × ${item.quantity}",
                                 style = MaterialTheme.typography.bodySmall,
                             )
-                            if (item.discountPercent != 0.0) {
+                            if (item.discountAmount != 0) {
                                 Text(
-                                    text = "${item.discountPercent}% 割引",
+                                    text = "ひとつ当たり ¥${item.discountAmount} 割引",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error,
                                 )
@@ -169,7 +169,7 @@ fun DetailedTransactionItem(
                             text = "¥${item.totalPrice}",
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium,
-                            color = if (item.discountPercent != 0.0) {
+                            color = if (item.discountAmount != 0) {
                                 MaterialTheme.colorScheme.error
                             } else {
                                 MaterialTheme.colorScheme.onSurface
