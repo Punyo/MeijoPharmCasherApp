@@ -48,7 +48,9 @@ import com.aay.compose.barChart.BarChart
 import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.baseComponents.model.LegendPosition
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
+import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.extensions.toDateString
+import com.punyo.casherapp.extensions.toInt
 import com.punyo.casherapp.ui.component.ResponsiveGrid
 import org.koin.compose.koinInject
 
@@ -231,7 +233,7 @@ fun CompactTransactionItem(transaction: TransactionDataModel) {
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = "¥${transaction.totalAmount}",
+                    text = transaction.totalAmount.format(),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -292,7 +294,7 @@ fun CompactProductItem(product: ProductSummary) {
             }
 
             Text(
-                text = "¥${product.totalRevenue}",
+                text = product.totalRevenue.format(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary,
@@ -325,7 +327,7 @@ fun ProductSalesBarChart(
             ) {
                 val barParameters = BarParameters(
                     dataName = "商品売上",
-                    data = productData.map { it.totalRevenue.toDouble() },
+                    data = productData.map { it.totalRevenue.toInt().toDouble() },
                     barColor = MaterialTheme.colorScheme.primary,
                 )
 
@@ -359,7 +361,7 @@ private fun TransactionsScreenContent(
     currentTransactions: List<TransactionDataModel>,
     customerCount: Int,
     totalQuantity: Int,
-    totalRevenue: Int,
+    totalRevenue: org.joda.money.Money,
     onPeriodSelected: (TimePeriod) -> Unit,
     onNavigateToAllTransactions: () -> Unit,
     onNavigateToProductsList: () -> Unit,
@@ -417,7 +419,7 @@ private fun TransactionsScreenContent(
 private fun SummaryCardsRow(
     customerCount: Int,
     totalQuantity: Int,
-    totalRevenue: Int,
+    totalRevenue: org.joda.money.Money,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -439,7 +441,7 @@ private fun SummaryCardsRow(
         EnhancedSummaryCard(
             modifier = Modifier.weight(1f),
             title = "売上金額",
-            value = totalRevenue.toString(),
+            value = totalRevenue.toInt().toString(),
             icon = Icons.Default.AttachMoney,
         )
     }

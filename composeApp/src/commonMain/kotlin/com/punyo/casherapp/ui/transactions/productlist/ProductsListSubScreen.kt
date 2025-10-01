@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.punyo.casherapp.extensions.format
+import com.punyo.casherapp.extensions.toInt
 import com.punyo.casherapp.ui.transactions.BaseTransactionSubScreen
 import com.punyo.casherapp.ui.transactions.ProductSummary
 import com.punyo.casherapp.ui.transactions.TimePeriod
@@ -67,9 +69,10 @@ fun ProductsListSubScreen(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "総売上: ¥${
-                        filteredProducts.sumOf { it.totalRevenue }.toString().reversed().chunked(3)
-                            .joinToString(",").reversed()
+                        text = "総売上: ${
+                        filteredProducts.fold(com.punyo.casherapp.extensions.JPY.let { org.joda.money.Money.zero(it) }) { acc, product -> 
+                            acc.plus(product.totalRevenue) 
+                        }.format()
                         }",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
@@ -118,10 +121,7 @@ fun DetailedProductItem(product: ProductSummary) {
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "¥${
-                    product.totalRevenue.toString().reversed().chunked(3)
-                        .joinToString(",").reversed()
-                    }",
+                    text = product.totalRevenue.format(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -145,7 +145,7 @@ fun DetailedProductItem(product: ProductSummary) {
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = "単価: ¥${product.unitPrice}",
+                    text = "単価: ${product.unitPrice.format()}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.secondary,

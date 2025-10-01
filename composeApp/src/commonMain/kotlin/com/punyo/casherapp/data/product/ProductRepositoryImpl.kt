@@ -8,6 +8,7 @@ import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.data.product.source.ProductLocalDataSource
 import com.punyo.casherapp.data.product.source.ProductPagingSource
 import kotlinx.coroutines.flow.Flow
+import org.joda.money.Money
 
 class ProductRepositoryImpl(
     private val localDataSource: ProductLocalDataSource,
@@ -22,7 +23,7 @@ class ProductRepositoryImpl(
     override suspend fun insertProduct(
         name: String,
         barcode: String?,
-        price: Int,
+        price: Money,
     ) {
         localDataSource.insertProduct(
             name = name,
