@@ -4,17 +4,17 @@ import org.joda.money.CurrencyUnit
 import org.joda.money.Money
 import java.math.RoundingMode
 
-val JPY = CurrencyUnit.of("JPY")
+val defaultCurrencyUnit = CurrencyUnit.JPY
 
 /**
  * Create Money from Int (assumes value is in yen)
  */
-fun Int.toMoney(): Money = Money.of(JPY, this.toBigDecimal())
+fun Int.toMoney(): Money = Money.of(defaultCurrencyUnit, this.toBigDecimal())
 
 /**
  * Create Money from Long (assumes value is in yen)
  */
-fun Long.toMoney(): Money = Money.of(JPY, this.toBigDecimal())
+fun Long.toMoney(): Money = Money.of(defaultCurrencyUnit, this.toBigDecimal())
 
 /**
  * Convert Money to Int (yen)
@@ -48,6 +48,6 @@ fun Money.applyDiscount(discountPercent: Float): Money {
  * Calculate discount amount
  */
 fun Money.discountAmount(discountPercent: Float): Money {
-    if (discountPercent <= 0f) return Money.zero(JPY)
+    if (discountPercent <= 0f) return Money.zero(defaultCurrencyUnit)
     return this.minus(this.applyDiscount(discountPercent))
 }

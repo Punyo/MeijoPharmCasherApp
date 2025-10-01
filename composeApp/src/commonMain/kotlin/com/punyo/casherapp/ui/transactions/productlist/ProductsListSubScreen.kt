@@ -69,11 +69,7 @@ fun ProductsListSubScreen(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "総売上: ${
-                        filteredProducts.fold(com.punyo.casherapp.extensions.JPY.let { org.joda.money.Money.zero(it) }) { acc, product -> 
-                            acc.plus(product.totalRevenue) 
-                        }.format()
-                        }",
+                        text = "総売上: ${uiState.data!!.totalRevenue.format()}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,

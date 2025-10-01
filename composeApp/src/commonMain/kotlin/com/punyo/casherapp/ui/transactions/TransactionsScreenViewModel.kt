@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.transaction.TransactionRepository
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
-import com.punyo.casherapp.extensions.JPY
+import com.punyo.casherapp.extensions.defaultCurrencyUnit
 import com.punyo.casherapp.extensions.endOfDay
 import com.punyo.casherapp.extensions.startOfDay
 import kotlinx.coroutines.Job
@@ -110,7 +110,7 @@ class TransactionsScreenViewModel(
 
     fun getCustomerCountByPeriod(period: TimePeriod): Int = getTransactionsByPeriod(period).size
 
-    fun getTotalRevenueByPeriod(period: TimePeriod): Money = getTransactionsByPeriod(period).fold(Money.zero(JPY)) { acc, transaction ->
+    fun getTotalRevenueByPeriod(period: TimePeriod): Money = getTransactionsByPeriod(period).fold(Money.zero(defaultCurrencyUnit)) { acc, transaction ->
         acc.plus(transaction.totalAmount)
     }
 

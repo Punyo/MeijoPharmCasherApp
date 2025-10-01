@@ -10,7 +10,7 @@ data class TransactionDataModel(
 ) {
     val totalAmount: Money
         get() = items.fold(items.firstOrNull()?.totalPrice?.currencyUnit?.let { Money.zero(it) } 
-            ?: com.punyo.casherapp.extensions.JPY.let { Money.zero(it) }) { acc, item -> 
+            ?: com.punyo.casherapp.extensions.defaultCurrencyUnit.let { Money.zero(it) }) { acc, item -> 
             acc.plus(item.totalPrice) 
         }
 
