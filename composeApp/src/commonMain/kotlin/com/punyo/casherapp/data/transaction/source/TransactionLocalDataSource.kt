@@ -7,6 +7,8 @@ import com.punyo.casherapp.data.transaction.db.Transactions
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.data.transaction.model.TransactionItem
 import com.punyo.casherapp.data.transaction.model.TransactionItemDataModel
+import com.punyo.casherapp.extensions.toLong
+import com.punyo.casherapp.extensions.toMoney
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -168,10 +170,10 @@ class TransactionLocalDataSource(
             TransactionItemDataModel(
                 id = item.id,
                 quantity = item.quantity.toInt(),
-                unitPrice = item.unit_price.toInt(),
+                unitPrice = item.unit_price.toMoney(),
                 transactionId = item.transaction_id,
                 productId = item.product_id,
-                discountAmount = item.discount_amount.toInt(),
+                discountAmount = item.discount_amount.toMoney(),
             )
         }
 }

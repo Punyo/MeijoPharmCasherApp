@@ -37,6 +37,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.androidx.paging.common)
                 implementation(libs.androidx.paging.compose)
+                implementation(libs.joda.money)
             }
         }
 

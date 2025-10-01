@@ -4,9 +4,11 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.punyo.casherapp.application.db.AppDatabase
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.extensions.toMoney
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.joda.money.Money
 import java.util.UUID
 
 class ProductLocalDataSource(
@@ -22,7 +24,7 @@ class ProductLocalDataSource(
                     id = product.id,
                     name = product.name,
                     barcode = product.barcode,
-                    price = product.price.toInt(),
+                    price = product.price.toMoney(),
                 )
             }
         }
@@ -32,7 +34,7 @@ class ProductLocalDataSource(
             id = product.id,
             name = product.name,
             barcode = product.barcode,
-            price = product.price.toInt(),
+            price = product.price.toMoney(),
         )
     }
 
@@ -46,7 +48,7 @@ class ProductLocalDataSource(
                     id = product.id,
                     name = product.name,
                     barcode = product.barcode,
-                    price = product.price.toInt(),
+                    price = product.price.toMoney(),
                 )
             }
         }
@@ -54,14 +56,14 @@ class ProductLocalDataSource(
     suspend fun insertProduct(
         name: String,
         barcode: String? = null,
-        price: Int,
+        price: Money,
     ) {
         val uuid = UUID.randomUUID().toString()
         database.productQueries.insertProduct(
             id = uuid,
             name = name,
             barcode = barcode,
-            price = price.toLong(),
+            price = price.amount.toLong(),
         )
     }
 
@@ -69,7 +71,7 @@ class ProductLocalDataSource(
         database.productQueries.updateProduct(
             name = product.name,
             barcode = product.barcode,
-            price = product.price.toLong(),
+            price = product.price.amount.toLong(),
             id = product.id,
         )
     }

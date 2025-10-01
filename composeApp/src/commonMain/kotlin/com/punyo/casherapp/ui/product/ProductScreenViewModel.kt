@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.extensions.toMoney
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,7 +72,7 @@ class ProductScreenViewModel(
             repository.insertProduct(
                 name = name,
                 barcode = barcode,
-                price = price.toInt(),
+                price = price.toInt().toMoney(),
             )
         }
     }
@@ -87,7 +88,7 @@ class ProductScreenViewModel(
                 id = id,
                 name = name,
                 barcode = barcode,
-                price = price.toInt(),
+                price = price.toInt().toMoney(),
             )
             repository.updateProduct(updatedProduct)
         }

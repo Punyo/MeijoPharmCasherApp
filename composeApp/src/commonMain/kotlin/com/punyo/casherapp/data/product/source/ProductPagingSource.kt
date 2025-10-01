@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.punyo.casherapp.application.db.AppDatabase
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.extensions.toMoney
 import java.io.IOException
 
 class ProductPagingSource(
@@ -36,7 +37,7 @@ class ProductPagingSource(
                 id = product.id,
                 name = product.name,
                 barcode = product.barcode,
-                price = product.price.toInt(),
+                price = product.price.toMoney(),
             )
         }
 

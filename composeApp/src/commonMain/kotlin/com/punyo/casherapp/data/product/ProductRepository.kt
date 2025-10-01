@@ -3,6 +3,7 @@ package com.punyo.casherapp.data.product
 import androidx.paging.PagingData
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import kotlinx.coroutines.flow.Flow
+import org.joda.money.Money
 
 interface ProductRepository {
     fun getAllProducts(): Flow<List<ProductDataModel>>
@@ -14,7 +15,7 @@ interface ProductRepository {
     suspend fun insertProduct(
         name: String,
         barcode: String?,
-        price: Int,
+        price: Money,
     )
 
     suspend fun updateProduct(product: ProductDataModel)
