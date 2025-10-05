@@ -102,14 +102,14 @@ class RegisterScreenViewModel(
         }
     }
 
-    fun applyDiscount(discountPercent: Float) {
+    fun applyDiscount(discountPercent: Int) {
         val currentCart = _uiState.value.cart
         _uiState.value = _uiState.value.copy(
             cart = currentCart.copy(totalDiscountPercent = discountPercent),
         )
     }
 
-    fun applyItemDiscount(index: Int, discountPercent: Float) {
+    fun applyItemDiscount(index: Int, discountPercent: Int) {
         val currentCart = _uiState.value.cart
         if (index >= 0 && index < currentCart.items.size) {
             val updatedItems = currentCart.items.toMutableList().apply {

@@ -51,7 +51,6 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.extensions.format
-import com.punyo.casherapp.extensions.toInt
 import com.punyo.casherapp.ui.component.ResponsiveGrid
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
@@ -346,7 +345,7 @@ private fun RightPanel(
     uiState: RegisterUiState,
     onQuantityUpdate: (Int, Int) -> Unit,
     onRemoveItem: (Int) -> Unit,
-    onApplyDiscount: (Float) -> Unit,
+    onApplyDiscount: (Int) -> Unit,
     onShowQuantityDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDiscountDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDeleteDialog: (Int, CartItem) -> Unit = { _, _ -> },
@@ -525,7 +524,7 @@ private fun CartItemRow(
 private fun TotalArea(
     modifier: Modifier = Modifier,
     cart: Cart,
-    onApplyDiscount: (Float) -> Unit,
+    onApplyDiscount: (Int) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -546,7 +545,7 @@ private fun TotalArea(
             Text(cart.originalSubtotal.format())
         }
 
-        if (cart.totalDiscountAmount.toInt() > 0) {
+        if (cart.totalDiscountAmount.isPositive) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

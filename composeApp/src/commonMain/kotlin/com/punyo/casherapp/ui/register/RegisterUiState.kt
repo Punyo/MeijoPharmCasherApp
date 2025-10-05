@@ -2,9 +2,8 @@ package com.punyo.casherapp.ui.register
 
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.data.transaction.model.TransactionItem
-import com.punyo.casherapp.extensions.defaultCurrencyUnit
 import com.punyo.casherapp.extensions.applyDiscount
-import com.punyo.casherapp.extensions.discountAmount
+import com.punyo.casherapp.extensions.defaultCurrencyUnit
 import org.joda.money.Money
 
 data class RegisterUiState(
@@ -23,7 +22,7 @@ data class CartItem(
     val product: ProductDataModel,
     val quantity: Int = 1,
     val unitPrice: Money,
-    val discountPercent: Float = 0f,
+    val discountPercent: Int = 0,
 ) {
     val originalPrice: Money = unitPrice.multipliedBy(quantity.toLong())
     val totalPrice: Money = originalPrice.applyDiscount(discountPercent)
@@ -32,7 +31,7 @@ data class CartItem(
 
 data class Cart(
     val items: List<CartItem> = emptyList(),
-    val totalDiscountPercent: Float = 0f,
+    val totalDiscountPercent: Int = 0,
 ) {
     val originalSubtotal: Money = items.fold(Money.zero(defaultCurrencyUnit)) { acc, item -> acc.plus(item.originalPrice) }
     val subtotal: Money = items.fold(Money.zero(defaultCurrencyUnit)) { acc, item -> acc.plus(item.totalPrice) }
@@ -48,6 +47,6 @@ fun Cart.toTransactionItems(): List<TransactionItem> = items.map { cartItem ->
         quantity = cartItem.quantity,
         unitPrice = cartItem.unitPrice,
         productId = cartItem.product.id,
-        discountAmount = cartItem.unitPrice.discountAmount(cartItem.discountPercent),
+        discountAmount = cartItem.unitPrice.minus(cartItem.unitPrice.applyDiscount(cartItem.discountPercent)),
     )
 }

@@ -50,7 +50,7 @@ import com.aay.compose.baseComponents.model.LegendPosition
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.extensions.toDateString
-import com.punyo.casherapp.extensions.toInt
+import com.punyo.casherapp.extensions.toDouble
 import com.punyo.casherapp.ui.component.ResponsiveGrid
 import org.koin.compose.koinInject
 
@@ -327,7 +327,7 @@ fun ProductSalesBarChart(
             ) {
                 val barParameters = BarParameters(
                     dataName = "商品売上",
-                    data = productData.map { it.totalRevenue.toInt().toDouble() },
+                    data = productData.map { it.totalRevenue.toDouble() },
                     barColor = MaterialTheme.colorScheme.primary,
                 )
 
@@ -441,7 +441,7 @@ private fun SummaryCardsRow(
         EnhancedSummaryCard(
             modifier = Modifier.weight(1f),
             title = "売上金額",
-            value = totalRevenue.toInt().toString(),
+            value = totalRevenue.format(),
             icon = Icons.Default.AttachMoney,
         )
     }

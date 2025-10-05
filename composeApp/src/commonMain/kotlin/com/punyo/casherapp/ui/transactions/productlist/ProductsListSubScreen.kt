@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.extensions.format
-import com.punyo.casherapp.extensions.toInt
 import com.punyo.casherapp.ui.transactions.BaseTransactionSubScreen
 import com.punyo.casherapp.ui.transactions.ProductSummary
 import com.punyo.casherapp.ui.transactions.TimePeriod

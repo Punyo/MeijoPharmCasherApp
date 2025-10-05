@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -89,12 +90,11 @@ fun QuantityUpdateDialog(
 @Composable
 fun DiscountDialog(
     productName: String,
-    currentDiscountPercent: Float,
-    onConfirm: (Float) -> Unit,
+    currentDiscountPercent: Int,
+    onConfirm: (Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var discountText by remember { mutableStateOf(currentDiscountPercent.toString()) }
-    val discount = discountText.toFloatOrNull() ?: 0f
+    var discount by remember { mutableStateOf(currentDiscountPercent) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -116,14 +116,23 @@ fun DiscountDialog(
                     modifier = Modifier.padding(vertical = 8.dp),
                 )
 
-                OutlinedTextField(
-                    value = discountText,
-                    onValueChange = { discountText = it },
-                    label = { Text("割引率 (%)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                )
+                ) {
+                    Text(
+                        text = "割引率: $discount%",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+
+                    Slider(
+                        value = discount.toFloat(),
+                        onValueChange = { discount = it.toInt() },
+                        valueRange = 0f..100f,
+                        steps = 99,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
 
                 Row(
                     modifier = Modifier
@@ -139,7 +148,6 @@ fun DiscountDialog(
 
                     TextButton(
                         onClick = { onConfirm(discount) },
-                        enabled = discount in 0.0..100.0,
                     ) {
                         Text("適用")
                     }

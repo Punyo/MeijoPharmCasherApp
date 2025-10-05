@@ -24,7 +24,6 @@ import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
 import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.extensions.toDateString
-import com.punyo.casherapp.extensions.toInt
 import com.punyo.casherapp.ui.transactions.BaseTransactionSubScreen
 import com.punyo.casherapp.ui.transactions.TimePeriod
 import kotlinx.datetime.TimeZone
@@ -159,7 +158,7 @@ fun DetailedTransactionItem(
                                 text = "$productName × ${item.quantity}",
                                 style = MaterialTheme.typography.bodySmall,
                             )
-                            if (item.discountAmount.toInt() != 0) {
+                            if (item.discountAmount.isPositive) {
                                 Text(
                                     text = "ひとつ当たり ${item.discountAmount.format()} 割引",
                                     style = MaterialTheme.typography.bodySmall,
@@ -171,7 +170,7 @@ fun DetailedTransactionItem(
                             text = item.totalPrice.format(),
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium,
-                            color = if (item.discountAmount.toInt() != 0) {
+                            color = if (item.discountAmount.isPositive) {
                                 MaterialTheme.colorScheme.error
                             } else {
                                 MaterialTheme.colorScheme.onSurface
