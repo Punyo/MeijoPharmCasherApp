@@ -8,7 +8,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 val defaultCurrencyUnit = CurrencyUnit.JPY!!
-private val defaultScale = 0
+private val defaultScale = 5
 private val defaultRoundingMode = RoundingMode.HALF_EVEN
 
 private val defaultMoneyFormatter: MoneyFormatter = MoneyFormatterBuilder()
