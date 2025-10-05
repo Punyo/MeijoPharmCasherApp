@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
+import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.extensions.toDateString
 import com.punyo.casherapp.ui.transactions.BaseTransactionSubScreen
 import com.punyo.casherapp.ui.transactions.TimePeriod
@@ -120,7 +121,7 @@ fun DetailedTransactionItem(
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "¥${transaction.totalAmount}",
+                    text = transaction.totalAmount.format(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -157,19 +158,19 @@ fun DetailedTransactionItem(
                                 text = "$productName × ${item.quantity}",
                                 style = MaterialTheme.typography.bodySmall,
                             )
-                            if (item.discountAmount != 0) {
+                            if (item.discountAmount.isPositive) {
                                 Text(
-                                    text = "ひとつ当たり ¥${item.discountAmount} 割引",
+                                    text = "ひとつ当たり ${item.discountAmount.format()} 割引",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error,
                                 )
                             }
                         }
                         Text(
-                            text = "¥${item.totalPrice}",
+                            text = item.totalPrice.format(),
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium,
-                            color = if (item.discountAmount != 0) {
+                            color = if (item.discountAmount.isPositive) {
                                 MaterialTheme.colorScheme.error
                             } else {
                                 MaterialTheme.colorScheme.onSurface

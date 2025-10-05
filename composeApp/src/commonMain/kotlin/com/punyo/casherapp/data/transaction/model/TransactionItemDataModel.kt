@@ -1,16 +1,18 @@
 package com.punyo.casherapp.data.transaction.model
 
+import org.joda.money.Money
+
 data class TransactionItemDataModel(
     val id: Long,
     val quantity: Int,
-    val unitPrice: Int,
+    val unitPrice: Money,
     val transactionId: String,
     val productId: String?,
-    val discountAmount: Int = 0,
+    val discountAmount: Money,
 ) {
-    val discountedUnitPrice: Int
-        get() = unitPrice - discountAmount
+    val discountedUnitPrice: Money
+        get() = unitPrice.minus(discountAmount)
 
-    val totalPrice: Int
-        get() = discountedUnitPrice * quantity
+    val totalPrice: Money
+        get() = discountedUnitPrice.multipliedBy(quantity.toLong())
 }

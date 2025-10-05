@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.ui.component.ResponsiveGrid
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
@@ -163,7 +164,7 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
                 Column {
                     Text("取引を確定しますか？")
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("合計金額: ¥${String.format("%,d", uiState.cart.finalTotal)}")
+                    Text("合計金額: ${uiState.cart.finalTotal.format()}")
                     Text("商品数: ${uiState.cart.totalQuantity}点")
                 }
             },
@@ -328,7 +329,7 @@ private fun ProductSearchItem(
             )
 
             Text(
-                text = "¥${product.price}",
+                text = product.price.format(),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -344,7 +345,7 @@ private fun RightPanel(
     uiState: RegisterUiState,
     onQuantityUpdate: (Int, Int) -> Unit,
     onRemoveItem: (Int) -> Unit,
-    onApplyDiscount: (Float) -> Unit,
+    onApplyDiscount: (Int) -> Unit,
     onShowQuantityDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDiscountDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDeleteDialog: (Int, CartItem) -> Unit = { _, _ -> },
@@ -454,7 +455,7 @@ private fun CartItemRow(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = "¥${cartItem.unitPrice} x ${cartItem.quantity}",
+                text = "${cartItem.unitPrice.format()} x ${cartItem.quantity}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -473,7 +474,7 @@ private fun CartItemRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "¥${cartItem.totalPrice}",
+                text = cartItem.totalPrice.format(),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
             )
@@ -523,7 +524,7 @@ private fun CartItemRow(
 private fun TotalArea(
     modifier: Modifier = Modifier,
     cart: Cart,
-    onApplyDiscount: (Float) -> Unit,
+    onApplyDiscount: (Int) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -541,10 +542,10 @@ private fun TotalArea(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text("小計:")
-            Text("¥${cart.originalSubtotal}")
+            Text(cart.originalSubtotal.format())
         }
 
-        if (cart.totalDiscountAmount > 0) {
+        if (cart.totalDiscountAmount.isPositive) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -554,7 +555,7 @@ private fun TotalArea(
                     color = MaterialTheme.colorScheme.error,
                 )
                 Text(
-                    text = "-¥${cart.totalDiscountAmount}",
+                    text = "-${cart.totalDiscountAmount.format()}",
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -574,7 +575,7 @@ private fun TotalArea(
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "¥${cart.finalTotal}",
+                text = cart.finalTotal.format(),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,

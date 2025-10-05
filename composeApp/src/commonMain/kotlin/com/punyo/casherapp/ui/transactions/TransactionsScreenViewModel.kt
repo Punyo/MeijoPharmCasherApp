@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.transaction.TransactionRepository
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
+import com.punyo.casherapp.extensions.defaultCurrencyUnit
 import com.punyo.casherapp.extensions.endOfDay
 import com.punyo.casherapp.extensions.startOfDay
 import kotlinx.coroutines.Job
@@ -18,6 +19,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
+import org.joda.money.Money
 import kotlin.collections.forEach
 
 class TransactionsScreenViewModel(
@@ -108,8 +110,8 @@ class TransactionsScreenViewModel(
 
     fun getCustomerCountByPeriod(period: TimePeriod): Int = getTransactionsByPeriod(period).size
 
-    fun getTotalRevenueByPeriod(period: TimePeriod): Int = getTransactionsByPeriod(period).sumOf { transaction ->
-        transaction.items.sumOf { item -> item.totalPrice }
+    fun getTotalRevenueByPeriod(period: TimePeriod): Money = getTransactionsByPeriod(period).fold(Money.zero(defaultCurrencyUnit)) { acc, transaction ->
+        acc.plus(transaction.totalAmount)
     }
 
     fun getTotalQuantityByPeriod(period: TimePeriod): Int = getTransactionsByPeriod(period).sumOf { transaction ->
@@ -135,7 +137,7 @@ class TransactionsScreenViewModel(
                     if (existingSummary != null) {
                         val updatedSummary = existingSummary.copy(
                             totalQuantity = existingSummary.totalQuantity + item.quantity,
-                            totalRevenue = existingSummary.totalRevenue + item.totalPrice,
+                            totalRevenue = existingSummary.totalRevenue.plus(item.totalPrice),
                         )
                         productMap[item.productId] = updatedSummary
                     } else {
@@ -203,6 +205,6 @@ data class ProductSummary(
     val productId: String?,
     val name: String,
     val totalQuantity: Int,
-    val totalRevenue: Int,
-    val unitPrice: Int,
+    val totalRevenue: Money,
+    val unitPrice: Money,
 )

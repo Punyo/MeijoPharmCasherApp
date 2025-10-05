@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.transaction.TransactionRepository
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
+import com.punyo.casherapp.extensions.defaultCurrencyUnit
 import com.punyo.casherapp.ui.transactions.BaseTransactionsSubScreenUiState
 import com.punyo.casherapp.ui.transactions.BaseTransactionsSubScreenViewModel
 import com.punyo.casherapp.ui.transactions.ProductSummary
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import org.joda.money.Money
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ProductsListSubScreenViewModel(
@@ -32,10 +34,14 @@ class ProductsListSubScreenViewModel(
             transactionsFlow.collect { transactions ->
                 val productSummaries = getProductSummariesByTransactionDataModels(transactions)
                 val filteredProducts = getFilteredProductsBySearchText(productSummaries, searchQuery)
+                val totalRevenue = filteredProducts?.fold(Money.zero(defaultCurrencyUnit)) { acc, product ->
+                    acc.plus(product.totalRevenue)
+                } ?: Money.zero(defaultCurrencyUnit)
                 state.value = state.value.copy(
                     data = ProductsListScreenData(
                         products = productSummaries,
                         filteredProducts = filteredProducts,
+                        totalRevenue = totalRevenue,
                     ),
                 )
             }
@@ -53,9 +59,14 @@ class ProductsListSubScreenViewModel(
     override fun setSearchText(text: String) {
         state.value = state.value.copy(searchText = text)
         state.value.data?.let { data ->
+            val filteredProducts = getFilteredProductsBySearchText(data.products, text)
+            val totalRevenue = filteredProducts?.fold(Money.zero(defaultCurrencyUnit)) { acc, product ->
+                acc.plus(product.totalRevenue)
+            } ?: Money.zero(defaultCurrencyUnit)
             state.value = state.value.copy(
                 data = data.copy(
-                    filteredProducts = getFilteredProductsBySearchText(data.products, text),
+                    filteredProducts = filteredProducts,
+                    totalRevenue = totalRevenue,
                 ),
             )
         }
@@ -116,4 +127,5 @@ class ProductsListSubScreenViewModel(
 data class ProductsListScreenData(
     val products: List<ProductSummary>,
     val filteredProducts: List<ProductSummary>?,
+    val totalRevenue: Money,
 )
