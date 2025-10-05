@@ -66,13 +66,13 @@ class ProductScreenViewModel(
     fun addProduct(
         name: String,
         barcode: String?,
-        price: UInt,
+        price: Long,
     ) {
         viewModelScope.launch {
             repository.insertProduct(
                 name = name,
                 barcode = barcode,
-                price = price.toInt().toMoney(),
+                price = price.toMoney(),
             )
         }
     }
@@ -81,14 +81,14 @@ class ProductScreenViewModel(
         id: String,
         name: String,
         barcode: String?,
-        price: UInt,
+        price: Long,
     ) {
         viewModelScope.launch {
             val updatedProduct = ProductDataModel(
                 id = id,
                 name = name,
                 barcode = barcode,
-                price = price.toInt().toMoney(),
+                price = price.toMoney(),
             )
             repository.updateProduct(updatedProduct)
         }

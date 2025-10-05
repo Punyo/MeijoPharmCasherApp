@@ -31,7 +31,7 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun AddProductDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, String?, UInt) -> Unit,
+    onConfirm: (String, String?, Long) -> Unit,
     productDialogState: ProductDialogState = rememberProductDialogState(),
 ) {
     ProductDialog(
@@ -45,7 +45,7 @@ fun AddProductDialog(
 @Composable
 fun EditProductDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, String, String?, UInt) -> Unit,
+    onConfirm: (String, String, String?, Long) -> Unit,
     editingProductId: String,
     productDialogState: ProductDialogState,
 ) {
@@ -69,7 +69,7 @@ fun EditProductDialog(
 private fun ProductDialog(
     title: String,
     onDismiss: () -> Unit,
-    onConfirm: (String, String?, UInt) -> Unit,
+    onConfirm: (String, String?, Long) -> Unit,
     productDialogState: ProductDialogState,
 ) {
     Dialog(
@@ -119,7 +119,7 @@ private fun ProductDialog(
                         value = productDialogState.price.toString(),
                         onValueChange = { newValue ->
                             if (newValue.all { it.isDigit() }) {
-                                productDialogState.price = newValue.toUIntOrNull() ?: 0u
+                                productDialogState.price = newValue.toLongOrNull() ?: 0L
                             }
                         },
                         label = { Text("価格 *") },
@@ -175,7 +175,7 @@ private fun ProductDialog(
 fun rememberProductDialogState(
     productName: String = "",
     barcode: String? = null,
-    price: UInt = 0u,
+    price: Long = 0L,
 ): ProductDialogState = rememberSaveable(saver = ProductDialogState.Saver) {
     ProductDialogStateImpl(
         initialProductName = productName,
@@ -187,7 +187,7 @@ fun rememberProductDialogState(
 interface ProductDialogState {
     var productName: String
     var barcode: String?
-    var price: UInt
+    var price: Long
 
     companion object {
         val Saver: Saver<ProductDialogState, List<Any?>> = Saver(
@@ -202,7 +202,7 @@ interface ProductDialogState {
                 ProductDialogStateImpl(
                     initialProductName = list[0] as String,
                     initialBarcode = list[1] as String?,
-                    initialPrice = (list[2] as String).toUIntOrNull() ?: 0u,
+                    initialPrice = (list[2] as String).toLongOrNull() ?: 0L,
                 )
             },
         )
@@ -212,7 +212,7 @@ interface ProductDialogState {
 private class ProductDialogStateImpl(
     initialProductName: String,
     initialBarcode: String?,
-    initialPrice: UInt,
+    initialPrice: Long,
 ) : ProductDialogState {
     private var _productName = mutableStateOf(initialProductName)
     private var _barcode = mutableStateOf(initialBarcode)
@@ -228,7 +228,7 @@ private class ProductDialogStateImpl(
         set(value) {
             _barcode.value = value
         }
-    override var price: UInt
+    override var price: Long
         get() = _price.value
         set(value) {
             _price.value = value
