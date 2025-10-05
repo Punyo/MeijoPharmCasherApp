@@ -33,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.extensions.format
-import com.punyo.casherapp.extensions.toInt
+import com.punyo.casherapp.extensions.toLong
 import com.punyo.casherapp.ui.component.DataTable
 import com.punyo.casherapp.ui.component.TableColumn
 import org.koin.compose.koinInject
@@ -108,7 +108,7 @@ fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
                                 editingProductId = products[index].id
                                 editingProductDialogState.productName = products[index].name
                                 editingProductDialogState.barcode = products[index].barcode
-                                editingProductDialogState.price = products[index].price.toInt().toUInt()
+                                editingProductDialogState.price = products[index].price.toLong()
                                 showEditProductDialog = true
                             },
                             "削除" to { index ->

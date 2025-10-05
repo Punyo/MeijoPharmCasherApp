@@ -17,19 +17,9 @@ private val defaultMoneyFormatter: MoneyFormatter = MoneyFormatterBuilder()
     .toFormatter()
 
 /**
- * Create Money from Int (assumes value is in yen)
- */
-fun Int.toMoney(): Money = Money.of(defaultCurrencyUnit, this.toBigDecimal())
-
-/**
  * Create Money from Long (assumes value is in yen)
  */
 fun Long.toMoney(): Money = Money.of(defaultCurrencyUnit, this.toBigDecimal())
-
-/**
- * Convert Money to Int (yen)
- */
-fun Money.toInt(): Int = this.amount.setScale(defaultScale, defaultRoundingMode).toInt()
 
 /**
  * Convert Money to Long (yen)
