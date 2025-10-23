@@ -170,7 +170,10 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
             },
             confirmButton = {
                 TextButton(
-                    onClick = { registerScreenViewModel.confirmTransaction() },
+                    onClick = {
+                        registerScreenViewModel.confirmTransaction()
+                        showDialogState = false
+                    },
                 ) {
                     Text("確定")
                 }
@@ -359,8 +362,6 @@ private fun RightPanel(
                 .fillMaxWidth()
                 .weight(1f),
             cart = uiState.cart,
-            onQuantityUpdate = onQuantityUpdate,
-            onRemoveItem = onRemoveItem,
             onShowQuantityDialog = onShowQuantityDialog,
             onShowDiscountDialog = onShowDiscountDialog,
             onShowDeleteDialog = onShowDeleteDialog,
@@ -372,7 +373,6 @@ private fun RightPanel(
             modifier = Modifier
                 .fillMaxWidth(),
             cart = uiState.cart,
-            onApplyDiscount = onApplyDiscount,
         )
 
         Button(
@@ -391,8 +391,6 @@ private fun RightPanel(
 private fun CartArea(
     modifier: Modifier = Modifier,
     cart: Cart,
-    onQuantityUpdate: (Int, Int) -> Unit,
-    onRemoveItem: (Int) -> Unit,
     onShowQuantityDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDiscountDialog: (Int, CartItem) -> Unit = { _, _ -> },
     onShowDeleteDialog: (Int, CartItem) -> Unit = { _, _ -> },
@@ -412,8 +410,6 @@ private fun CartArea(
             itemsIndexed(cart.items) { index, cartItem ->
                 CartItemRow(
                     cartItem = cartItem,
-                    onQuantityUpdate = { newQuantity -> onQuantityUpdate(index, newQuantity) },
-                    onRemoveItem = { onRemoveItem(index) },
                     onShowQuantityDialog = { onShowQuantityDialog(index, cartItem) },
                     onShowDiscountDialog = { onShowDiscountDialog(index, cartItem) },
                     onShowDeleteDialog = { onShowDeleteDialog(index, cartItem) },
@@ -429,8 +425,6 @@ private fun CartArea(
 @Composable
 private fun CartItemRow(
     cartItem: CartItem,
-    onQuantityUpdate: (Int) -> Unit,
-    onRemoveItem: () -> Unit,
     onShowQuantityDialog: () -> Unit = {},
     onShowDiscountDialog: () -> Unit = {},
     onShowDeleteDialog: () -> Unit = {},
@@ -524,7 +518,6 @@ private fun CartItemRow(
 private fun TotalArea(
     modifier: Modifier = Modifier,
     cart: Cart,
-    onApplyDiscount: (Int) -> Unit,
 ) {
     Column(
         modifier = modifier,
