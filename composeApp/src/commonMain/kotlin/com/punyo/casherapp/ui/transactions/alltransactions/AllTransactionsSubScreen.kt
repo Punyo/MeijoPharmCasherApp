@@ -19,6 +19,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.punyo.casherapp.data.product.ProductRepository
 import com.punyo.casherapp.data.transaction.model.TransactionDataModel
@@ -119,12 +120,16 @@ fun DetailedTransactionItem(
                     text = dateTime.toDateString(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = transaction.totalAmount.format(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
@@ -133,6 +138,8 @@ fun DetailedTransactionItem(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
 
             Column(
@@ -157,12 +164,16 @@ fun DetailedTransactionItem(
                             Text(
                                 text = "$productName × ${item.quantity}",
                                 style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
                             if (item.discountAmount.isPositive) {
                                 Text(
                                     text = "ひとつ当たり ${item.discountAmount.format()} 割引",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
                                 )
                             }
                         }
@@ -175,6 +186,8 @@ fun DetailedTransactionItem(
                             } else {
                                 MaterialTheme.colorScheme.onSurface
                             },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
