@@ -164,8 +164,16 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
                 Column {
                     Text("取引を確定しますか？")
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("合計金額: ${uiState.cart.finalTotal.format()}")
-                    Text("商品数: ${uiState.cart.totalQuantity}点")
+                    Text(
+                        text = "合計金額: ${uiState.cart.finalTotal.format()}",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = "商品数: ${uiState.cart.totalQuantity}点",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             },
             confirmButton = {
@@ -460,6 +468,8 @@ private fun CartItemRow(
                     text = "割引: ${cartItem.discountPercent}%",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }

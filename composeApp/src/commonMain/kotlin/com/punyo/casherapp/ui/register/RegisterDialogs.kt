@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
@@ -52,6 +53,8 @@ fun QuantityUpdateDialog(
                     text = productName,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 8.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 OutlinedTextField(
@@ -114,6 +117,8 @@ fun DiscountDialog(
                     text = productName,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 8.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 Column(
@@ -123,6 +128,8 @@ fun DiscountDialog(
                         text = "割引率: $discount%",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 8.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
 
                     Slider(

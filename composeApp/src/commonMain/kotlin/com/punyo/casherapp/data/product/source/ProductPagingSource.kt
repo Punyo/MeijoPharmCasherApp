@@ -16,8 +16,6 @@ class ProductPagingSource(
         val page = params.key ?: 0
         val offset = page * params.loadSize
 
-        println("PagingSource load: page=$page, loadSize=${params.loadSize}, offset=$offset")
-
         val products = if (query.isNullOrEmpty()) {
             database.productQueries.selectWithPaging(
                 params.loadSize.toLong(),
@@ -40,8 +38,6 @@ class ProductPagingSource(
                 price = product.price.toMoney(),
             )
         }
-
-        println("PagingSource loaded: ${productDataModels.size} items, hasNext=${products.isNotEmpty()}")
 
         LoadResult.Page(
             data = productDataModels,
