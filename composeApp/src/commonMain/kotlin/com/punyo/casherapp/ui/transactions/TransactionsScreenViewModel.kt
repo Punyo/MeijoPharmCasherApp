@@ -143,7 +143,9 @@ class TransactionsScreenViewModel(
                     } else {
                         val newSummary = ProductSummary(
                             productId = item.productId,
-                            name = productRepository.getProductById(item.productId)!!.name,
+                            name = productRepository.getProductById(item.productId)
+                                ?.name
+                                ?: "不明な商品",
                             totalQuantity = item.quantity,
                             totalRevenue = item.totalPrice,
                             unitPrice = item.unitPrice,

@@ -28,4 +28,8 @@
     <string name="product_title">商品</string>
     <string name="product_description">商品を登録・確認</string>
 
+    <string name="settings_theme_section_title">テーマ設定</string>
+    <string name="settings_theme_light">ライトモード</string>
+    <string name="settings_theme_dark">ダークモード</string>
+
 </resources>
