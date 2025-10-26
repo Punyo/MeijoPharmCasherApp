@@ -1,6 +1,5 @@
 package com.punyo.casherapp.ui.register
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -236,29 +235,6 @@ private fun InputModeSelector(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun CameraArea(
-    modifier: Modifier = Modifier,
-    onBarcodeScanned: (String) -> Unit,
-) {
-    Card(
-        modifier = modifier,
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "バーコードスキャナー\n（実装予定）",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
