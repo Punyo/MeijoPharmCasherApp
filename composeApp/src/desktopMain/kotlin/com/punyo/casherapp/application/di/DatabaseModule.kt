@@ -3,17 +3,16 @@ package com.punyo.casherapp.application.di
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.punyo.casherapp.application.db.AppDatabase
+import com.punyo.casherapp.application.util.AppPathUtil
 import org.koin.dsl.module
-import java.io.File
-import java.nio.file.FileSystems
 
 actual val databaseModule =
     module {
+        single { AppPathUtil() }
         single<SqlDriver> {
-            val separator = FileSystems.getDefault().separator
-            val appDir = "${System.getProperty("user.home")}$separator.meijopharmcasherapp"
-            File(appDir).mkdirs()
-            JdbcSqliteDriver("jdbc:sqlite:${appDir}${separator}database.db").also {
+            val appPathUtil: AppPathUtil = get()
+            val databasePath = appPathUtil.getDatabasePath()
+            JdbcSqliteDriver("jdbc:sqlite:$databasePath").also {
                 AppDatabase.Schema.create(it)
             }
         }

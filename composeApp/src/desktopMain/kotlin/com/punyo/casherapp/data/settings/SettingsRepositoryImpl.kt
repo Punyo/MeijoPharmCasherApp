@@ -1,26 +1,23 @@
 package com.punyo.casherapp.data.settings
 
+import com.punyo.casherapp.application.util.AppPathUtil
 import com.punyo.casherapp.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
-import java.nio.file.FileSystems
+import java.nio.file.Files
 import java.util.Properties
 
-class SettingsRepositoryImpl : SettingsRepository {
-    private val settingsFile: File
-    private val themeModeFlow = MutableStateFlow(loadThemeMode())
-
-    init {
-        val separator = FileSystems.getDefault().separator
-        val appDir = "${System.getProperty("user.home")}$separator.meijopharmcasherapp"
-        File(appDir).mkdirs()
-        settingsFile = File("$appDir${separator}settings.properties")
-        if (!settingsFile.exists()) {
-            settingsFile.createNewFile()
+class SettingsRepositoryImpl(
+    appPathUtil: AppPathUtil,
+) : SettingsRepository {
+    private val settingsFile: File = appPathUtil.getSettingsPath().toFile().also {
+        if (!it.exists()) {
+            Files.createFile(it.toPath())
         }
     }
+    private val themeModeFlow = MutableStateFlow(loadThemeMode())
 
     private fun loadThemeMode(): ThemeMode {
         return try {
