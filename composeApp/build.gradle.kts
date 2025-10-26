@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,13 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.sqldelight)
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
 }
 
 kotlin {
@@ -83,8 +91,14 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.punyo.casherapp"
+            packageName = "MeijoPharmCasherApp"
             packageVersion = "1.0.0"
+            description = "名城大学薬学部大学祭実行委員会内部向けに作成されたアプリケーション"
+            modules("java.sql")
+            windows {
+                menuGroup = "MeijoPharmCasherApp"
+                upgradeUuid = localProperties.getProperty("windows.upgradeUuid")
+            }
         }
     }
 }
