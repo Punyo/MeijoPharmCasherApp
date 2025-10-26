@@ -73,7 +73,8 @@ import org.koin.compose.koinInject
 @Composable
 fun TransactionsScreen(
     viewModel: TransactionsScreenViewModel = koinInject(),
-    navController: androidx.navigation.NavController? = null,
+    onNavigateToAllTransactions: (TimePeriod) -> Unit = {},
+    onNavigateToProductsList: (TimePeriod) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     if (uiState.collectedTransactions != null && uiState.productSummaries != null) {
@@ -85,8 +86,8 @@ fun TransactionsScreen(
             totalQuantity = viewModel.getTotalQuantityByPeriod(uiState.currentPeriod),
             totalRevenue = viewModel.getTotalRevenueByPeriod(uiState.currentPeriod),
             onPeriodSelected = { viewModel.setCurrentPeriod(it) },
-            onNavigateToAllTransactions = { navController?.navigateToAllTransactions(uiState.currentPeriod) },
-            onNavigateToProductsList = { navController?.navigateToProductsList(uiState.currentPeriod) },
+            onNavigateToAllTransactions = { onNavigateToAllTransactions(uiState.currentPeriod) },
+            onNavigateToProductsList = { onNavigateToProductsList(uiState.currentPeriod) },
             modifier = Modifier.fillMaxSize().padding(8.dp),
         )
     } else {

@@ -31,6 +31,10 @@
     <string name="settings_theme_section_title">テーマ設定</string>
     <string name="settings_theme_light">ライトモード</string>
     <string name="settings_theme_dark">ダークモード</string>
+    <string name="settings_licenses_title">ライセンス</string>
+
+    <string name="nav_licenses">ライセンス情報</string>
+    <string name="licenses_screen_title">オープンソースライセンス</string>
 
     <!-- Buttons -->
     <string name="button_cancel">キャンセル</string>
