@@ -11,14 +11,12 @@ class AppPathUtil {
         private const val SETTINGS_FILE_NAME = "settings.properties"
     }
 
-    private val appDirectory: Path by lazy {
+    val appDirectory: Path by lazy {
         val homeDir = Paths.get(System.getProperty("user.home"))
         val appDir = homeDir.resolve(APP_DIR_NAME)
         Files.createDirectories(appDir)
         appDir
     }
-
-    fun getAppDirectory(): Path = appDirectory
 
     fun getDatabasePath(): Path = appDirectory.resolve(DATABASE_FILE_NAME)
 
