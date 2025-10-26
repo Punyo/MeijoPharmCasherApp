@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.aboutlibraries)
 }
 
 val localProperties = Properties().apply {
@@ -46,6 +47,8 @@ kotlin {
                 implementation(libs.androidx.paging.common)
                 implementation(libs.androidx.paging.compose)
                 implementation(libs.joda.money)
+                implementation(libs.aboutlibraries.core)
+                implementation(libs.aboutlibraries.compose.m3)
             }
         }
 
