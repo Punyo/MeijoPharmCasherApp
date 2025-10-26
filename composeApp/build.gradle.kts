@@ -88,16 +88,23 @@ sqldelight {
 compose.desktop {
     application {
         mainClass = "com.punyo.casherapp.MainKt"
-
+        application {
+            buildTypes.release.proguard {
+                isEnabled.set(false)
+            }
+        }
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MeijoPharmCasherApp"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
             description = "名城大学薬学部大学祭実行委員会内部向けに作成されたアプリケーション"
             modules("java.sql")
             windows {
                 menuGroup = "MeijoPharmCasherApp"
                 upgradeUuid = localProperties.getProperty("windows.upgradeUuid")
+                menu = true
+                dirChooser = true
+                shortcut = true
             }
         }
     }
