@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -49,7 +50,9 @@ import com.punyo.casherapp.ui.navigation.CasherAppNavigation
 import com.punyo.casherapp.ui.navigation.NavigationDestinations
 import com.punyo.casherapp.ui.product.navigateToProduct
 import com.punyo.casherapp.ui.register.navigateToRegister
+import com.punyo.casherapp.ui.settings.SettingsViewModel
 import com.punyo.casherapp.ui.settings.navigateToSettings
+import com.punyo.casherapp.ui.theme.AppTheme
 import com.punyo.casherapp.ui.transactions.navigateToTransactions
 import kotlinx.coroutines.launch
 import meijopharmcasherapp.composeapp.generated.resources.Res
@@ -61,6 +64,7 @@ import meijopharmcasherapp.composeapp.generated.resources.nav_settings
 import meijopharmcasherapp.composeapp.generated.resources.nav_transactions
 import meijopharmcasherapp.composeapp.generated.resources.product_title
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 data class DrawerItem(
     val icon: ImageVector,
@@ -160,8 +164,10 @@ fun ResponsiveNavigationDrawer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App() {
-    MaterialTheme {
+fun App(settingsViewModel: SettingsViewModel = koinInject()) {
+    val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle()
+
+    AppTheme(themeMode = themeMode) {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route ?: NavigationDestinations.TRANSACTIONS_ROUTE

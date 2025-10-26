@@ -101,11 +101,13 @@ class ProductsListSubScreenViewModel(
                     )
                     productMap[productId] = updatedSummary
                 } else {
-                    val productData = productRepository.getProductById(item.productId)!!
+                    val productData = productRepository.getProductById(item.productId)
                     val newSummary = ProductSummary(
                         productId = item.productId,
-                        name = productData.name,
-                        unitPrice = productData.price,
+                        name = productData?.name
+                            ?: "不明な商品",
+                        unitPrice = productData?.price
+                            ?: Money.zero(defaultCurrencyUnit),
                         totalQuantity = item.quantity,
                         totalRevenue = item.totalPrice,
                     )
