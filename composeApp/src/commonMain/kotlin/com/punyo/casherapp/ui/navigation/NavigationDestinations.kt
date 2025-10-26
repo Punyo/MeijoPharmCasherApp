@@ -7,4 +7,5 @@ object NavigationDestinations {
     const val ALL_TRANSACTIONS_ROUTE = "all_transactions_route"
     const val PRODUCTS_LIST_ROUTE = "products_list_route"
     const val SETTINGS_ROUTE = "settings_route"
+    const val LICENSES_ROUTE = "licenses_route"
 }

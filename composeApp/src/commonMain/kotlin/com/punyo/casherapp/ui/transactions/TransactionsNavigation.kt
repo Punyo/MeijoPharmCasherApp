@@ -26,9 +26,15 @@ fun NavController.navigateToProductsList(timePeriod: TimePeriod) {
     navigate(route)
 }
 
-fun NavGraphBuilder.transactionsScreen(navController: NavController) {
+fun NavGraphBuilder.transactionsScreen(
+    onNavigateToAllTransactions: (TimePeriod) -> Unit,
+    onNavigateToProductsList: (TimePeriod) -> Unit,
+) {
     composable(route = NavigationDestinations.TRANSACTIONS_ROUTE) {
-        TransactionsScreen(navController = navController)
+        TransactionsScreen(
+            onNavigateToAllTransactions = onNavigateToAllTransactions,
+            onNavigateToProductsList = onNavigateToProductsList,
+        )
     }
 }
 
