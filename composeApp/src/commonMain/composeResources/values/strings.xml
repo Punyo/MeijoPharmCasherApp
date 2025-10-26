@@ -32,4 +32,102 @@
     <string name="settings_theme_light">ライトモード</string>
     <string name="settings_theme_dark">ダークモード</string>
 
+    <!-- Buttons -->
+    <string name="button_cancel">キャンセル</string>
+    <string name="button_confirm">確定</string>
+    <string name="button_apply">適用</string>
+    <string name="button_save">保存</string>
+    <string name="button_clear_search">検索条件をクリア</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_quantity_change">数量変更</string>
+    <string name="dialog_discount_apply">割引適用</string>
+    <string name="dialog_transaction_confirm">取引確認</string>
+    <string name="dialog_add_product">商品の追加</string>
+    <string name="dialog_edit_product">商品の編集</string>
+
+    <!-- Labels -->
+    <string name="label_quantity">数量</string>
+    <string name="label_discount_rate">割引率: %1$d%%</string>
+    <string name="label_total_amount">合計金額: %1$s</string>
+    <string name="label_product_count">商品数: %1$d点</string>
+    <string name="label_cart">カート</string>
+    <string name="label_price_quantity">%1$s x %2$d</string>
+    <string name="label_discount">割引: %1$d%%</string>
+    <string name="label_product_count_prefix">商品数:</string>
+    <string name="label_items_count">%1$d個</string>
+    <string name="label_subtotal">小計:</string>
+    <string name="label_discount_prefix">割引:</string>
+    <string name="label_discount_amount">-%1$s</string>
+    <string name="label_total">合計:</string>
+    <string name="label_product_name_required">商品名 *</string>
+    <string name="label_price_required">価格 *</string>
+    <string name="label_transaction_info">%1$d点 | %2$s</string>
+    <string name="label_sales_count">%1$d個売上</string>
+    <string name="label_webcam_selection">Webcam選択</string>
+
+    <!-- Placeholders -->
+    <string name="placeholder_search_product">商品名で検索</string>
+    <string name="placeholder_product_name">商品名を入力してください</string>
+    <string name="placeholder_search_product_barcode">商品名またはバーコードで検索</string>
+    <string name="placeholder_select_webcam">Webcamを選択</string>
+
+    <!-- Messages -->
+    <string name="message_confirm_transaction">取引を確定しますか？</string>
+    <string name="message_no_products">商品を追加してください</string>
+    <string name="message_no_search_results">該当する商品が見つかりません</string>
+
+    <!-- Errors -->
+    <string name="error_product_name_required">商品名は必須です</string>
+    <string name="error_no_webcam_available">利用可能なWebcamが見つかりません</string>
+
+    <!-- Input modes -->
+    <string name="input_mode_search">商品検索</string>
+    <string name="input_mode_camera">カメラ</string>
+
+    <!-- Menu items -->
+    <string name="menu_change_quantity">数量変更</string>
+    <string name="menu_apply_discount">割引適用</string>
+    <string name="menu_delete">削除</string>
+
+    <!-- Table headers -->
+    <string name="table_header_product_name">商品名</string>
+    <string name="table_header_barcode">二次元コード</string>
+    <string name="table_header_price">価格</string>
+
+    <!-- Barcode status -->
+    <string name="barcode_not_registered">未登録</string>
+    <string name="barcode_registered">登録済み</string>
+
+    <!-- Actions -->
+    <string name="action_edit">編集</string>
+    <string name="action_delete">削除</string>
+
+    <!-- Content descriptions -->
+    <string name="content_desc_search">検索</string>
+    <string name="content_desc_clear">クリア</string>
+    <string name="content_desc_add_product">商品を追加</string>
+    <string name="content_desc_menu">メニュー</string>
+    <string name="content_desc_view_more">もっと見る</string>
+
+    <!-- Time periods -->
+    <string name="time_period_today">今日</string>
+    <string name="time_period_all_time">全期間</string>
+
+    <!-- Chart titles -->
+    <string name="chart_title_product_sales">商品売上チャート</string>
+    <string name="chart_label_product_sales">商品売上</string>
+
+    <!-- Card titles -->
+    <string name="card_title_transactions">取引</string>
+    <string name="card_title_popular_products">人気商品</string>
+
+    <!-- Summary cards -->
+    <string name="summary_card_customer_count">顧客数</string>
+    <string name="summary_card_sales_quantity">売上個数</string>
+    <string name="summary_card_sales_amount">売上金額</string>
+
+    <!-- Other -->
+    <string name="suffix_currency">円</string>
+
 </resources>

@@ -29,6 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.github.sarxos.webcam.Webcam
 import com.punyo.casherapp.ui.component.BarcodeScanner
+import casherapp.composeapp.generated.resources.Res
+import casherapp.composeapp.generated.resources.error_no_webcam_available
+import casherapp.composeapp.generated.resources.label_webcam_selection
+import casherapp.composeapp.generated.resources.placeholder_select_webcam
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +76,7 @@ actual fun CameraArea(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "利用可能なWebcamが見つかりません",
+                text = stringResource(Res.string.error_no_webcam_available),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -88,9 +93,9 @@ actual fun CameraArea(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 OutlinedTextField(
-                    value = selectedWebcam?.name ?: "Webcamを選択",
+                    value = selectedWebcam?.name ?: stringResource(Res.string.placeholder_select_webcam),
                     onValueChange = { },
-                    label = { Text("Webcam選択") },
+                    label = { Text(stringResource(Res.string.label_webcam_selection)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },

@@ -27,6 +27,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import casherapp.composeapp.generated.resources.Res
+import casherapp.composeapp.generated.resources.button_cancel
+import casherapp.composeapp.generated.resources.button_save
+import casherapp.composeapp.generated.resources.dialog_add_product
+import casherapp.composeapp.generated.resources.dialog_edit_product
+import casherapp.composeapp.generated.resources.error_product_name_required
+import casherapp.composeapp.generated.resources.label_price_required
+import casherapp.composeapp.generated.resources.label_product_name_required
+import casherapp.composeapp.generated.resources.placeholder_product_name
+import casherapp.composeapp.generated.resources.suffix_currency
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AddProductDialog(
@@ -35,7 +46,7 @@ fun AddProductDialog(
     productDialogState: ProductDialogState = rememberProductDialogState(),
 ) {
     ProductDialog(
-        title = "商品の追加",
+        title = stringResource(Res.string.dialog_add_product),
         onDismiss = onDismiss,
         onConfirm = onConfirm,
         productDialogState = productDialogState,
@@ -50,7 +61,7 @@ fun EditProductDialog(
     productDialogState: ProductDialogState,
 ) {
     ProductDialog(
-        title = "商品の編集",
+        title = stringResource(Res.string.dialog_edit_product),
         onDismiss = onDismiss,
         onConfirm =
         { name, barcode, price ->
@@ -103,12 +114,12 @@ private fun ProductDialog(
                             productDialogState.productName = it
                             productNameEmptyError = it.isEmpty()
                         },
-                        label = { Text("商品名 *") },
-                        placeholder = { Text("商品名を入力してください") },
+                        label = { Text(stringResource(Res.string.label_product_name_required)) },
+                        placeholder = { Text(stringResource(Res.string.placeholder_product_name)) },
                         isError = productNameEmptyError,
                         supportingText = {
                             if (productNameEmptyError) {
-                                Text("商品名は必須です")
+                                Text(stringResource(Res.string.error_product_name_required))
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -122,8 +133,8 @@ private fun ProductDialog(
                                 productDialogState.price = newValue.toLongOrNull() ?: 0L
                             }
                         },
-                        label = { Text("価格 *") },
-                        suffix = { Text("円") },
+                        label = { Text(stringResource(Res.string.label_price_required)) },
+                        suffix = { Text(stringResource(Res.string.suffix_currency)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         supportingText = {},
                         modifier = Modifier.fillMaxWidth(),
@@ -145,7 +156,7 @@ private fun ProductDialog(
                         onClick = onDismiss,
                         modifier = Modifier.padding(end = 16.dp),
                     ) {
-                        Text("キャンセル", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(Res.string.button_cancel), color = MaterialTheme.colorScheme.primary)
                     }
                     TextButton(
                         onClick = {
@@ -161,7 +172,7 @@ private fun ProductDialog(
                         },
                     ) {
                         Text(
-                            text = "保存",
+                            text = stringResource(Res.string.button_save),
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }

@@ -38,6 +38,22 @@ import com.punyo.casherapp.ui.component.DataTable
 import com.punyo.casherapp.ui.component.TableColumn
 import org.koin.compose.koinInject
 import kotlin.collections.listOf
+import casherapp.composeapp.generated.resources.Res
+import casherapp.composeapp.generated.resources.action_delete
+import casherapp.composeapp.generated.resources.action_edit
+import casherapp.composeapp.generated.resources.barcode_not_registered
+import casherapp.composeapp.generated.resources.barcode_registered
+import casherapp.composeapp.generated.resources.button_clear_search
+import casherapp.composeapp.generated.resources.content_desc_add_product
+import casherapp.composeapp.generated.resources.content_desc_clear
+import casherapp.composeapp.generated.resources.content_desc_search
+import casherapp.composeapp.generated.resources.message_no_products
+import casherapp.composeapp.generated.resources.message_no_search_results
+import casherapp.composeapp.generated.resources.placeholder_search_product_barcode
+import casherapp.composeapp.generated.resources.table_header_barcode
+import casherapp.composeapp.generated.resources.table_header_price
+import casherapp.composeapp.generated.resources.table_header_product_name
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
@@ -71,32 +87,30 @@ fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
                     )
                 } else {
                     val productColumns =
-                        remember {
-                            listOf<TableColumn<ProductDataModel>>(
-                                TableColumn(
-                                    header = "商品名",
-                                    accessor = { it.name },
-                                    width = 3f,
-                                ),
-                                TableColumn(
-                                    header = "二次元コード",
-                                    accessor = {
-                                        if (it.barcode == null) {
-                                            "未登録"
-                                        } else {
-                                            "登録済み"
-                                        }
-                                    },
-                                    width = 1f,
-                                ),
-                                TableColumn(
-                                    header = "価格",
-                                    accessor = { it.price.format() },
-                                    width = 1f,
-                                    isRightAligned = true,
-                                ),
-                            )
-                        }
+                        listOf<TableColumn<ProductDataModel>>(
+                            TableColumn(
+                                header = stringResource(Res.string.table_header_product_name),
+                                accessor = { it.name },
+                                width = 3f,
+                            ),
+                            TableColumn(
+                                header = stringResource(Res.string.table_header_barcode),
+                                accessor = {
+                                    if (it.barcode == null) {
+                                        stringResource(Res.string.barcode_not_registered)
+                                    } else {
+                                        stringResource(Res.string.barcode_registered)
+                                    }
+                                },
+                                width = 1f,
+                            ),
+                            TableColumn(
+                                header = stringResource(Res.string.table_header_price),
+                                accessor = { it.price.format() },
+                                width = 1f,
+                                isRightAligned = true,
+                            ),
+                        )
 
                     DataTable(
                         data = products,
@@ -104,14 +118,14 @@ fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
                         modifier = Modifier.fillMaxWidth(),
                         actions =
                         mapOf(
-                            "編集" to { index ->
+                            stringResource(Res.string.action_edit) to { index ->
                                 editingProductId = products[index].id
                                 editingProductDialogState.productName = products[index].name
                                 editingProductDialogState.barcode = products[index].barcode
                                 editingProductDialogState.price = products[index].price.toLong()
                                 showEditProductDialog = true
                             },
-                            "削除" to { index ->
+                            stringResource(Res.string.action_delete) to { index ->
                                 viewModel.deleteProduct(products[index].id)
                             },
                         ),
@@ -136,7 +150,7 @@ fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "商品を追加",
+                contentDescription = stringResource(Res.string.content_desc_add_product),
             )
         }
     }
@@ -177,14 +191,14 @@ private fun EmptyState(
         if (searchText.isEmpty()) {
             // 商品なしの場合
             Text(
-                text = "商品を追加してください",
+                text = stringResource(Res.string.message_no_products),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
             // 検索結果なしの場合
             Text(
-                text = "該当する商品が見つかりません",
+                text = stringResource(Res.string.message_no_search_results),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -194,7 +208,7 @@ private fun EmptyState(
                 onClick = onClearSearch,
             ) {
                 Text(
-                    text = "検索条件をクリア",
+                    text = stringResource(Res.string.button_clear_search),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -216,11 +230,11 @@ private fun ProductHeader(
         OutlinedTextField(
             value = searchText,
             onValueChange = onSearchTextChange,
-            placeholder = { Text("商品名またはバーコードで検索") },
+            placeholder = { Text(stringResource(Res.string.placeholder_search_product_barcode)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "検索",
+                    contentDescription = stringResource(Res.string.content_desc_search),
                 )
             },
             trailingIcon = {
@@ -228,7 +242,7 @@ private fun ProductHeader(
                     IconButton(onClick = { onSearchTextChange("") }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = "クリア",
+                            contentDescription = stringResource(Res.string.content_desc_clear),
                         )
                     }
                 }

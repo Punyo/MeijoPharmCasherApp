@@ -53,6 +53,31 @@ import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.ui.component.ResponsiveGrid
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
+import casherapp.composeapp.generated.resources.Res
+import casherapp.composeapp.generated.resources.button_cancel
+import casherapp.composeapp.generated.resources.button_confirm
+import casherapp.composeapp.generated.resources.content_desc_menu
+import casherapp.composeapp.generated.resources.content_desc_search
+import casherapp.composeapp.generated.resources.dialog_transaction_confirm
+import casherapp.composeapp.generated.resources.input_mode_camera
+import casherapp.composeapp.generated.resources.input_mode_search
+import casherapp.composeapp.generated.resources.label_cart
+import casherapp.composeapp.generated.resources.label_discount
+import casherapp.composeapp.generated.resources.label_discount_amount
+import casherapp.composeapp.generated.resources.label_discount_prefix
+import casherapp.composeapp.generated.resources.label_items_count
+import casherapp.composeapp.generated.resources.label_price_quantity
+import casherapp.composeapp.generated.resources.label_product_count
+import casherapp.composeapp.generated.resources.label_product_count_prefix
+import casherapp.composeapp.generated.resources.label_subtotal
+import casherapp.composeapp.generated.resources.label_total
+import casherapp.composeapp.generated.resources.label_total_amount
+import casherapp.composeapp.generated.resources.menu_apply_discount
+import casherapp.composeapp.generated.resources.menu_change_quantity
+import casherapp.composeapp.generated.resources.menu_delete
+import casherapp.composeapp.generated.resources.message_confirm_transaction
+import casherapp.composeapp.generated.resources.placeholder_search_product
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject()) {
@@ -158,18 +183,18 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
     if (showDialogState) {
         AlertDialog(
             onDismissRequest = { showDialogState = false },
-            title = { Text("取引確認") },
+            title = { Text(stringResource(Res.string.dialog_transaction_confirm)) },
             text = {
                 Column {
-                    Text("取引を確定しますか？")
+                    Text(stringResource(Res.string.message_confirm_transaction))
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "合計金額: ${uiState.cart.finalTotal.format()}",
+                        text = stringResource(Res.string.label_total_amount, uiState.cart.finalTotal.format()),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        text = "商品数: ${uiState.cart.totalQuantity}点",
+                        text = stringResource(Res.string.label_product_count, uiState.cart.totalQuantity),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -182,14 +207,14 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
                         showDialogState = false
                     },
                 ) {
-                    Text("確定")
+                    Text(stringResource(Res.string.button_confirm))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDialogState = false },
                 ) {
-                    Text("キャンセル")
+                    Text(stringResource(Res.string.button_cancel))
                 }
             },
         )
@@ -229,8 +254,8 @@ private fun InputModeSelector(
             ) {
                 Text(
                     text = when (mode) {
-                        InputMode.SEARCH -> "商品検索"
-                        InputMode.CAMERA -> "カメラ"
+                        InputMode.SEARCH -> stringResource(Res.string.input_mode_search)
+                        InputMode.CAMERA -> stringResource(Res.string.input_mode_camera)
                     },
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -256,10 +281,10 @@ private fun ProductSearchArea(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "検索",
+                    contentDescription = stringResource(Res.string.content_desc_search),
                 )
             },
-            placeholder = { Text("商品名で検索") },
+            placeholder = { Text(stringResource(Res.string.placeholder_search_product)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
         )
@@ -366,7 +391,7 @@ private fun RightPanel(
                 .padding(top = 16.dp),
             enabled = uiState.cart.items.isNotEmpty(),
         ) {
-            Text("確定")
+            Text(stringResource(Res.string.button_confirm))
         }
     }
 }
@@ -383,7 +408,7 @@ private fun CartArea(
         modifier = modifier,
     ) {
         Text(
-            text = "カート",
+            text = stringResource(Res.string.label_cart),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
         )
@@ -433,7 +458,7 @@ private fun CartItemRow(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = "${cartItem.unitPrice.format()} x ${cartItem.quantity}",
+                text = stringResource(Res.string.label_price_quantity, cartItem.unitPrice.format(), cartItem.quantity),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -441,7 +466,7 @@ private fun CartItemRow(
             )
             if (cartItem.discountPercent > 0) {
                 Text(
-                    text = "割引: ${cartItem.discountPercent}%",
+                    text = stringResource(Res.string.label_discount, cartItem.discountPercent),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                     maxLines = 1,
@@ -465,7 +490,7 @@ private fun CartItemRow(
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "メニュー",
+                        contentDescription = stringResource(Res.string.content_desc_menu),
                     )
                 }
 
@@ -474,21 +499,21 @@ private fun CartItemRow(
                     onDismissRequest = { showMenu = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("数量変更") },
+                        text = { Text(stringResource(Res.string.menu_change_quantity)) },
                         onClick = {
                             showMenu = false
                             onShowQuantityDialog()
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("割引適用") },
+                        text = { Text(stringResource(Res.string.menu_apply_discount)) },
                         onClick = {
                             showMenu = false
                             onShowDiscountDialog()
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("削除") },
+                        text = { Text(stringResource(Res.string.menu_delete)) },
                         onClick = {
                             showMenu = false
                             onShowDeleteDialog()
@@ -512,15 +537,15 @@ private fun TotalArea(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("商品数:")
-            Text("${cart.totalQuantity}個")
+            Text(stringResource(Res.string.label_product_count_prefix))
+            Text(stringResource(Res.string.label_items_count, cart.totalQuantity))
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("小計:")
+            Text(stringResource(Res.string.label_subtotal))
             Text(cart.originalSubtotal.format())
         }
 
@@ -530,11 +555,11 @@ private fun TotalArea(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "割引:",
+                    text = stringResource(Res.string.label_discount_prefix),
                     color = MaterialTheme.colorScheme.error,
                 )
                 Text(
-                    text = "-${cart.totalDiscountAmount.format()}",
+                    text = stringResource(Res.string.label_discount_amount, cart.totalDiscountAmount.format()),
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -549,7 +574,7 @@ private fun TotalArea(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = "合計:",
+                text = stringResource(Res.string.label_total),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
             )
