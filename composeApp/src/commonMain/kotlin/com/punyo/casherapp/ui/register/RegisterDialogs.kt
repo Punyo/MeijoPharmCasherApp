@@ -24,6 +24,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.button_apply
+import meijopharmcasherapp.composeapp.generated.resources.button_cancel
+import meijopharmcasherapp.composeapp.generated.resources.button_confirm
+import meijopharmcasherapp.composeapp.generated.resources.dialog_discount_apply
+import meijopharmcasherapp.composeapp.generated.resources.dialog_quantity_change
+import meijopharmcasherapp.composeapp.generated.resources.label_discount_rate
+import meijopharmcasherapp.composeapp.generated.resources.label_quantity
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun QuantityUpdateDialog(
@@ -44,7 +53,7 @@ fun QuantityUpdateDialog(
                 modifier = Modifier.padding(16.dp),
             ) {
                 Text(
-                    text = "数量変更",
+                    text = stringResource(Res.string.dialog_quantity_change),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                 )
@@ -60,7 +69,7 @@ fun QuantityUpdateDialog(
                 OutlinedTextField(
                     value = quantityText,
                     onValueChange = { quantityText = it },
-                    label = { Text("数量") },
+                    label = { Text(stringResource(Res.string.label_quantity)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
@@ -75,14 +84,14 @@ fun QuantityUpdateDialog(
                     TextButton(
                         onClick = onDismiss,
                     ) {
-                        Text("キャンセル")
+                        Text(stringResource(Res.string.button_cancel))
                     }
 
                     TextButton(
                         onClick = { onConfirm(quantity) },
                         enabled = quantity > 0,
                     ) {
-                        Text("確定")
+                        Text(stringResource(Res.string.button_confirm))
                     }
                 }
             }
@@ -108,7 +117,7 @@ fun DiscountDialog(
                 modifier = Modifier.padding(16.dp),
             ) {
                 Text(
-                    text = "割引適用",
+                    text = stringResource(Res.string.dialog_discount_apply),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                 )
@@ -125,7 +134,7 @@ fun DiscountDialog(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = "割引率: $discount%",
+                        text = stringResource(Res.string.label_discount_rate, discount),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 8.dp),
                         maxLines = 1,
@@ -150,13 +159,13 @@ fun DiscountDialog(
                     TextButton(
                         onClick = onDismiss,
                     ) {
-                        Text("キャンセル")
+                        Text(stringResource(Res.string.button_cancel))
                     }
 
                     TextButton(
                         onClick = { onConfirm(discount) },
                     ) {
-                        Text("適用")
+                        Text(stringResource(Res.string.button_apply))
                     }
                 }
             }

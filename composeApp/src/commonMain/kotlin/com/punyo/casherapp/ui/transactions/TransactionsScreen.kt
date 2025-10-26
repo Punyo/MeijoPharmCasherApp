@@ -53,6 +53,20 @@ import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.extensions.toDateString
 import com.punyo.casherapp.extensions.toDouble
 import com.punyo.casherapp.ui.component.ResponsiveGrid
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.card_title_popular_products
+import meijopharmcasherapp.composeapp.generated.resources.card_title_transactions
+import meijopharmcasherapp.composeapp.generated.resources.chart_label_product_sales
+import meijopharmcasherapp.composeapp.generated.resources.chart_title_product_sales
+import meijopharmcasherapp.composeapp.generated.resources.content_desc_view_more
+import meijopharmcasherapp.composeapp.generated.resources.label_sales_count
+import meijopharmcasherapp.composeapp.generated.resources.label_transaction_info
+import meijopharmcasherapp.composeapp.generated.resources.summary_card_customer_count
+import meijopharmcasherapp.composeapp.generated.resources.summary_card_sales_amount
+import meijopharmcasherapp.composeapp.generated.resources.summary_card_sales_quantity
+import meijopharmcasherapp.composeapp.generated.resources.time_period_all_time
+import meijopharmcasherapp.composeapp.generated.resources.time_period_today
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,8 +118,8 @@ fun TimePeriodSelector(
                 label = {
                     Text(
                         text = when (period) {
-                            TimePeriod.TODAY -> "今日"
-                            TimePeriod.ALL_TIME -> "全期間"
+                            TimePeriod.TODAY -> stringResource(Res.string.time_period_today)
+                            TimePeriod.ALL_TIME -> stringResource(Res.string.time_period_all_time)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -199,7 +213,7 @@ fun <T> DataListCard(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowRightAlt,
-                            contentDescription = "もっと見る",
+                            contentDescription = stringResource(Res.string.content_desc_view_more),
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -249,7 +263,7 @@ fun CompactTransactionItem(transaction: TransactionDataModel) {
                 )
             }
             Text(
-                text = "${transaction.totalQuantity}点 | ${transaction.id}",
+                text = stringResource(Res.string.label_transaction_info, transaction.totalQuantity, transaction.id),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -300,7 +314,7 @@ fun CompactProductItem(product: ProductSummary) {
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "${product.totalQuantity}個売上",
+                    text = stringResource(Res.string.label_sales_count, product.totalQuantity),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -332,7 +346,7 @@ fun ProductSalesBarChart(
             modifier = Modifier.padding(16.dp),
         ) {
             Text(
-                text = "商品売上チャート",
+                text = stringResource(Res.string.chart_title_product_sales),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 12.dp),
@@ -343,7 +357,7 @@ fun ProductSalesBarChart(
                     .fillMaxWidth(),
             ) {
                 val barParameters = BarParameters(
-                    dataName = "商品売上",
+                    dataName = stringResource(Res.string.chart_label_product_sales),
                     data = productData.map { it.totalRevenue.toDouble() },
                     barColor = MaterialTheme.colorScheme.primary,
                 )
@@ -410,7 +424,7 @@ private fun TransactionsScreenContent(
 
         item(span = { GridItemSpan(1) }) {
             DataListCard(
-                title = "取引",
+                title = stringResource(Res.string.card_title_transactions),
                 items = currentTransactions.take(5),
                 itemContent = { transaction ->
                     CompactTransactionItem(transaction)
@@ -421,7 +435,7 @@ private fun TransactionsScreenContent(
 
         item(span = { GridItemSpan(1) }) {
             DataListCard(
-                title = "人気商品",
+                title = stringResource(Res.string.card_title_popular_products),
                 items = productSummaries.take(5),
                 itemContent = { product ->
                     CompactProductItem(product)
@@ -445,19 +459,19 @@ private fun SummaryCardsRow(
     ) {
         EnhancedSummaryCard(
             modifier = Modifier.weight(1f),
-            title = "顧客数",
+            title = stringResource(Res.string.summary_card_customer_count),
             value = customerCount.toString(),
             icon = Icons.Default.People,
         )
         EnhancedSummaryCard(
             modifier = Modifier.weight(1f),
-            title = "売上個数",
+            title = stringResource(Res.string.summary_card_sales_quantity),
             value = totalQuantity.toString(),
             icon = Icons.Default.ShoppingCart,
         )
         EnhancedSummaryCard(
             modifier = Modifier.weight(1f),
-            title = "売上金額",
+            title = stringResource(Res.string.summary_card_sales_amount),
             value = totalRevenue.format(),
             icon = Icons.Default.AttachMoney,
         )

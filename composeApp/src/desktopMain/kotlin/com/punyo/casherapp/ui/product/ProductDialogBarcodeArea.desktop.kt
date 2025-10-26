@@ -19,6 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import com.github.sarxos.webcam.Webcam
 import com.punyo.casherapp.ui.component.BarcodeScanner
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.label_webcam_selection
+import meijopharmcasherapp.composeapp.generated.resources.placeholder_select_webcam
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,9 +63,9 @@ actual fun ProductDialogBarcodeArea(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     OutlinedTextField(
-                        value = selectedWebcam?.name ?: "Webcamを選択",
+                        value = selectedWebcam?.name ?: stringResource(Res.string.placeholder_select_webcam),
                         onValueChange = { },
-                        label = { Text("Webcam選択") },
+                        label = { Text(stringResource(Res.string.label_webcam_selection)) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
