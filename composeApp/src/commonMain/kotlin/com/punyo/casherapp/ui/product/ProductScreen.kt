@@ -36,24 +36,27 @@ import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.extensions.toLong
 import com.punyo.casherapp.ui.component.DataTable
 import com.punyo.casherapp.ui.component.TableColumn
+import com.punyo.meijopharmcasherapp.ui.product.AddProductDialog
+import com.punyo.meijopharmcasherapp.ui.product.EditProductDialog
+import com.punyo.meijopharmcasherapp.ui.product.rememberProductDialogState
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.action_delete
+import meijopharmcasherapp.composeapp.generated.resources.action_edit
+import meijopharmcasherapp.composeapp.generated.resources.barcode_not_registered
+import meijopharmcasherapp.composeapp.generated.resources.barcode_registered
+import meijopharmcasherapp.composeapp.generated.resources.button_clear_search
+import meijopharmcasherapp.composeapp.generated.resources.content_desc_add_product
+import meijopharmcasherapp.composeapp.generated.resources.content_desc_clear
+import meijopharmcasherapp.composeapp.generated.resources.content_desc_search
+import meijopharmcasherapp.composeapp.generated.resources.message_no_products
+import meijopharmcasherapp.composeapp.generated.resources.message_no_search_results
+import meijopharmcasherapp.composeapp.generated.resources.placeholder_search_product_barcode
+import meijopharmcasherapp.composeapp.generated.resources.table_header_barcode
+import meijopharmcasherapp.composeapp.generated.resources.table_header_price
+import meijopharmcasherapp.composeapp.generated.resources.table_header_product_name
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import kotlin.collections.listOf
-import casherapp.composeapp.generated.resources.Res
-import casherapp.composeapp.generated.resources.action_delete
-import casherapp.composeapp.generated.resources.action_edit
-import casherapp.composeapp.generated.resources.barcode_not_registered
-import casherapp.composeapp.generated.resources.barcode_registered
-import casherapp.composeapp.generated.resources.button_clear_search
-import casherapp.composeapp.generated.resources.content_desc_add_product
-import casherapp.composeapp.generated.resources.content_desc_clear
-import casherapp.composeapp.generated.resources.content_desc_search
-import casherapp.composeapp.generated.resources.message_no_products
-import casherapp.composeapp.generated.resources.message_no_search_results
-import casherapp.composeapp.generated.resources.placeholder_search_product_barcode
-import casherapp.composeapp.generated.resources.table_header_barcode
-import casherapp.composeapp.generated.resources.table_header_price
-import casherapp.composeapp.generated.resources.table_header_product_name
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
@@ -63,6 +66,8 @@ fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
     var editingProductId by remember { mutableStateOf("") }
 
     val editingProductDialogState = rememberProductDialogState()
+    val barcodeRegistered = stringResource(Res.string.barcode_not_registered)
+    val barcodeNotRegistered = stringResource(Res.string.barcode_registered)
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -97,9 +102,9 @@ fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
                                 header = stringResource(Res.string.table_header_barcode),
                                 accessor = {
                                     if (it.barcode == null) {
-                                        stringResource(Res.string.barcode_not_registered)
+                                        barcodeNotRegistered
                                     } else {
-                                        stringResource(Res.string.barcode_registered)
+                                        barcodeRegistered
                                     }
                                 },
                                 width = 1f,

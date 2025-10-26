@@ -1,4 +1,4 @@
-package com.punyo.casherapp.ui.product
+package com.punyo.meijopharmcasherapp.ui.product
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,16 +27,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import casherapp.composeapp.generated.resources.Res
-import casherapp.composeapp.generated.resources.button_cancel
-import casherapp.composeapp.generated.resources.button_save
-import casherapp.composeapp.generated.resources.dialog_add_product
-import casherapp.composeapp.generated.resources.dialog_edit_product
-import casherapp.composeapp.generated.resources.error_product_name_required
-import casherapp.composeapp.generated.resources.label_price_required
-import casherapp.composeapp.generated.resources.label_product_name_required
-import casherapp.composeapp.generated.resources.placeholder_product_name
-import casherapp.composeapp.generated.resources.suffix_currency
+import com.punyo.casherapp.ui.product.ProductDialogBarcodeArea
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.button_cancel
+import meijopharmcasherapp.composeapp.generated.resources.button_save
+import meijopharmcasherapp.composeapp.generated.resources.dialog_add_product
+import meijopharmcasherapp.composeapp.generated.resources.dialog_edit_product
+import meijopharmcasherapp.composeapp.generated.resources.error_product_name_required
+import meijopharmcasherapp.composeapp.generated.resources.label_price_required
+import meijopharmcasherapp.composeapp.generated.resources.label_product_name_required
+import meijopharmcasherapp.composeapp.generated.resources.placeholder_product_name
+import meijopharmcasherapp.composeapp.generated.resources.suffix_currency
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

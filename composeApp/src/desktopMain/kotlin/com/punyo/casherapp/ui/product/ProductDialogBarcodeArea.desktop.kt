@@ -19,9 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import com.github.sarxos.webcam.Webcam
 import com.punyo.casherapp.ui.component.BarcodeScanner
-import casherapp.composeapp.generated.resources.Res
-import casherapp.composeapp.generated.resources.label_webcam_selection
-import casherapp.composeapp.generated.resources.placeholder_select_webcam
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.label_webcam_selection
+import meijopharmcasherapp.composeapp.generated.resources.placeholder_select_webcam
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)

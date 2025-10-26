@@ -53,21 +53,21 @@ import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.extensions.toDateString
 import com.punyo.casherapp.extensions.toDouble
 import com.punyo.casherapp.ui.component.ResponsiveGrid
-import org.koin.compose.koinInject
-import casherapp.composeapp.generated.resources.Res
-import casherapp.composeapp.generated.resources.card_title_popular_products
-import casherapp.composeapp.generated.resources.card_title_transactions
-import casherapp.composeapp.generated.resources.chart_label_product_sales
-import casherapp.composeapp.generated.resources.chart_title_product_sales
-import casherapp.composeapp.generated.resources.content_desc_view_more
-import casherapp.composeapp.generated.resources.label_sales_count
-import casherapp.composeapp.generated.resources.label_transaction_info
-import casherapp.composeapp.generated.resources.summary_card_customer_count
-import casherapp.composeapp.generated.resources.summary_card_sales_amount
-import casherapp.composeapp.generated.resources.summary_card_sales_quantity
-import casherapp.composeapp.generated.resources.time_period_all_time
-import casherapp.composeapp.generated.resources.time_period_today
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.card_title_popular_products
+import meijopharmcasherapp.composeapp.generated.resources.card_title_transactions
+import meijopharmcasherapp.composeapp.generated.resources.chart_label_product_sales
+import meijopharmcasherapp.composeapp.generated.resources.chart_title_product_sales
+import meijopharmcasherapp.composeapp.generated.resources.content_desc_view_more
+import meijopharmcasherapp.composeapp.generated.resources.label_sales_count
+import meijopharmcasherapp.composeapp.generated.resources.label_transaction_info
+import meijopharmcasherapp.composeapp.generated.resources.summary_card_customer_count
+import meijopharmcasherapp.composeapp.generated.resources.summary_card_sales_amount
+import meijopharmcasherapp.composeapp.generated.resources.summary_card_sales_quantity
+import meijopharmcasherapp.composeapp.generated.resources.time_period_all_time
+import meijopharmcasherapp.composeapp.generated.resources.time_period_today
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

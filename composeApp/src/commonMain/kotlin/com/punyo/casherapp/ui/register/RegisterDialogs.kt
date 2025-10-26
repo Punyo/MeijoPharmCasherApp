@@ -24,14 +24,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import casherapp.composeapp.generated.resources.Res
-import casherapp.composeapp.generated.resources.button_apply
-import casherapp.composeapp.generated.resources.button_cancel
-import casherapp.composeapp.generated.resources.button_confirm
-import casherapp.composeapp.generated.resources.dialog_discount_apply
-import casherapp.composeapp.generated.resources.dialog_quantity_change
-import casherapp.composeapp.generated.resources.label_discount_rate
-import casherapp.composeapp.generated.resources.label_quantity
+import meijopharmcasherapp.composeapp.generated.resources.Res
+import meijopharmcasherapp.composeapp.generated.resources.button_apply
+import meijopharmcasherapp.composeapp.generated.resources.button_cancel
+import meijopharmcasherapp.composeapp.generated.resources.button_confirm
+import meijopharmcasherapp.composeapp.generated.resources.dialog_discount_apply
+import meijopharmcasherapp.composeapp.generated.resources.dialog_quantity_change
+import meijopharmcasherapp.composeapp.generated.resources.label_discount_rate
+import meijopharmcasherapp.composeapp.generated.resources.label_quantity
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
