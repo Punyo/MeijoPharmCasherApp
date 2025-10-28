@@ -2,6 +2,7 @@ package com.punyo.casherapp.data.product
 
 import androidx.paging.PagingData
 import com.punyo.casherapp.data.product.model.ProductDataModel
+import com.punyo.casherapp.ui.register.ProductSortOption
 import kotlinx.coroutines.flow.Flow
 import org.joda.money.Money
 
@@ -24,7 +25,7 @@ interface ProductRepository {
 
     suspend fun deleteAllProducts()
 
-    fun getAllProductsPaged(): Flow<PagingData<ProductDataModel>>
+    fun getAllProductsPaged(sortOption: ProductSortOption = ProductSortOption.NAME_ASC): Flow<PagingData<ProductDataModel>>
 
-    fun searchProductsPaged(query: String): Flow<PagingData<ProductDataModel>>
+    fun searchProductsPaged(query: String, sortOption: ProductSortOption = ProductSortOption.NAME_ASC): Flow<PagingData<ProductDataModel>>
 }

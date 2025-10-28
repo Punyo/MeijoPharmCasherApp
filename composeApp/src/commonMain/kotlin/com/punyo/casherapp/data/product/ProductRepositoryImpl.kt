@@ -7,6 +7,7 @@ import com.punyo.casherapp.application.db.AppDatabase
 import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.data.product.source.ProductLocalDataSource
 import com.punyo.casherapp.data.product.source.ProductPagingSource
+import com.punyo.casherapp.ui.register.ProductSortOption
 import kotlinx.coroutines.flow.Flow
 import org.joda.money.Money
 
@@ -44,19 +45,19 @@ class ProductRepositoryImpl(
         localDataSource.deleteAllProducts()
     }
 
-    override fun getAllProductsPaged(): Flow<PagingData<ProductDataModel>> = Pager(
+    override fun getAllProductsPaged(sortOption: ProductSortOption): Flow<PagingData<ProductDataModel>> = Pager(
         config = PagingConfig(
             pageSize = 10,
             enablePlaceholders = false,
         ),
-        pagingSourceFactory = { ProductPagingSource(database) },
+        pagingSourceFactory = { ProductPagingSource(database, sortOption = sortOption) },
     ).flow
 
-    override fun searchProductsPaged(query: String): Flow<PagingData<ProductDataModel>> = Pager(
+    override fun searchProductsPaged(query: String, sortOption: ProductSortOption): Flow<PagingData<ProductDataModel>> = Pager(
         config = PagingConfig(
             pageSize = 10,
             enablePlaceholders = false,
         ),
-        pagingSourceFactory = { ProductPagingSource(database, query) },
+        pagingSourceFactory = { ProductPagingSource(database, query, sortOption) },
     ).flow
 }

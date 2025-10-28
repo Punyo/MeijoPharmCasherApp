@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -23,17 +24,22 @@ class RegisterScreenViewModel(
 
     private val _uiState = MutableStateFlow(RegisterUiState())
     private val searchQueryFlow = MutableStateFlow("")
+    private val sortOptionFlow = MutableStateFlow(ProductSortOption.NAME_ASC)
 
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
     val searchQuery: StateFlow<String> = searchQueryFlow.asStateFlow()
+    val sortOption: StateFlow<ProductSortOption> = sortOptionFlow.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val pagingDataFlow: Flow<PagingData<ProductDataModel>> = searchQueryFlow
-        .flatMapLatest { query ->
+    val pagingDataFlow: Flow<PagingData<ProductDataModel>> = combine(
+        searchQueryFlow,
+        sortOptionFlow
+    ) { query, sort -> query to sort }
+        .flatMapLatest { (query, sort) ->
             if (query.isBlank()) {
-                productRepository.getAllProductsPaged()
+                productRepository.getAllProductsPaged(sort)
             } else {
-                productRepository.searchProductsPaged(query)
+                productRepository.searchProductsPaged(query, sort)
             }
         }
         .cachedIn(viewModelScope)
@@ -123,6 +129,10 @@ class RegisterScreenViewModel(
 
     fun updateSearchQuery(query: String) {
         searchQueryFlow.value = query
+    }
+
+    fun updateSortOption(option: ProductSortOption) {
+        sortOptionFlow.value = option
     }
 
     private fun clearCart() {

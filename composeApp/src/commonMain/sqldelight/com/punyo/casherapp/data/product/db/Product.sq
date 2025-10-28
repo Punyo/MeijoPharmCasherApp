@@ -21,11 +21,59 @@ SELECT * FROM product
 ORDER BY id ASC
 LIMIT ? OFFSET ?;
 
+selectWithPagingByNameAsc:
+SELECT * FROM product
+ORDER BY name ASC
+LIMIT ? OFFSET ?;
+
+selectWithPagingByNameDesc:
+SELECT * FROM product
+ORDER BY name DESC
+LIMIT ? OFFSET ?;
+
+selectWithPagingByPriceAsc:
+SELECT * FROM product
+ORDER BY price ASC
+LIMIT ? OFFSET ?;
+
+selectWithPagingByPriceDesc:
+SELECT * FROM product
+ORDER BY price DESC
+LIMIT ? OFFSET ?;
+
 searchWithPaging:
 SELECT * FROM product
 WHERE name LIKE '%' || ? || '%'
    OR barcode LIKE '%' || ? || '%'
 ORDER BY id ASC
+LIMIT ? OFFSET ?;
+
+searchWithPagingByNameAsc:
+SELECT * FROM product
+WHERE name LIKE '%' || ? || '%'
+   OR barcode LIKE '%' || ? || '%'
+ORDER BY name ASC
+LIMIT ? OFFSET ?;
+
+searchWithPagingByNameDesc:
+SELECT * FROM product
+WHERE name LIKE '%' || ? || '%'
+   OR barcode LIKE '%' || ? || '%'
+ORDER BY name DESC
+LIMIT ? OFFSET ?;
+
+searchWithPagingByPriceAsc:
+SELECT * FROM product
+WHERE name LIKE '%' || ? || '%'
+   OR barcode LIKE '%' || ? || '%'
+ORDER BY price ASC
+LIMIT ? OFFSET ?;
+
+searchWithPagingByPriceDesc:
+SELECT * FROM product
+WHERE name LIKE '%' || ? || '%'
+   OR barcode LIKE '%' || ? || '%'
+ORDER BY price DESC
 LIMIT ? OFFSET ?;
 
 insertProduct:
