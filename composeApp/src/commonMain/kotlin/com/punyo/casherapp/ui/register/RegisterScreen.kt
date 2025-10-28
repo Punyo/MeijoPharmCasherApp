@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -40,9 +41,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -52,6 +56,7 @@ import com.punyo.casherapp.data.product.model.ProductDataModel
 import com.punyo.casherapp.extensions.format
 import com.punyo.casherapp.ui.component.ResponsiveGrid
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import meijopharmcasherapp.composeapp.generated.resources.Res
 import meijopharmcasherapp.composeapp.generated.resources.button_cancel
 import meijopharmcasherapp.composeapp.generated.resources.button_confirm
@@ -264,6 +269,7 @@ private fun InputModeSelector(
     }
 }
 
+@OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
 private fun ProductSearchArea(
     modifier: Modifier = Modifier,
@@ -293,19 +299,33 @@ private fun ProductSearchArea(
 
         searchResults?.let { pagingFlow ->
             val lazyPagingItems = pagingFlow.collectAsLazyPagingItems()
+            val gridState = rememberLazyGridState()
+            val coroutineScope = rememberCoroutineScope()
 
-            LazyHorizontalGrid(
-                rows = GridCells.Adaptive(72.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                items(lazyPagingItems.itemCount) { index ->
-                    lazyPagingItems[index]?.let { product ->
-                        ProductSearchItem(
-                            product = product,
-                            onClick = { onProductSelected(product) },
-                        )
+            Box(modifier = Modifier.fillMaxSize()) {
+                LazyHorizontalGrid(
+                    state = gridState,
+                    rows = GridCells.Adaptive(72.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .onPointerEvent(PointerEventType.Scroll) { event ->
+                            val delta = event.changes.first().scrollDelta
+                            coroutineScope.launch {
+                                gridState.scroll {
+                                    scrollBy(delta.y * 100f)
+                                }
+                            }
+                        },
+                ) {
+                    items(lazyPagingItems.itemCount) { index ->
+                        lazyPagingItems[index]?.let { product ->
+                            ProductSearchItem(
+                                product = product,
+                                onClick = { onProductSelected(product) },
+                            )
+                        }
                     }
                 }
             }
