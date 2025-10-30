@@ -88,6 +88,8 @@ private fun ProductDialog(
         onDismissRequest = onDismiss,
     ) {
         var productNameEmptyError by remember { mutableStateOf(false) }
+        var priceText by remember { mutableStateOf(productDialogState.price.toString()) }
+        val price = priceText.toLongOrNull() ?: 0L
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
@@ -128,12 +130,8 @@ private fun ProductDialog(
                     )
 
                     OutlinedTextField(
-                        value = productDialogState.price.toString(),
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() }) {
-                                productDialogState.price = newValue.toLongOrNull() ?: 0L
-                            }
-                        },
+                        value = priceText,
+                        onValueChange = { priceText = it },
                         label = { Text(stringResource(Res.string.label_price_required)) },
                         suffix = { Text(stringResource(Res.string.suffix_currency)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -163,6 +161,7 @@ private fun ProductDialog(
                         onClick = {
                             productNameEmptyError = productDialogState.productName.isEmpty()
                             if (!productNameEmptyError) {
+                                productDialogState.price = price
                                 onConfirm(
                                     productDialogState.productName,
                                     productDialogState.barcode,
@@ -171,6 +170,7 @@ private fun ProductDialog(
                                 onDismiss()
                             }
                         },
+                        enabled = price > 0,
                     ) {
                         Text(
                             text = stringResource(Res.string.button_save),
