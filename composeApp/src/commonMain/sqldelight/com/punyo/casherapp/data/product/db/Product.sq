@@ -76,6 +76,16 @@ WHERE name LIKE '%' || ? || '%'
 ORDER BY price DESC
 LIMIT ? OFFSET ?;
 
+selectWithPagingNoOrder:
+SELECT * FROM product
+LIMIT ? OFFSET ?;
+
+searchWithPagingNoOrder:
+SELECT * FROM product
+WHERE name LIKE '%' || ? || '%'
+   OR barcode LIKE '%' || ? || '%'
+LIMIT ? OFFSET ?;
+
 insertProduct:
 INSERT INTO product (id, name, barcode, price)
 VALUES (?, ?, ?, ?);

@@ -91,6 +91,7 @@
 
     <!-- Sort options -->
     <string name="sort_label">並び替え</string>
+    <string name="sort_db_order">登録順</string>
     <string name="sort_name_asc">商品名 (昇順)</string>
     <string name="sort_name_desc">商品名 (降順)</string>
     <string name="sort_price_asc">価格 (安い順)</string>

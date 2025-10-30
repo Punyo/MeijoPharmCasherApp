@@ -79,7 +79,7 @@ import meijopharmcasherapp.composeapp.generated.resources.menu_change_quantity
 import meijopharmcasherapp.composeapp.generated.resources.menu_delete
 import meijopharmcasherapp.composeapp.generated.resources.message_confirm_transaction
 import meijopharmcasherapp.composeapp.generated.resources.placeholder_search_product
-import meijopharmcasherapp.composeapp.generated.resources.sort_label
+import meijopharmcasherapp.composeapp.generated.resources.sort_db_order
 import meijopharmcasherapp.composeapp.generated.resources.sort_name_asc
 import meijopharmcasherapp.composeapp.generated.resources.sort_name_desc
 import meijopharmcasherapp.composeapp.generated.resources.sort_price_asc
@@ -314,6 +314,7 @@ private fun ProductSearchArea(
                 ) {
                     Text(
                         text = when (sortOption) {
+                            ProductSortOption.DB_ORDER -> stringResource(Res.string.sort_db_order)
                             ProductSortOption.NAME_ASC -> stringResource(Res.string.sort_name_asc)
                             ProductSortOption.NAME_DESC -> stringResource(Res.string.sort_name_desc)
                             ProductSortOption.PRICE_ASC -> stringResource(Res.string.sort_price_asc)
@@ -333,6 +334,13 @@ private fun ProductSearchArea(
                     expanded = showSortMenu,
                     onDismissRequest = { showSortMenu = false },
                 ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.sort_db_order)) },
+                        onClick = {
+                            onSortOptionChange(ProductSortOption.DB_ORDER)
+                            showSortMenu = false
+                        },
+                    )
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.sort_name_asc)) },
                         onClick = {

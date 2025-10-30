@@ -20,6 +20,10 @@ class ProductPagingSource(
 
         val products = if (query.isNullOrEmpty()) {
             when (sortOption) {
+                ProductSortOption.DB_ORDER -> database.productQueries.selectWithPagingNoOrder(
+                    params.loadSize.toLong(),
+                    offset.toLong(),
+                ).executeAsList()
                 ProductSortOption.NAME_ASC -> database.productQueries.selectWithPagingByNameAsc(
                     params.loadSize.toLong(),
                     offset.toLong(),
@@ -39,6 +43,12 @@ class ProductPagingSource(
             }
         } else {
             when (sortOption) {
+                ProductSortOption.DB_ORDER -> database.productQueries.searchWithPagingNoOrder(
+                    query,
+                    query,
+                    params.loadSize.toLong(),
+                    offset.toLong(),
+                ).executeAsList()
                 ProductSortOption.NAME_ASC -> database.productQueries.searchWithPagingByNameAsc(
                     query,
                     query,

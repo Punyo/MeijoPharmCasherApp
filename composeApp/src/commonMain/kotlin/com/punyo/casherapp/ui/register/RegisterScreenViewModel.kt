@@ -24,7 +24,7 @@ class RegisterScreenViewModel(
 
     private val _uiState = MutableStateFlow(RegisterUiState())
     private val searchQueryFlow = MutableStateFlow("")
-    private val sortOptionFlow = MutableStateFlow(ProductSortOption.NAME_ASC)
+    private val sortOptionFlow = MutableStateFlow(ProductSortOption.DB_ORDER)
 
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
     val searchQuery: StateFlow<String> = searchQueryFlow.asStateFlow()
@@ -33,7 +33,7 @@ class RegisterScreenViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val pagingDataFlow: Flow<PagingData<ProductDataModel>> = combine(
         searchQueryFlow,
-        sortOptionFlow
+        sortOptionFlow,
     ) { query, sort -> query to sort }
         .flatMapLatest { (query, sort) ->
             if (query.isBlank()) {
