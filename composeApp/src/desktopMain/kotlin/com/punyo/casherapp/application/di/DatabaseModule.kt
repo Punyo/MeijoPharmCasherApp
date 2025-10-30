@@ -5,6 +5,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.punyo.casherapp.application.db.AppDatabase
 import com.punyo.casherapp.application.util.AppPathUtil
 import org.koin.dsl.module
+import java.util.Properties
 
 actual val databaseModule =
     module {
@@ -12,8 +13,11 @@ actual val databaseModule =
         single<SqlDriver> {
             val appPathUtil: AppPathUtil = get()
             val databasePath = appPathUtil.getDatabasePath()
-            JdbcSqliteDriver("jdbc:sqlite:$databasePath").also {
-                AppDatabase.Schema.create(it)
+            val properties = Properties().apply {
+                put("foreign_keys", "true")
+            }
+            JdbcSqliteDriver("jdbc:sqlite:$databasePath", properties).also { driver ->
+                AppDatabase.Schema.create(driver)
             }
         }
         single { AppDatabase(get()) }
