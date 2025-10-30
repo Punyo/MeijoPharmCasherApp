@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -28,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -76,6 +79,11 @@ import meijopharmcasherapp.composeapp.generated.resources.menu_change_quantity
 import meijopharmcasherapp.composeapp.generated.resources.menu_delete
 import meijopharmcasherapp.composeapp.generated.resources.message_confirm_transaction
 import meijopharmcasherapp.composeapp.generated.resources.placeholder_search_product
+import meijopharmcasherapp.composeapp.generated.resources.sort_db_order
+import meijopharmcasherapp.composeapp.generated.resources.sort_name_asc
+import meijopharmcasherapp.composeapp.generated.resources.sort_name_desc
+import meijopharmcasherapp.composeapp.generated.resources.sort_price_asc
+import meijopharmcasherapp.composeapp.generated.resources.sort_price_desc
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -83,6 +91,7 @@ import org.koin.compose.koinInject
 fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject()) {
     val uiState by registerScreenViewModel.uiState.collectAsState()
     val searchQuery by registerScreenViewModel.searchQuery.collectAsState()
+    val sortOption by registerScreenViewModel.sortOption.collectAsState()
 
     var quantityDialogState by remember { mutableStateOf<QuantityDialogState?>(null) }
     var discountDialogState by remember { mutableStateOf<DiscountDialogState?>(null) }
@@ -114,8 +123,10 @@ fun RegisterScreen(registerScreenViewModel: RegisterScreenViewModel = koinInject
                     InputMode.SEARCH -> ProductSearchArea(
                         modifier = Modifier.fillMaxSize(),
                         searchQuery = searchQuery,
+                        sortOption = sortOption,
                         searchResults = registerScreenViewModel.pagingDataFlow,
                         onSearchQueryChange = registerScreenViewModel::updateSearchQuery,
+                        onSortOptionChange = registerScreenViewModel::updateSortOption,
                         onProductSelected = registerScreenViewModel::addProductToCart,
                     )
                 }
@@ -268,26 +279,99 @@ private fun InputModeSelector(
 private fun ProductSearchArea(
     modifier: Modifier = Modifier,
     searchQuery: String,
+    sortOption: ProductSortOption,
     searchResults: Flow<PagingData<ProductDataModel>>?,
     onSearchQueryChange: (String) -> Unit,
+    onSortOptionChange: (ProductSortOption) -> Unit,
     onProductSelected: (ProductDataModel) -> Unit,
 ) {
+    var showSortMenu by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier,
     ) {
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(Res.string.content_desc_search),
-                )
-            },
-            placeholder = { Text(stringResource(Res.string.placeholder_search_product)) },
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-        )
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = stringResource(Res.string.content_desc_search),
+                    )
+                },
+                placeholder = { Text(stringResource(Res.string.placeholder_search_product)) },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+            )
+
+            Box {
+                OutlinedButton(
+                    onClick = { showSortMenu = true },
+                ) {
+                    Text(
+                        text = when (sortOption) {
+                            ProductSortOption.DB_ORDER -> stringResource(Res.string.sort_db_order)
+                            ProductSortOption.NAME_ASC -> stringResource(Res.string.sort_name_asc)
+                            ProductSortOption.NAME_DESC -> stringResource(Res.string.sort_name_desc)
+                            ProductSortOption.PRICE_ASC -> stringResource(Res.string.sort_price_asc)
+                            ProductSortOption.PRICE_DESC -> stringResource(Res.string.sort_price_desc)
+                        },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showSortMenu,
+                    onDismissRequest = { showSortMenu = false },
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.sort_db_order)) },
+                        onClick = {
+                            onSortOptionChange(ProductSortOption.DB_ORDER)
+                            showSortMenu = false
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.sort_name_asc)) },
+                        onClick = {
+                            onSortOptionChange(ProductSortOption.NAME_ASC)
+                            showSortMenu = false
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.sort_name_desc)) },
+                        onClick = {
+                            onSortOptionChange(ProductSortOption.NAME_DESC)
+                            showSortMenu = false
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.sort_price_asc)) },
+                        onClick = {
+                            onSortOptionChange(ProductSortOption.PRICE_ASC)
+                            showSortMenu = false
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.sort_price_desc)) },
+                        onClick = {
+                            onSortOptionChange(ProductSortOption.PRICE_DESC)
+                            showSortMenu = false
+                        },
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
