@@ -99,7 +99,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MeijoPharmCasherApp"
-            packageVersion = "1.0.1"
+            packageVersion = project.findProperty("app.version") as String? ?: "1.0.0"
             description = "名城大学薬学部大学祭実行委員会内部向けに作成されたアプリケーション"
             modules("java.sql")
             windows {
