@@ -66,8 +66,8 @@ fun ProductScreen(viewModel: ProductScreenViewModel = koinInject()) {
     var editingProductId by remember { mutableStateOf("") }
 
     val editingProductDialogState = rememberProductDialogState()
-    val barcodeRegistered = stringResource(Res.string.barcode_not_registered)
-    val barcodeNotRegistered = stringResource(Res.string.barcode_registered)
+    val barcodeRegistered = stringResource(Res.string.barcode_registered)
+    val barcodeNotRegistered = stringResource(Res.string.barcode_not_registered)
 
     Box(
         modifier = Modifier.fillMaxSize(),
