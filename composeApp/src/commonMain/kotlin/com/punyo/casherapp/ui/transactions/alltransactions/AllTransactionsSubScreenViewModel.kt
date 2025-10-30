@@ -45,4 +45,11 @@ class AllTransactionsSubScreenViewModel(
             state.value.searchText,
         )
     }
+
+    fun deleteTransaction(transactionId: String) {
+        viewModelScope.launch {
+            transactionRepository.deleteTransaction(transactionId)
+            updateData()
+        }
+    }
 }
