@@ -17,13 +17,14 @@ data class MotionPart(
 ) {
     /**
      * Get the bounding rectangle of this part
+     * Note: size represents the radius of the circle
      */
     fun getBounds(): Rect {
         return Rect(
-            left = position.x - size / 2,
-            top = position.y - size / 2,
-            right = position.x + size / 2,
-            bottom = position.y + size / 2
+            left = position.x - size,
+            top = position.y - size,
+            right = position.x + size,
+            bottom = position.y + size
         )
     }
 

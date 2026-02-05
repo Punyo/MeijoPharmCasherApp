@@ -3,17 +3,16 @@ package com.punyo.casherapp.ui.motion
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-
-const val MOTION_PLAYBACK_ROUTE = "motion_playback_route"
+import com.punyo.casherapp.ui.navigation.NavigationDestinations
 
 fun NavGraphBuilder.motionPlaybackScreen(
     onNavigateBack: () -> Unit
 ) {
-    composable(MOTION_PLAYBACK_ROUTE) {
+    composable(NavigationDestinations.MOTION_PLAYBACK_ROUTE) {
         MotionPlaybackScreen(onNavigateBack = onNavigateBack)
     }
 }
 
 fun NavHostController.navigateToMotionPlayback() {
-    navigate(MOTION_PLAYBACK_ROUTE)
+    navigate(NavigationDestinations.MOTION_PLAYBACK_ROUTE)
 }

@@ -74,7 +74,7 @@ fun SettingsScreen(
         )
 
         SettingsItem(
-            text = "Motion Playback Demo",
+            text = stringResource(Res.string.settings_motion_playback_title),
             onClick = onNavigateToMotionPlayback,
         )
     }
