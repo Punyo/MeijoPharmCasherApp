@@ -8,4 +8,5 @@ object NavigationDestinations {
     const val PRODUCTS_LIST_ROUTE = "products_list_route"
     const val SETTINGS_ROUTE = "settings_route"
     const val LICENSES_ROUTE = "licenses_route"
+    const val MOTION_PLAYBACK_ROUTE = "motion_playback_route"
 }

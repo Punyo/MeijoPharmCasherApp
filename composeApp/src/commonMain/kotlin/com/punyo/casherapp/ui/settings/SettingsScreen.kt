@@ -35,6 +35,7 @@ import org.koin.compose.koinInject
 fun SettingsScreen(
     viewModel: SettingsViewModel = koinInject(),
     onNavigateToLicenses: () -> Unit = {},
+    onNavigateToMotionPlayback: () -> Unit = {},
 ) {
     val currentThemeMode by viewModel.themeMode.collectAsStateWithLifecycle()
 
@@ -70,6 +71,11 @@ fun SettingsScreen(
         SettingsItem(
             text = stringResource(Res.string.settings_licenses_title),
             onClick = onNavigateToLicenses,
+        )
+
+        SettingsItem(
+            text = "Motion Playback Demo",
+            onClick = onNavigateToMotionPlayback,
         )
     }
 }

@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.punyo.casherapp.ui.motion.motionPlaybackScreen
+import com.punyo.casherapp.ui.motion.navigateToMotionPlayback
 import com.punyo.casherapp.ui.product.productScreen
 import com.punyo.casherapp.ui.register.registerScreen
 import com.punyo.casherapp.ui.settings.licenses.licensesScreen
@@ -33,8 +35,12 @@ fun CasherAppNavigation(
             },
         )
         transactionsSubScreen { navController.popBackStack() }
-        settingsScreen { navController.navigateToLicenses() }
+        settingsScreen(
+            onNavigateToLicenses = { navController.navigateToLicenses() },
+            onNavigateToMotionPlayback = { navController.navigateToMotionPlayback() }
+        )
         registerScreen()
         licensesScreen { navController.popBackStack() }
+        motionPlaybackScreen { navController.popBackStack() }
     }
 }

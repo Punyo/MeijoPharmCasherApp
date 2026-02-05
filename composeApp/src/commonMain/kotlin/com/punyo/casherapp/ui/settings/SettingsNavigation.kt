@@ -11,8 +11,14 @@ fun NavController.navigateToSettings() {
     }
 }
 
-fun NavGraphBuilder.settingsScreen(onNavigateToLicenses: () -> Unit) {
+fun NavGraphBuilder.settingsScreen(
+    onNavigateToLicenses: () -> Unit,
+    onNavigateToMotionPlayback: () -> Unit = {}
+) {
     composable(route = NavigationDestinations.SETTINGS_ROUTE) {
-        SettingsScreen(onNavigateToLicenses = onNavigateToLicenses)
+        SettingsScreen(
+            onNavigateToLicenses = onNavigateToLicenses,
+            onNavigateToMotionPlayback = onNavigateToMotionPlayback
+        )
     }
 }
